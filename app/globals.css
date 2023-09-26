@@ -25,7 +25,6 @@
     --input: 240 5.9% 90%;
     --ring: 142.1 76.2% 36.3%;
     --radius: 0.5rem;
-    --t-gradient: linear-gradient(180deg,#555,#000);
   }
  
   .dark {
@@ -58,5 +57,14 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@keyframes fadeIn50 {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.5;
   }
 }

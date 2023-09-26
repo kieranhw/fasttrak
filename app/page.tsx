@@ -38,8 +38,12 @@ export default async function Index() {
   return (
     <div className="w-full flex flex-col items-center">
       <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm text-foreground">
-          <div />
+        <div className="w-full max-w-7xl flex justify-between items-center p-3 text-sm text-foreground">
+          <Link
+            href="/"
+          >
+            <p className="text-primary text-xl font-bold">FastTrak</p>
+          </Link>
           <div>
             {user ? (
               <div className="flex items-center gap-4">
@@ -60,16 +64,16 @@ export default async function Index() {
       <div className="flex flex-col gap-16 max-w-4xl px-3 py-16 lg:py-24 text-foreground">
 
         <div className="flex flex-col items-center gap-8">
-          <h1 className="text-6xl lg:text-7xl mx-auto max-w-4xl text-center font-extrabold"><p className="text-primary">FastTrak</p> <p className="p-2 bg-gradient-to-t from-foreground to-gray-600 bg-clip-text text-transparent">Vehicle Routing</p></h1>
-          <p className="text-lg lg:text-xl mx-auto max-w-xl text-center opacity-50">
+          <h1 className="text-6xl lg:text-7xl mx-auto max-w-4xl text-center font-extrabold"><p className="text-primary">FastTrak</p> <p className="p-2 bg-gradient-to-t from-gray-800 to-gray-600 bg-clip-text text-transparent">Vehicle Routing</p></h1>
+          <p className="text-lg lg:text-xl mx-auto max-w-xl text-center opacity-50 animate-fadeIn50 animation-duration[200ms]">
             Parcel logistics and tracking made simple.
           </p>
           <div className="flex gap-2 mx-auto justify-center items-center w-full">
             <Button>
-              Demo
+              Dashboard
             </Button>
             <Button variant="secondary">
-              Login
+              View Demo
             </Button>
           </div>
 
