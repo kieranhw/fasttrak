@@ -2,21 +2,34 @@
 
 import { useSearchParams } from 'next/navigation'
 
+import { BiSolidErrorCircle } from 'react-icons/bi'
+import { BsQuestionCircleFill } from 'react-icons/bs'
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+
+
 export default function Messages() {
   const searchParams = useSearchParams()
-  const error = searchParams.get('error')
-  const message = searchParams.get('message')
+  const error = searchParams?.get('error') ?? null
+  const message = searchParams?.get('message') ?? null
   return (
     <>
       {error && (
-        <p className="mt-4 p-4 bg-neutral-900 text-neutral-300 text-center">
-          {error}
-        </p>
+        <Alert variant="destructive"> 
+          <BiSolidErrorCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
       )}
       {message && (
-        <p className="mt-4 p-4 bg-neutral-900 text-neutral-300 text-center">
-          {message}
-        </p>
+        <Alert>
+          <BsQuestionCircleFill className="h-4 w-4" />
+          <AlertTitle>Heads up!</AlertTitle>
+          <AlertDescription>
+            {message}
+          </AlertDescription>
+        </Alert>
       )}
     </>
   )
