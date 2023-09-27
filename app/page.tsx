@@ -69,12 +69,34 @@ export default async function Index() {
             Parcel logistics and tracking made simple.
           </p>
           <div className="flex gap-2 mx-auto justify-center items-center w-full">
-            <Button>
-              Dashboard
-            </Button>
-            <Button variant="secondary">
-              View Demo
-            </Button>
+            {user ? (
+              <Link
+                href="/dashboard"
+              >
+                <Button>
+                  Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+              >
+                <Button>
+                  Get Started
+                </Button>
+              </Link>
+            )}
+
+
+
+            <Link
+              href="/demo"
+            >
+              <Button variant="secondary">
+                View Demo
+              </Button>
+            </Link>
+
           </div>
 
         </div>
