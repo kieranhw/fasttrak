@@ -12,13 +12,12 @@ export default function DashboardLayout({
 }) {
     return (
         <div className="h-screen w-full flex flex-col overflow-hidden">
-
             <header className="h-16 w-full text-white flex items-center px-4 border-b">
                 <p className="text-primary text-xl font-bold">FastTrak</p>
             </header>
             <div className="flex flex-grow overflow-hidden">
                 <Sidebar />
-                <div className="flex-grow bg-secondary p-4 overflow-hidden">
+                <div className="flex-grow p-4 overflow-y-auto">
                     {children}
                 </div>
             </div>

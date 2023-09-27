@@ -4,7 +4,7 @@ export type Vehicle = {
     manufacturer: string
     model: string
     manufacture_year: number
-    status: "available" | "unavailable"
+    status: "Available" | "Unavailable"
     max_load: number
     max_volume: number
 }
