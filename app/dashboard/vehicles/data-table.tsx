@@ -74,6 +74,7 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-sm"
         />
+        
         <div className="inline-flex space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -97,7 +98,7 @@ export function DataTable<TData, TValue>({
                         column.toggleVisibility(!!value)
                       }
                     >
-                      {column.id}
+                      {column.id.replace("_", " ")}
                     </DropdownMenuCheckboxItem>
                   )
                 })}
