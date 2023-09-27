@@ -7,7 +7,7 @@ import { DataTable } from '@/components/ui/data-tables/data-table'
 import { columns } from './columns'
 import { Button } from '@/components/ui/button';
 
-export const deliveryVehicles: Vehicle[] = [
+const deliveryVehicles: Vehicle[] = [
     {
         vehicle_id: "1",
         store_id: "1",
