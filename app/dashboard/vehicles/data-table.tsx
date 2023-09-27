@@ -6,6 +6,9 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
+  VisibilityState,
+  ColumnFiltersState,
+  getFilteredRowModel,
 } from "@tanstack/react-table"
 
 import {
@@ -19,6 +22,14 @@ import {
 
 import { Button } from "@/components/ui/button"
 
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useState } from "react"
+import { Input } from "../../../components/ui/input"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -29,11 +40,22 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      columnVisibility,
+      columnFilters,
+    },
     initialState: {
       pagination: {
         pageSize: 8,
@@ -43,6 +65,49 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
+      <div className="flex items-center justify-between py-4">
+        <Input
+          placeholder="Search by ID..."
+          value={(table.getColumn("vehicle_id")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("vehicle_id")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+        <div className="inline-flex space-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter(
+                  (column) => column.getCanHide()
+                )
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  )
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button>Add Vehicle</Button>
+        </div>
+
+      </div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -87,7 +152,10 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
         <div className="border-t flex items-center justify-between space-x-2 py-4 px-4">
-          <div className="text-foreground/50 text-sm">{data.length} Items</div>
+          <div className="text-foreground/50 text-sm">
+            {table.getFilteredRowModel().rows?.length || 0} Items
+          </div>
+
           <div className="inline-flex items-center space-x-2">
             <div className="text-foreground/50 text-sm pr-2">Page {table.getState().pagination.pageIndex + 1} of{" "} {table.getPageCount()}</div>
             <Button
