@@ -13,6 +13,7 @@ import Link from 'next/link'
 import { BiSolidDashboard, BiSolidTruck } from 'react-icons/bi'
 import { PiPackageBold } from 'react-icons/pi'
 import { RiRouteFill } from 'react-icons/ri'
+import { Label } from '@radix-ui/react-dropdown-menu'
 
 export default function Sidebar() {
     const router = usePathname();
@@ -31,7 +32,8 @@ export default function Sidebar() {
     const activeLink = "inline-flex font-medium text-primary p-2 w-full justify-start ml-4";
 
     return (
-        <aside className="h-screen w-[200px] text-foreground flex flex-col p-4 border-r">
+        <aside className="h-screen w-[250px] text-foreground flex flex-col p-4 border-r">
+            <p className="text-primary text-2xl font-bold mx-4 mb-8">FastTrak</p>
             <Link href="/dashboard">
                 <div className={`${buttonStyle} ${isActive("/dashboard") ? activeButton : ''}`}>
                     <BiSolidDashboard />
@@ -80,7 +82,7 @@ export default function Sidebar() {
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
-            
+
         </aside>
     )
 }
