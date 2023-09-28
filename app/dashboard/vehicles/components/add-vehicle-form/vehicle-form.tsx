@@ -25,6 +25,7 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
             manufacturer: "",
             model: "",
             manufacture_year: undefined,
+            registration: "",
             max_load: undefined,
             max_volume: undefined,
         },
@@ -43,6 +44,14 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
         }
     };
 
+    const yearInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        preventNonNumericInput(e);
+        // If the input is not empty, prevent more than 4 digits in the input and allow backspace to remove numbers
+        if (e.currentTarget.value !== '' && e.currentTarget.value.length >= 4 && e.key !== 'Backspace') {
+            e.preventDefault();
+        }
+    }
+
     const capitalizeWords = (str: string) => {
         return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
     };
@@ -53,48 +62,104 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
         setValue(name as keyof z.infer<typeof vehicleSchema>, capitalizedValue);
     };
 
+    const onRegistrationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const target = e.target as HTMLInputElement;
+
+        // Prevent input from having more than 7 chars and prevent spaces
+        if (target.value.length > 7 || target.value.includes(' ')) {
+            e.preventDefault();
+            return;
+        }
+
+        const { name, value } = target;
+        const upperCaseValue = value.toUpperCase();
+
+        setValue(name as keyof z.infer<typeof vehicleSchema>, upperCaseValue);
+    }
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
-                <FormField
-                    control={form.control}
-                    name="manufacturer"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Manufacturer</FormLabel>
-                            <FormControl>
-                                <Input {...field} value={field.value || ''} onChange={onTextChange} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="model"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Model</FormLabel>
-                            <FormControl>
-                                <Input {...field} value={field.value || ''} onChange={onTextChange} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="manufacture_year"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Year of Manufacture</FormLabel>
-                            <FormControl>
-                                <Input type="number" {...field} value={field.value?.toString() || ''} onKeyDown={preventNonNumericInput} onChange={onInputChange} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                <div className="grid grid-cols-2 gap-x-4 ">
+
+                    <FormField
+                        control={form.control}
+                        name="manufacturer"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Manufacturer</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        value={field.value || ''}
+                                        placeholder="Vehicle Manufacturer"
+                                        onChange={onTextChange} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="model"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Model</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        value={field.value || ''}
+                                        placeholder="Vehicle Model"
+                                        onChange={onTextChange} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+
+                <div className="grid grid-cols-2 gap-x-4 ">
+
+                    <FormField
+                        control={form.control}
+                        name="manufacture_year"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Year of Manufacture</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        value={field.value?.toString() || ''}
+                                        placeholder="YYYY"
+                                        type="number"
+                                        onKeyDown={yearInput}
+                                        onChange={onInputChange} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="registration"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Registration</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        value={field.value?.toString() || ''}
+                                        type="text"
+                                        placeholder="AB72CDE"
+                                        onChange={onRegistrationChange} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                </div>
+
                 <div className="grid grid-cols-2 gap-x-4 ">
                     <FormField
                         control={form.control}
@@ -103,7 +168,13 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
                             <FormItem>
                                 <FormLabel>Max Load (kg)</FormLabel>
                                 <FormControl>
-                                    <Input type="number" {...field} value={field.value?.toString() || ''} onKeyDown={preventNonNumericInput} onChange={onInputChange} />
+                                    <Input 
+                                    {...field} 
+                                    value={field.value?.toString() || ''} 
+                                    type="number" 
+                                    placeholder="Weight Limit"
+                                    onKeyDown={preventNonNumericInput} 
+                                    onChange={onInputChange} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -116,7 +187,14 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
                             <FormItem>
                                 <FormLabel>Max Volume (cm<sup>3</sup>)</FormLabel>
                                 <FormControl>
-                                    <Input type="number" {...field} value={field.value?.toString() || ''} onKeyDown={preventNonNumericInput} onChange={onInputChange} />
+                                    <Input 
+                                    {...field} 
+                                    value={field.value?.toString() || ''} 
+                                    type="number"
+                                    placeholder="Cargo Volume Capacity"
+
+                                    onKeyDown={preventNonNumericInput} 
+                                    onChange={onInputChange} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

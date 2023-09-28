@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 const deliveryVehicles: Vehicle[] = [
     {
         vehicle_id: "1",
+        registration: "AB72CDE",
         store_id: "1",
         manufacturer: "Ford",
         model: "Model 1",

@@ -82,7 +82,7 @@ export function DataTable<TData, TValue>({
   }
 
   return (
-    <div>
+    <>
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Search by ID..."
@@ -215,7 +215,7 @@ export function DataTable<TData, TValue>({
 
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

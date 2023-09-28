@@ -1,5 +1,6 @@
 export type Vehicle = {
     vehicle_id: string
+    registration: string
     store_id: string
     manufacturer: string
     model: string
