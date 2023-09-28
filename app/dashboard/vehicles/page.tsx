@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 
 
 import { Vehicle } from '@/types/vehicle'
-import { DataTable } from '@/app/dashboard/vehicles/data-table'
-import { columns } from './columns'
+import { DataTable } from './components/data-table'
+import { columns } from './components/columns'
 import { Button } from '@/components/ui/button';
 
 const deliveryVehicles: Vehicle[] = [
@@ -13,136 +13,6 @@ const deliveryVehicles: Vehicle[] = [
         store_id: "1",
         manufacturer: "Ford",
         model: "Model 1",
-        manufacture_year: 2021,
-        status: "Available",
-        max_load: 1000,
-        max_volume: 1000
-    },
-    {
-        vehicle_id: "2",
-        store_id: "2",
-        manufacturer: "Ford",
-        model: "Model 2",
-        manufacture_year: 2021,
-        status: "Available",
-        max_load: 1000,
-        max_volume: 1000
-    },
-    {
-        vehicle_id: "1",
-        store_id: "1",
-        manufacturer: "Ford",
-        model: "Model 1",
-        manufacture_year: 2021,
-        status: "Available",
-        max_load: 1000,
-        max_volume: 1000
-    },
-    {
-        vehicle_id: "2",
-        store_id: "2",
-        manufacturer: "Ford",
-        model: "Model 2",
-        manufacture_year: 2021,
-        status: "Available",
-        max_load: 1000,
-        max_volume: 1000
-    },
-    {
-        vehicle_id: "1",
-        store_id: "1",
-        manufacturer: "Ford",
-        model: "Model 1",
-        manufacture_year: 2021,
-        status: "Available",
-        max_load: 1000,
-        max_volume: 1000
-    },
-    {
-        vehicle_id: "2",
-        store_id: "2",
-        manufacturer: "Ford",
-        model: "Model 2",
-        manufacture_year: 2021,
-        status: "Available",
-        max_load: 1000,
-        max_volume: 1000
-    },
-    {
-        vehicle_id: "1",
-        store_id: "1",
-        manufacturer: "Ford",
-        model: "Model 1",
-        manufacture_year: 2021,
-        status: "Available",
-        max_load: 1000,
-        max_volume: 1000
-    },
-    {
-        vehicle_id: "2",
-        store_id: "2",
-        manufacturer: "Ford",
-        model: "Model 2",
-        manufacture_year: 2021,
-        status: "Available",
-        max_load: 1000,
-        max_volume: 1000
-    },
-    {
-        vehicle_id: "1",
-        store_id: "1",
-        manufacturer: "Ford",
-        model: "Model 1",
-        manufacture_year: 2021,
-        status: "Available",
-        max_load: 1000,
-        max_volume: 1000
-    },
-    {
-        vehicle_id: "2",
-        store_id: "2",
-        manufacturer: "Ford",
-        model: "Model 2",
-        manufacture_year: 2021,
-        status: "Available",
-        max_load: 1000,
-        max_volume: 1000
-    },
-    {
-        vehicle_id: "1",
-        store_id: "1",
-        manufacturer: "Ford",
-        model: "Model 1",
-        manufacture_year: 2021,
-        status: "Available",
-        max_load: 1000,
-        max_volume: 1000
-    },
-    {
-        vehicle_id: "2",
-        store_id: "2",
-        manufacturer: "Ford",
-        model: "Model 2",
-        manufacture_year: 2021,
-        status: "Available",
-        max_load: 1000,
-        max_volume: 1000
-    },
-    {
-        vehicle_id: "1",
-        store_id: "1",
-        manufacturer: "Ford",
-        model: "Model 1",
-        manufacture_year: 2021,
-        status: "Available",
-        max_load: 1000,
-        max_volume: 1000
-    },
-    {
-        vehicle_id: "2",
-        store_id: "2",
-        manufacturer: "Ford",
-        model: "Model 2",
         manufacture_year: 2021,
         status: "Available",
         max_load: 1000,
