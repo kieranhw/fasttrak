@@ -17,20 +17,6 @@ import {
 
 export const columns: ColumnDef<Vehicle>[] = [
     {
-        accessorKey: "vehicle_id",
-        header: () => (
-            <div
-                className="text-left max-w-[100px]"
-            >
-                ID
-            </div>
-        ),
-        cell: ({ row }) => {
-            const formatted = row.original.vehicle_id
-            return <div className="text-left truncate max-w-[100px] font-medium">{formatted}</div>
-        },
-    },
-    {
         accessorKey: "registration",
         header: "Registration",
     },
@@ -43,10 +29,7 @@ export const columns: ColumnDef<Vehicle>[] = [
         accessorKey: "model",
         header: "Model",
     },
-    {
-        accessorKey: "status",
-        header: "Status",
-    },
+
     {
         accessorKey: "max_load",
         header: "Max Load (kg)",
@@ -58,6 +41,10 @@ export const columns: ColumnDef<Vehicle>[] = [
                 Volume (cm<sup>3</sup>)
             </div>
         ),
+    },
+    {
+        accessorKey: "status",
+        header: "Status",
     },
     {
         id: "actions",

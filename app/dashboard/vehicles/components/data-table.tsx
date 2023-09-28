@@ -42,17 +42,20 @@ import {
 
 import * as z from "zod"
 
-import { VehicleForm } from "./add-vehicle-form/vehicle-form"; 
+import { VehicleForm } from "./add-vehicle-form/vehicle-form";
 import { vehicleSchema } from "./add-vehicle-form/vehicle-schema";
+import { supabase } from "@/pages/api/supabase-client";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  refreshData: () => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  refreshData,
 }: DataTableProps<TData, TValue>) {
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -77,18 +80,37 @@ export function DataTable<TData, TValue>({
     },
   })
 
-  function onSubmit(values: z.infer<typeof vehicleSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof vehicleSchema>) {
+    const { error } = await supabase
+      .from('vehicles')
+      .insert({
+        registration: values.registration,
+        manufacturer: values.manufacturer,
+        model: values.model,
+        manufacture_year: values.manufacture_year,
+        status: "Available",
+        max_load: values.max_load,
+        max_volume: values.max_volume,
+      })
+    if (error) {
+      alert(error.message)
+    } else {
+      refreshData(); 
+      setOpen(false);
+    }
   }
+
+  const [open, setOpen] = useState(false)
+
 
   return (
     <>
       <div className="flex items-center justify-between py-4">
         <Input
-          placeholder="Search by ID..."
-          value={(table.getColumn("vehicle_id")?.getFilterValue() as string) ?? ""}
+          placeholder="Search by Registration..."
+          value={(table.getColumn("registration")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("vehicle_id")?.setFilterValue(event.target.value)
+            table.getColumn("registration")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -122,7 +144,7 @@ export function DataTable<TData, TValue>({
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Dialog>
+          <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger>
               Add Vehicle
             </DialogTrigger>
@@ -132,10 +154,7 @@ export function DataTable<TData, TValue>({
                 <DialogDescription>
                   Add a new vehicle to your fleet.
                 </DialogDescription>
-
                 <VehicleForm onSubmit={onSubmit} />
-
-
               </DialogHeader>
             </DialogContent>
           </Dialog>

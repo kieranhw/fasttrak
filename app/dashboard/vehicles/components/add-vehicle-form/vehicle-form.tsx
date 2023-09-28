@@ -46,8 +46,8 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
 
     const yearInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
         preventNonNumericInput(e);
-        // If the input is not empty, prevent more than 4 digits in the input and allow backspace to remove numbers
-        if (e.currentTarget.value !== '' && e.currentTarget.value.length >= 4 && e.key !== 'Backspace') {
+        // If the input is not empty, prevent more than 4 digits in the input, allow backspace, tab and arrow keys
+        if (e.currentTarget.value !== '' && e.currentTarget.value.length >= 4 && e.key !== 'Backspace' && e.key !== 'Tab' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
             e.preventDefault();
         }
     }
