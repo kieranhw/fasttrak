@@ -12,15 +12,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-import { vehicleSchema } from "./vehicle-schema";
+import { VehicleSchema } from "./vehicle-schema";
 
 interface VehicleFormProps {
-    onSubmit: (values: z.infer<typeof vehicleSchema>) => void;
+    onSubmit: (values: z.infer<typeof VehicleSchema>) => void;
 }
 
 export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
-    const form = useForm<z.infer<typeof vehicleSchema>>({
-        resolver: zodResolver(vehicleSchema),
+    const form = useForm<z.infer<typeof VehicleSchema>>({
+        resolver: zodResolver(VehicleSchema),
         defaultValues: {
             manufacturer: "",
             model: "",
@@ -35,7 +35,7 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setValue(name as keyof z.infer<typeof vehicleSchema>, parseFloat(value));
+        setValue(name as keyof z.infer<typeof VehicleSchema>, parseFloat(value));
     };
 
     const preventNonNumericInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -59,7 +59,7 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
     const onTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         const capitalizedValue = capitalizeWords(value);
-        setValue(name as keyof z.infer<typeof vehicleSchema>, capitalizedValue);
+        setValue(name as keyof z.infer<typeof VehicleSchema>, capitalizedValue);
     };
 
     const onRegistrationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,12 +74,12 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
         const { name, value } = target;
         const upperCaseValue = value.toUpperCase();
 
-        setValue(name as keyof z.infer<typeof vehicleSchema>, upperCaseValue);
+        setValue(name as keyof z.infer<typeof VehicleSchema>, upperCaseValue);
     }
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+            <form onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="grid grid-cols-2 gap-x-4 ">
 
                     <FormField

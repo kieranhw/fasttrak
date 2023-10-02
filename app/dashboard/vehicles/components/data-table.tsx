@@ -43,7 +43,7 @@ import {
 import * as z from "zod"
 
 import { VehicleForm } from "./add-vehicle-form/vehicle-form";
-import { vehicleSchema } from "./add-vehicle-form/vehicle-schema";
+import { VehicleSchema } from "./add-vehicle-form/vehicle-schema";
 import { supabase } from "@/pages/api/supabase-client";
 
 interface DataTableProps<TData, TValue> {
@@ -80,7 +80,7 @@ export function DataTable<TData, TValue>({
     },
   })
 
-  async function onSubmit(values: z.infer<typeof vehicleSchema>) {
+  async function onSubmit(values: z.infer<typeof VehicleSchema>) {
     const { error } = await supabase
       .from('vehicles')
       .insert({

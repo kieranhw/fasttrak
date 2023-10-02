@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-export const vehicleSchema = z.object({
+export const VehicleSchema = z.object({
     manufacturer: z.string()
         .nonempty({ message: "Manufacturer is required" })
         .max(50, { message: "Manufacturer name should not exceed 50 characters" })
