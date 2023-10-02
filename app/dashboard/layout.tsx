@@ -14,7 +14,7 @@ export default function DashboardLayout({
         <div className="h-screen w-full flex flex overflow-hidden">
             <Sidebar />
             <div className="w-full flex flex-col">
-                <header className="h-16 w-full text-white flex items-center px-4 border-b">
+                <header className="min-h-[60px] w-full text-white flex items-center px-4 border-b">
                 </header>
                 <div className="flex flex-grow overflow-hidden">
                     <div className="flex-grow p-4 overflow-y-auto">
