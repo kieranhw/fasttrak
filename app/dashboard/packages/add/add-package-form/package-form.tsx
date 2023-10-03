@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import PackageSchema from "./package-schema";
 import sanitizeHtml from "sanitize-html";
 import { sanitizeFloat } from "@/lib/validation";
+import { Textarea } from "@/components/ui/textarea";
 
 interface PackageFormProps {
     onSubmit: (values: z.infer<typeof PackageSchema>) => void;
@@ -256,11 +257,14 @@ export const PackageForm: React.FC<PackageFormProps> = ({ onSubmit, form }) => {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormControl>
-                                            <Input
+ 
+                                            <Textarea
                                                 {...field}
                                                 value={field.value || ''}
                                                 placeholder="Delivery Notes"
+                                                className="resize-none"
                                                 onChange={field.onChange}
+
                                             />
 
                                         </FormControl>
@@ -328,7 +332,7 @@ export const PackageForm: React.FC<PackageFormProps> = ({ onSubmit, form }) => {
                         </div>
 
                         {/* Sender Details */}
-                        <div className="space-y-4 border rounded-md p-4">
+                        <div className="space-y-4 border rounded-md p-4 flex-grow">
                             <FormField
                                 control={form.control}
                                 name="sender_name"
