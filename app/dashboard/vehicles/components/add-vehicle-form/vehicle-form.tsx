@@ -80,8 +80,7 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="grid grid-cols-2 gap-x-4 ">
-
+                <div className="grid grid-cols-2 gap-x-4 py-2">
                     <FormField
                         control={form.control}
                         name="manufacturer"
@@ -118,7 +117,7 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
                     />
                 </div>
 
-                <div className="grid grid-cols-2 gap-x-4 ">
+                <div className="grid grid-cols-2 gap-x-4 py-2">
 
                     <FormField
                         control={form.control}
@@ -157,10 +156,9 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
                             </FormItem>
                         )}
                     />
-
                 </div>
 
-                <div className="grid grid-cols-2 gap-x-4 ">
+                <div className="grid grid-cols-2 gap-x-4 py-2">
                     <FormField
                         control={form.control}
                         name="max_load"
@@ -201,7 +199,7 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
                         )}
                     />
                 </div>
-                <div className="flex justify-end">
+                <div className="flex justify-end pt-2">
                     <Button type="submit">Submit</Button>
                 </div>
             </form>
