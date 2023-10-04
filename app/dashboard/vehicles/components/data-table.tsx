@@ -95,7 +95,7 @@ export function DataTable<TData, TValue>({
     if (error) {
       alert(error.message)
     } else {
-      refreshData(); 
+      refreshData();
       setOpen(false);
     }
   }
@@ -158,9 +158,7 @@ export function DataTable<TData, TValue>({
               </DialogHeader>
             </DialogContent>
           </Dialog>
-
         </div>
-
       </div>
 
       <div className="rounded-md border">
@@ -208,7 +206,8 @@ export function DataTable<TData, TValue>({
         </Table>
         <div className="border-t flex items-center justify-between space-x-2 py-4 px-4">
           <div className="text-foreground/50 text-sm">
-            {table.getFilteredRowModel().rows?.length || 0} Items
+            {table.getFilteredRowModel().rows?.length || 0}
+            {table.getFilteredRowModel().rows?.length >= 1 ? ' Item' : ' Items'}
           </div>
 
           <div className="inline-flex items-center space-x-2">
