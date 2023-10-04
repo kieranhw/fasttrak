@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
-import { BiSolidDashboard, BiSolidTruck } from 'react-icons/bi'
+import { BiSolidDashboard, BiSolidReport, BiSolidTruck } from 'react-icons/bi'
 import { PiPackageBold } from 'react-icons/pi'
 import { RiRouteFill } from 'react-icons/ri'
 import { Label } from '@radix-ui/react-dropdown-menu'
@@ -41,7 +41,7 @@ export default function Sidebar() {
                     <p>Dashboard</p>
                 </div>
             </Link>
-            <Accordion type="multiple">
+            <Accordion type="single" collapsible>
                 <AccordionItem value="item-1">
                     <AccordionTrigger className={`${buttonStyle} ${isActive("/dashboard/routes") ? activeButton : ''}`}>
                         <div className="inline-flex justify-start items-center gap-2">
@@ -54,12 +54,15 @@ export default function Sidebar() {
                             <Button className={`${linkStyle} ${isActive("/dashboard/delivery/schedule") ? activeLink : ''}`} variant="link">Delivery Schedule</Button>
                         </Link>
                         <Link href="/dashboard/delivery/manage">
-                            <Button className={`${linkStyle} ${isActive("/dashboard/delivery/manage") ? activeLink : ''}`} variant="link">Manage Routing</Button>
+                            <Button className={`${linkStyle} ${isActive("/dashboard/delivery/manage") ? activeLink : ''}`} variant="link">Route Configuration</Button>
+                        </Link>
+                        <Link href="/dashboard/delivery/history">
+                            <Button className={`${linkStyle} ${isActive("/dashboard/delivery/history") ? activeLink : ''}`} variant="link">Delivery History</Button>
                         </Link>
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
-            <Accordion type="multiple">
+            <Accordion type="single" collapsible>
                 <AccordionItem value="item-1">
                     <AccordionTrigger className={`${buttonStyle} ${isActive("/dashboard/packages") ? activeButton : ''}`}>
                         <div className="inline-flex justify-start items-center gap-2">
@@ -87,6 +90,12 @@ export default function Sidebar() {
                 <div className={`${buttonStyle} ${isActive("/dashboard/vehicles") ? activeButton : ''}`}>
                     <BiSolidTruck />
                     <p>Vehicles</p>
+                </div>
+            </Link>
+            <Link href="/dashboard/reports">
+                <div className={`${buttonStyle} ${isActive("/dashboard/reports") ? activeButton : ''}`}>
+                    <BiSolidReport />
+                    <p>Reports</p>
                 </div>
             </Link>
 
