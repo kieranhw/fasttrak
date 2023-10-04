@@ -3,6 +3,7 @@ import { UUID } from "crypto"
 export type Package = {
     package_id: UUID
     store_id: UUID
+    tracking_id: string;
     recipient_name: string
     recipient_address: string
     recipient_phone: string

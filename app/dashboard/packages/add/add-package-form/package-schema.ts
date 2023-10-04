@@ -17,7 +17,7 @@ const PackageSchema = z.object({
             message: "Recipient name must contain only letters and spaces",
         }),
     recipient_address: z.string()
-        .min(51, "Recipient address is required")
+        .min(1, "Recipient address is required")
         .refine(value => addressRegex.test(value), {
             message: "Recipient address contains invalid characters",
         }),
@@ -31,7 +31,7 @@ const PackageSchema = z.object({
             message: "Sender name must contain only letters and spaces",
         }),
     sender_address: z.string()
-        .min(5, "Sender address is required")
+        .min(1, "Sender address is required")
         .refine(value => addressRegex.test(value), {
             message: "Sender address contains invalid characters",
         }),

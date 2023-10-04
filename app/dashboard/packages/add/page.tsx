@@ -9,6 +9,7 @@ import { supabase } from "@/pages/api/supabase-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { generateId } from "@/lib/generate-id";
 
 export default function AddPackage() {
 
@@ -30,13 +31,14 @@ export default function AddPackage() {
   })
 
   const [formKey, setFormKey] = useState<number>(0);
-  
+
   async function onSubmit(values: z.infer<typeof PackageSchema>) {
     console.log("submitted")
     console.log(values)
     const { error } = await supabase
       .from('packages')
       .insert({
+        tracking_id: generateId("FT"),
         recipient_name: values.recipient_name,
         recipient_phone: values.recipient_phone,
         recipient_address: values.recipient_address,
@@ -44,8 +46,8 @@ export default function AddPackage() {
         sender_phone: values.sender_phone,
         sender_address: values.sender_address,
         status: "Pending",
-        weight: values.weight,
-        volume: values.volume,
+        weight: Number(values.weight).toFixed(2),
+        volume: Number(values.volume).toFixed(2),
         fragile: values.fragile,
         priority: values.priority,
       })
@@ -54,7 +56,7 @@ export default function AddPackage() {
     } else {
       form.reset();
       // Increment key to re-render component
-      setFormKey(prevKey => prevKey + 1); 
+      setFormKey(prevKey => prevKey + 1);
     }
   }
 
