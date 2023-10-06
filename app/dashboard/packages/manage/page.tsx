@@ -32,7 +32,7 @@ export default function ManagePackage() {
       <div className="inline-flex justify-between">
         <h1 className="text-foreground font-bold text-3xl my-auto">Inventory</h1>
       </div>
-      <DataTable columns={columns} data={data} refreshData={refreshData} />
+      <DataTable columns={columns(refreshData)} data={data} refreshData={refreshData} />
 
     </div>
   )
