@@ -67,24 +67,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <>
-      <div className="flex items-center justify-between py-4">
-        <div className="inline-flex justify-between border w-full">
-          <div>Date</div>
 
-          <div className="inline-flex justify-between gap-2">
-            <div>L</div>
-            <div>Today</div>
-            <div>R</div>
-          </div>
-
-          <div>Log</div>
-          <div>Export</div>
-          <div>Info</div>
-          <div>Settings</div>
-          <div>Schedule Now</div>
-        </div>
-
-      </div>
 
       <div className="rounded-md border">
         <Table>
@@ -123,7 +106,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  No delivery scheduled on this date. <br/><br/> Deliveries are scheduled at XX:XX on the day of delivery, or can be scheduled manually above.
                 </TableCell>
               </TableRow>
             )}
