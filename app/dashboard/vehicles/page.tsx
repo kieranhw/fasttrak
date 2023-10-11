@@ -34,7 +34,6 @@ export default function Vehicles() {
                 <h1 className="text-foreground font-bold text-3xl my-auto">Vehicles</h1>
             </div>
             <DataTable columns={columns} data={data} refreshData={refreshData} />
-
         </div>
     )
 }

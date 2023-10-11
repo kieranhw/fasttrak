@@ -19,6 +19,26 @@ export const fetchPackages = async () => {
     }
 }
 
+// Fetch packages by Ids
+export const fetchPackagesByIds = async (ids: UUID[]) => {
+    if (!ids) {
+        return ([] as Package[]);
+    }
+
+    let { data: packages, error } = await supabase
+        .from('packages')
+        .select('*')
+        .in('package_id', ids);
+
+    if (error) {
+        console.error("Error fetching bins: ", error);
+        return;
+    } else {
+        return (packages as Package[]);
+    }
+}
+
+
 // Remove package by ID
 export const removePackageById = async (id: UUID) => {
     console.log("Removing package: " + id)
