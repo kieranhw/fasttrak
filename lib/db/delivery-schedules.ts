@@ -7,16 +7,18 @@ import { fetchVehicleById } from "./vehicles";
 
 
 // Fetch all schedules for a date
-export const fetchSchedulesByDate = async () => {
+export const fetchSchedulesByDate = async (date: Date) => {
+    const formattedDate = date.toISOString().slice(0, 10);
+
     let { data: schedules, error } = await supabase
         .from('delivery_schedules')
         .select('*')
-        //.eq('delivery_date', new Date())
-        // add store id
+        .eq('delivery_date', formattedDate)
+        // TODO: add store id
         .order('created_at', { ascending: false });
 
     if (error) {
-        console.error("Error fetching bins: ", error);
+        console.error("Error fetching schedules: ", error);
         return;
     } else {
         // For all schedules, convert the array of packageId UUIDs to array of Package objects using fetchPackagesByIds
@@ -28,7 +30,7 @@ export const fetchSchedulesByDate = async () => {
 
 
         }
-        
+
         const deliverySchedule: DeliverySchedule[] = schedules as DeliverySchedule[];
 
         return deliverySchedule;

@@ -24,7 +24,7 @@ import {
 export default function DeliverySchedule() {
 
   // Date Picker
-  const [date, setDate] = useState<Date>()
+  const [date, setDate] = useState<Date>(new Date());
 
   const isDateWithinLimit = (newDate: Date) => {
     const tomorrow = new Date();
@@ -52,12 +52,14 @@ export default function DeliverySchedule() {
   useEffect(() => {
     async function fetchData() {
       // Fetch delivery schedules
-      // TODO: Implement date filtering
-      let schedules = await fetchSchedulesByDate();
+      // TODO: Testing for different setups of schedules
+      // TODO: Loading screens when fetching data
+
+      let schedules = await fetchSchedulesByDate(date!);
 
       if (schedules) {
         setData(schedules as DeliverySchedule[]);
-        console.log(schedules);
+        console.log("schedules" + schedules);
       } else {
         console.log("no schedules")
       }
@@ -95,7 +97,11 @@ export default function DeliverySchedule() {
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={setDate}
+                  onSelect={(selectedDate) => {
+                    if (selectedDate instanceof Date) {
+                      setDate(selectedDate);
+                    }
+                  }}
                   disabled={(date) =>
                     // Disable dates in the past and more than 1 day in the future
                     date > new Date((new Date()).valueOf() + 1000 * 3600 * 24) || date < new Date("1900-01-01")
@@ -109,7 +115,11 @@ export default function DeliverySchedule() {
               <Button
                 className="w-10 h-10 p-0"
                 variant="outline"
-                onClick={e => setDate(prevDate => prevDate ? new Date(prevDate.setDate(prevDate.getDate() - 1)) : undefined)}
+                onClick={e => {
+                  const newDate = new Date(date || new Date());
+                  newDate.setDate(newDate.getDate() - 1);
+                  setDate(newDate);
+                }}
               >
                 <ChevronLeft size={16} />
               </Button>
@@ -120,16 +130,19 @@ export default function DeliverySchedule() {
                 className="w-10 h-10 p-0"
                 variant="outline"
                 disabled={!isNextDateValid()}
-                onClick={e => setDate(prevDate => {
-                  if (prevDate) {
-                    const newDate = new Date(prevDate.setDate(prevDate.getDate() + 1));
-                    return isDateWithinLimit(newDate) ? newDate : prevDate;
+                onClick={e => {
+                  if (date) {
+                    const newDate = new Date(date);
+                    newDate.setDate(date.getDate() + 1);
+                    if (isDateWithinLimit(newDate)) {
+                      setDate(newDate);
+                    }
                   }
-                  return undefined;
-                })}
+                }}
               >
                 <ChevronRight size={16} />
               </Button>
+
             </div>
           </div>
 
