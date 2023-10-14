@@ -44,11 +44,15 @@ export default function DeliverySchedule() {
 
   useEffect(() => {
     setDate(new Date())
+    // TODO: Check if there are any schedules for today
+    // TODO: If there are, set isScheduledToday to true
+    // TODO: If there aren't, set isScheduledToday to false
   }, [])
 
   // Data
   const [data, setData] = useState<DeliverySchedule[]>([]);
   const [reload, setReload] = useState(false);
+  const [isScheduledToday, setIsScheduledToday] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -56,13 +60,15 @@ export default function DeliverySchedule() {
       // TODO: Testing for different setups of schedules
       // TODO: Loading screens when fetching data
 
-      let schedules = await fetchSchedulesByDate(date!);
+      let schedules = await fetchSchedulesByDate(date);
 
       if (schedules) {
         setData(schedules as DeliverySchedule[]);
+        setIsScheduledToday(true);
         console.log("schedules" + schedules);
       } else {
         console.log("no schedules")
+        setIsScheduledToday(false);
       }
     }
     fetchData();
@@ -151,10 +157,12 @@ export default function DeliverySchedule() {
           <div>Export</div>
           <div>Info</div>
           <div className="inline-flex">
-            <Button className="w-10 p-0 rounded-r-none border-r-none" variant="outline">
+            <Button className="w-10 p-0 rounded-r-none border-r-0" variant="outline">
               <HiOutlineCog size={16} />
             </Button>
-            <Button className="rounded-l-none border-l-none">
+            <Button className="rounded-l-none border-l-none border-y border-r"
+              disabled={date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") && isScheduledToday == false}
+            >
               Schedule
             </Button>
           </div>
