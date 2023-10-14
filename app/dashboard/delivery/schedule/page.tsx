@@ -20,6 +20,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { HiOutlineCog } from "react-icons/hi";
 
 export default function DeliverySchedule() {
 
@@ -149,10 +150,15 @@ export default function DeliverySchedule() {
           <div>Log</div>
           <div>Export</div>
           <div>Info</div>
-          <div>Settings</div>
-          <div>Schedule Now</div>
+          <div className="inline-flex">
+            <Button className="w-10 p-0 rounded-r-none border-r-none" variant="outline">
+              <HiOutlineCog size={16} />
+            </Button>
+            <Button className="rounded-l-none border-l-none">
+              Schedule
+            </Button>
+          </div>
         </div>
-
       </div>
 
       <DataTable columns={columns(refreshData)} data={data} />

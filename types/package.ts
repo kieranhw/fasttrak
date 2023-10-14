@@ -14,7 +14,7 @@ export type Package = {
     weight: string
     volume: string
     fragile?: boolean
-    priority: "Redelivery" | "Express" | "Standard"
+    priority: "Redelivery" | "Express" | "Standard" | "Return"
     delivery_notes: string
     date_added: Date
     date_modified: Date

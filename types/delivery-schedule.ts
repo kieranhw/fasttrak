@@ -11,10 +11,10 @@ export enum DeliveryStatus {
 }
 
 export type DeliverySchedule = {
-    schedule_id: UUID;
+    schedule_id?: UUID;
     vehicle_id: UUID;
     vehicle: Vehicle; // Convert UUID to store Vehicle object
-    store_id: UUID;
+    store_id?: UUID;
     package_order: Package[];  // Convert array of UUIDs to array of Package objects
     delivery_date: Date;
     start_time: Date;
@@ -23,5 +23,7 @@ export type DeliverySchedule = {
     estimated_duration_mins: number;
     actual_duration_mins: number;
     distance_miles: number;
+    load_weight: number;
+    load_volume: number;
     created_at: Date;
 };

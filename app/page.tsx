@@ -22,9 +22,9 @@ const resources = [
     icon: <TbRoute size={32} />,
   },
   {
-    title: 'Vehicle Management',
+    title: 'Vehicle Optimisation',
     subtitle:
-      'Monitor and manage your fleet in real-time. Schedule maintenance, track vehicle status, and ensure optimal fleet performance for reliable deliveries.',
+      'Monitor and manage your fleet with performance reports and recommendations. Schedule maintenance, track vehicle status, and ensure optimal fleet performance for reliable deliveries.',
     icon: <FaTruck size={32} />,
   },
 ];

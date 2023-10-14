@@ -9,15 +9,15 @@ mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!;
 export default function Depot() {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const depotCoordinates: mapboxgl.LngLatLike | undefined = [-2.966384, 53.406605];
-  const centerCoordinates: mapboxgl.LngLatLike | undefined = [-2.969384, 53.406605];
+  const centerCoordinates: mapboxgl.LngLatLike | undefined = [-2.968084, 53.406605];
 
   useEffect(() => {
     if (mapContainer.current) {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/kieran260/clnmah019006101qy21yxguuo',
+        style: 'mapbox://styles/kieran260/clnnnsf1m00al01o37ltmbokb',
         center: centerCoordinates,
-        zoom: 15,
+        zoom: 16,
       });
 
       map.on('load', () => {
@@ -64,8 +64,8 @@ export default function Depot() {
               // Add click event to the layer
               map.on('click', 'points', function () {
                 map.flyTo({
-                  center: depotCoordinates,
-                  zoom: 15,
+                  center: centerCoordinates,
+                  zoom: 16,
                 });
               });
             }
@@ -88,7 +88,6 @@ export default function Depot() {
       <div className="relative flex-grow">
         {/* Overlay div */}
         <div className="flex md:absolute md:drop-shadow-xl left-5 top-5 z-40 w-full md:w-[400px] h-[400px] space-y-4 border rounded-md p-4 bg-card">
-          {/* Your overlay content here */}
         </div>
 
         {/* Map container */}
