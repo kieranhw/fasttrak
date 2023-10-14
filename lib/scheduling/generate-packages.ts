@@ -9,7 +9,7 @@ export const generatePackages = (numPackages: number): Package[] => {
     const packages: Package[] = [];
     for (let i = 0; i < numPackages; i++) {
         const priorities: PriorityType[] = ["Redelivery", "Express", "Standard", "Return"];
-        const randomNumber = faker.datatype.number({
+        const randomNumber = faker.number.int({
             'min': 0,
             'max': priorities.length - 1
         });
@@ -30,7 +30,7 @@ export const generatePackages = (numPackages: number): Package[] => {
             fragile: false,
             priority: priorities[randomNumber],
             delivery_notes: faker.word.words(10),
-            date_added: faker.date.between(new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000, new Date().getTime())),
+            date_added: faker.date.between({from: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), to: new Date().getTime()}),
         });
     }
     return packages;

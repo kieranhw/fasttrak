@@ -21,3 +21,22 @@ export const fetchVehicleById = async (id: UUID[]) => {
 
     return null;
 }
+
+// Fetch Vehicles
+export const fetchVehicles = async () => {
+
+    const { data, error } = await supabase
+        .from('vehicles')
+        .select('*');
+
+    if (error) {
+        console.error("Error fetching vehicles: ", error);
+        return null;
+    } else if (data && data.length > 0) {
+        // Convert vehicles to Vehicle type
+        const vehicles: Vehicle[] = data as Vehicle[];
+        return vehicles;
+    }
+
+    return null;
+}

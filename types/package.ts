@@ -1,8 +1,11 @@
 import { UUID } from "crypto"
 
+export type PriorityType = "Redelivery" | "Express" | "Standard" | "Return";
+
+
 export type Package = {
     package_id: UUID
-    store_id: UUID
+    store_id?: UUID
     tracking_id: string;
     recipient_name: string
     recipient_address: string
@@ -14,11 +17,11 @@ export type Package = {
     weight: string
     volume: string
     fragile?: boolean
-    priority: "Redelivery" | "Express" | "Standard" | "Return"
+    priority: PriorityType
     delivery_notes: string
     date_added: Date
-    date_modified: Date
-    date_delivered: Date
-    date_dispatched: Date
+    //date_modified?: Date
+    //date_delivered?: Date
+    //date_dispatched?: Date
 }
   

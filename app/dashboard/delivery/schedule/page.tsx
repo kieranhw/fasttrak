@@ -22,7 +22,12 @@ import {
 } from "@/components/ui/popover"
 import { HiOutlineCog } from "react-icons/hi";
 
-export default function DeliverySchedule() {
+import { SchedulePackages } from "@/lib/scheduling/algorithm-1";
+import { fetchVehicles } from "@/lib/db/vehicles";
+import { fetchPackages } from "@/lib/db/packages";
+import { UUID } from "crypto";
+
+export default function ScheduleDeliveries() {
 
   // Date Picker
   const [date, setDate] = useState<Date>(new Date());
@@ -75,6 +80,71 @@ export default function DeliverySchedule() {
   }, [reload, date]);
 
   const refreshData = () => setReload(prev => !prev);
+
+  // Schedule
+  async function handleScheduleDelivery() {
+    // fetch vehicles
+    let vehicles = await fetchVehicles();
+    console.log(vehicles)
+
+    // fetch packages
+    let packages = await fetchPackages();
+    console.log(packages)
+
+    let deliverySchedule: DeliverySchedule[] = [];
+
+    // schedule packages
+    if (vehicles && packages) {
+      deliverySchedule = SchedulePackages(vehicles, packages);
+      console.log(deliverySchedule)
+    }
+
+    if (deliverySchedule && deliverySchedule.length > 0) {
+
+
+
+      for (const schedule in deliverySchedule) {
+        let packageOrderIds = [];
+
+        for (const pkg in deliverySchedule[schedule].package_order) {
+          packageOrderIds.push(deliverySchedule[schedule].package_order[pkg].package_id)
+        }
+
+        // update scheduledPackageIds status to scheduled
+        const { error } = await supabase
+          .from('packages')
+          .update({ status: 'Scheduled' })
+          .in('package_id', packageOrderIds)
+        if (error) {
+          alert(error.message)
+        } else {
+          // upload insert to supabase for schedule
+          console.log("updated packages")
+          const { error } = await supabase
+            .from('delivery_schedules')
+            .insert({
+              vehicle_id: deliverySchedule[schedule].vehicle_id,
+              package_order: packageOrderIds,
+              delivery_date: deliverySchedule[schedule].delivery_date,
+              start_time: deliverySchedule[schedule].start_time,
+              status: deliverySchedule[schedule].status,
+              num_packages: deliverySchedule[schedule].num_packages,
+              estimated_duration_mins: deliverySchedule[schedule].estimated_duration_mins,
+              distance_miles: deliverySchedule[schedule].distance_miles,
+              load_weight: deliverySchedule[schedule].load_weight,
+              load_volume: deliverySchedule[schedule].load_volume,
+            })
+
+          if (error) {
+            alert(error.message)
+          }
+        }
+      }
+    }
+    refreshData();
+
+  }
+
 
 
   return (
@@ -162,6 +232,7 @@ export default function DeliverySchedule() {
             </Button>
             <Button className="rounded-l-none border-l-none border-y border-r"
               disabled={date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") && isScheduledToday == false}
+              onClick={e => handleScheduleDelivery()}
             >
               Schedule
             </Button>
