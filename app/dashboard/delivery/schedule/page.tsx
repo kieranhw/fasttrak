@@ -49,9 +49,6 @@ export default function ScheduleDeliveries() {
 
   useEffect(() => {
     setDate(new Date())
-    // TODO: Check if there are any schedules for today
-    // TODO: If there are, set isScheduledToday to true
-    // TODO: If there aren't, set isScheduledToday to false
   }, [])
 
   // Data
@@ -67,12 +64,14 @@ export default function ScheduleDeliveries() {
 
       let schedules = await fetchSchedulesByDate(date);
 
-      if (schedules) {
+      if (schedules && schedules.length > 0) {
         setData(schedules as DeliverySchedule[]);
         setIsScheduledToday(true);
         console.log("schedules" + schedules);
       } else {
         console.log("no schedules")
+        setData([]);
+
         setIsScheduledToday(false);
       }
     }
@@ -231,7 +230,7 @@ export default function ScheduleDeliveries() {
               <HiOutlineCog size={16} />
             </Button>
             <Button className="rounded-l-none border-l-none border-y border-r"
-              disabled={date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") && isScheduledToday == false}
+              disabled={date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isScheduledToday == true}
               onClick={e => handleScheduleDelivery()}
             >
               Schedule
