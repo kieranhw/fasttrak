@@ -23,8 +23,7 @@ import {
 import { HiOutlineCog } from "react-icons/hi";
 
 import { SchedulePackages } from "@/lib/scheduling/algorithm-1";
-import { fetchVehicles } from "@/lib/db/vehicles";
-import { fetchPackages } from "@/lib/db/packages";
+import { db } from "@/lib/db/db";
 import { UUID } from "crypto";
 
 export default function ScheduleDeliveries() {
@@ -55,46 +54,51 @@ export default function ScheduleDeliveries() {
   const [data, setData] = useState<DeliverySchedule[]>([]);
   const [reload, setReload] = useState(false);
   const [isScheduledToday, setIsScheduledToday] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
 
   useEffect(() => {
     async function fetchData() {
-      // Fetch delivery schedules
-      // TODO: Testing for different setups of schedules
-      // TODO: Loading screens when fetching data
+      setIsLoading(true); // Set loading to true when starting to fetch data
 
       let schedules = await fetchSchedulesByDate(date);
 
       if (schedules && schedules.length > 0) {
         setData(schedules as DeliverySchedule[]);
         setIsScheduledToday(true);
-        console.log("schedules" + schedules);
       } else {
-        console.log("no schedules")
         setData([]);
-
         setIsScheduledToday(false);
       }
+
+      setIsLoading(false); // Set loading to false after fetching data
     }
+
     fetchData();
   }, [reload, date]);
+
+
+
 
   const refreshData = () => setReload(prev => !prev);
 
   // Schedule
   async function handleScheduleDelivery() {
+    setIsLoading(true);
+
     // fetch vehicles
-    let vehicles = await fetchVehicles();
+    let vehicles = await db.vehicles.fetch.all();
     console.log(vehicles)
 
     // fetch packages
-    let packages = await fetchPackages();
+    let packages = await db.packages.fetch.pending();
     console.log(packages)
 
     let deliverySchedule: DeliverySchedule[] = [];
-
+    console.log("Scheduling for date:", date)
     // schedule packages
     if (vehicles && packages) {
-      deliverySchedule = SchedulePackages(vehicles, packages);
+      deliverySchedule = SchedulePackages(vehicles, packages, date);
       console.log(deliverySchedule)
     }
 
@@ -141,7 +145,7 @@ export default function ScheduleDeliveries() {
       }
     }
     refreshData();
-
+    setIsLoading(false);
   }
 
 
@@ -222,20 +226,22 @@ export default function ScheduleDeliveries() {
             </div>
           </div>
 
-          <div>Log</div>
-          <div>Export</div>
-          <div>Info</div>
-          <div className="inline-flex">
-            <Button className="w-10 p-0 rounded-r-none border-r-0" variant="outline">
-              <HiOutlineCog size={16} />
-            </Button>
-            <Button className="rounded-l-none border-l-none border-y border-r"
-              disabled={date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isScheduledToday == true}
-              onClick={e => handleScheduleDelivery()}
-            >
-              Schedule
-            </Button>
+          <div className="inline-flex justify-between gap-2">
+            <Button variant="outline">Report</Button>
+            <Button className="" variant="outline">Info</Button>
+            <div className="inline-flex">
+              <Button className="w-10 p-0 rounded-r-none border-r-0" variant="outline">
+                <HiOutlineCog size={16} />
+              </Button>
+              <Button className="rounded-l-none border-l-none border-y border-r"
+                disabled={isLoading == true || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isScheduledToday == true}
+                onClick={e => handleScheduleDelivery()}
+              >
+                Schedule
+              </Button>
+            </div>
           </div>
+
         </div>
       </div>
 

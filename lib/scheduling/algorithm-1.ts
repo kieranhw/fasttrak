@@ -4,7 +4,7 @@ import { Vehicle } from "@/types/vehicle";
 
 
 
-export function SchedulePackages(vehiclesData: Vehicle[], packagesData: Package[]) {
+export function SchedulePackages(vehiclesData: Vehicle[], packagesData: Package[], date: Date) {
     console.log("Scheduling packages...")
     // Initialize variables for tracking total volume and weight
     let totalVolume = 0;
@@ -54,8 +54,8 @@ export function SchedulePackages(vehiclesData: Vehicle[], packagesData: Package[
             vehicle: vehicle,
             store_id: undefined,
             package_order: [],  // Initialize as empty; will populate later
-            delivery_date: new Date(),  // Placeholder for now, replace with date of schedule
-            start_time: new Date(),  // Placeholder, replace with start date/time of first delivery
+            delivery_date: date,  // Placeholder for now, replace with date of schedule
+            start_time: date,  // Placeholder, replace with start date/time of first delivery
             status: DeliveryStatus.Pending,
             num_packages: 0,
             estimated_duration_mins: 0,
