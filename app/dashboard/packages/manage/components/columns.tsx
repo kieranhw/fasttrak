@@ -56,7 +56,7 @@ export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
         accessorKey: "volume",
         header: () => (
             <div className="text-left">
-                Volume (cm<sup>3</sup>)
+                Volume (m<sup>3</sup>)
             </div>
         ),
     },

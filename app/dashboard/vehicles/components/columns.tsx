@@ -38,7 +38,7 @@ export const columns: ColumnDef<Vehicle>[] = [
         accessorKey: "max_volume",
         header: () => (
             <div className="text-left">
-                Volume (cm<sup>3</sup>)
+                Volume (m<sup>3</sup>)
             </div>
         ),
     },

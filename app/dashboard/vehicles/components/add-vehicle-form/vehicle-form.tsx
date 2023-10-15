@@ -183,7 +183,7 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
                         name="max_volume"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Max Volume (cm<sup>3</sup>)</FormLabel>
+                                <FormLabel>Max Volume (m<sup>3</sup>)</FormLabel>
                                 <FormControl>
                                     <Input 
                                     {...field} 
