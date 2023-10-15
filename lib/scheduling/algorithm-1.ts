@@ -9,7 +9,7 @@ export function SchedulePackages(vehiclesData: Vehicle[], packagesData: Package[
     // Initialize variables for tracking total volume and weight
     let totalVolume = 0;
     let totalWeight = 0;
-    
+
 
 
     // Sort packages in order of priority: Redelivery -> date_added >= 3 days -> Express -> Standard -> Return -> date_aded(newest)
@@ -123,17 +123,7 @@ export function SchedulePackages(vehiclesData: Vehicle[], packagesData: Package[
 
 
 
-    // Output schedule info
-    for (const schedule of deliverySchedules) {
-        console.log("--------------------")
-        console.log("Schedule: " + schedule.schedule_id);
-        console.log(schedule.num_packages + " packages");
-        console.log(schedule.load_weight + " kg of packages");
-        console.log(schedule.vehicle.max_load + " kg max load");
-        console.log(schedule.load_volume + " m3 of packages");
-        console.log(schedule.vehicle.max_volume + " m3 max volume");
-        console.log(schedule.estimated_duration_mins + " mins estimated time");
-    }
+
 
     // Return the delivery schedules
     return deliverySchedules;
@@ -177,18 +167,27 @@ function calculateTotalTime(schedule: DeliverySchedule): number {
     for (let i = 0; i < schedule.num_packages; i++) {
         const packageItem = schedule.package_order[i];
         if (packageItem) {
-            // If first package, calculate time from depot to packageItem[i]
-            if (i === 0) {
+            if (i === 0 && schedule.num_packages === 0) {
+                // If first package, and only package, calculate time from depot to packageItem[i] and back to depot
+                // calculateTravelTime(depot, packageItem[i])
+                time += 1;
+                // calculateTravelTime(packageItem[i], depot)
+                time += 1;
+            } else if (i === 0) {
+                // If first package, calculate time from depot to packageItem[i]
                 // Calculate travel time of depot to first package
                 // calculateTravelTime(depot, packageItem[i])
                 time += 1;
             } else if (i === schedule.num_packages - 1) {
-                // Calcualte travel time of last package to depot, and from previous package to current package
-                // calculateTravelTime(packageItem[i], depot)
+                // If last package
+                // Calculate travel time from previous package to current package, and from current package (last package) back to depot
                 // calculateTravelTime(packageItem[i-1], packageItem[i]])
                 time += 1;
+
+                // calculateTravelTime(packageItem[i], depot)
                 time += 1;
             } else {
+                // If package n but not first or last package
                 // Calculate travel time of packageItem[i-1] to packageItem[i]
                 // calculateTravelTime(packageItem[i], packageItem[i-1])
                 time += 1;
