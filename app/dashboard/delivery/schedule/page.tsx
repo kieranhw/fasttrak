@@ -9,7 +9,7 @@ import { supabase } from "@/pages/api/supabase-client";
 import { fetchSchedulesByDate } from "@/lib/db/delivery-schedules";
 
 import { format } from "date-fns"
-import { Calendar as CalendarIcon } from "lucide-react"
+import { Calendar as CalendarIcon, Loader2 } from "lucide-react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -55,6 +55,7 @@ export default function ScheduleDeliveries() {
   const [reload, setReload] = useState(false);
   const [isScheduledToday, setIsScheduledToday] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isScheduling, setIsScheduling] = useState(false);
 
 
   useEffect(() => {
@@ -85,6 +86,7 @@ export default function ScheduleDeliveries() {
   // Schedule
   async function handleScheduleDelivery() {
     setIsLoading(true);
+    setIsScheduling(true);
 
     // fetch vehicles
     let vehicles = await db.vehicles.fetch.all();
@@ -146,8 +148,40 @@ export default function ScheduleDeliveries() {
     }
     refreshData();
     setIsLoading(false);
+    setIsScheduling(false);
   }
 
+  async function handleDeleteSchedule() {
+    if (data && data.length > 0) {
+      for (const schedule in data) {
+        let packageOrderIds = [];
+
+        for (const pkg in data[schedule].package_order) {
+          packageOrderIds.push(data[schedule].package_order[pkg].package_id)
+        }
+
+        // update scheduledPackageIds status to scheduled
+        const { error } = await supabase
+          .from('packages')
+          .update({ status: 'Pending' })
+          .in('package_id', packageOrderIds)
+        if (error) {
+          alert(error.message)
+        } else {
+          // delete schedule from supabase
+          const { error } = await supabase
+            .from('delivery_schedules')
+            .delete()
+            .match({ schedule_id: data[schedule].schedule_id })
+
+          if (error) {
+            alert(error.message)
+          }
+        }
+      }
+    }
+    refreshData();
+  }
 
 
   return (
@@ -226,19 +260,36 @@ export default function ScheduleDeliveries() {
             </div>
           </div>
 
-          <div className="inline-flex justify-between gap-2">
-            <Button variant="outline">Report</Button>
+          <div className="inline-flex justify-between gap-1">
+            <Button variant="outline"
+              disabled={isLoading == true || isScheduledToday == false || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01")}
+              onClick={e => handleDeleteSchedule()}
+            >
+              Delete
+            </Button>
+
+
             <Button className="" variant="outline">Info</Button>
             <div className="inline-flex">
               <Button className="w-10 p-0 rounded-r-none border-r-0" variant="outline">
                 <HiOutlineCog size={16} />
               </Button>
-              <Button className="rounded-l-none border-l-none border-y border-r"
-                disabled={isLoading == true || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isScheduledToday == true}
-                onClick={e => handleScheduleDelivery()}
-              >
-                Schedule
-              </Button>
+
+              {isScheduling == true &&
+                <Button disabled className="rounded-l-none border-l-none border-y border-r">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Scheduling
+                </Button>
+              }
+
+              {isScheduling == false &&
+                <Button className="rounded-l-none border-l-none border-y border-r"
+                  disabled={isLoading == true || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isScheduledToday == true}
+                  onClick={e => handleScheduleDelivery()}
+                >
+                  Schedule
+                </Button>
+              }
             </div>
           </div>
 

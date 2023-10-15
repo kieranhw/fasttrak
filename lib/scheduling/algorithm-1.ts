@@ -167,30 +167,44 @@ function calculateTotalTime(schedule: DeliverySchedule): number {
     for (let i = 0; i < schedule.num_packages; i++) {
         const packageItem = schedule.package_order[i];
         if (packageItem) {
-            if (i === 0 && schedule.num_packages === 0) {
-                // If first package, and only package, calculate time from depot to packageItem[i] and back to depot
+            if (schedule.num_packages == 1) {
+                // If and only if one package
+                // Calculate time from depot to packageItem[i] and back to depot
+
                 // calculateTravelTime(depot, packageItem[i])
                 time += 1;
+
                 // calculateTravelTime(packageItem[i], depot)
                 time += 1;
+
+                console.log(1)
             } else if (i === 0) {
-                // If first package, calculate time from depot to packageItem[i]
-                // Calculate travel time of depot to first package
+                // If first package
+                // Calculate time from depot to packageItem[i]
+
                 // calculateTravelTime(depot, packageItem[i])
                 time += 1;
+                
+                console.log(2)
             } else if (i === schedule.num_packages - 1) {
                 // If last package
                 // Calculate travel time from previous package to current package, and from current package (last package) back to depot
+
                 // calculateTravelTime(packageItem[i-1], packageItem[i]])
                 time += 1;
 
                 // calculateTravelTime(packageItem[i], depot)
                 time += 1;
+
+                console.log(3)
             } else {
-                // If package n but not first or last package
+                // If package, but not first or last package
                 // Calculate travel time of packageItem[i-1] to packageItem[i]
+                
                 // calculateTravelTime(packageItem[i], packageItem[i-1])
                 time += 1;
+
+                console.log(4)
             }
         }
     }

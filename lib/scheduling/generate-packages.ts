@@ -5,7 +5,9 @@ import { UUID } from "crypto"
 import { faker } from '@faker-js/faker';
 import { generateId } from "@/lib/generate-id";
 
+
 export const generatePackages = (numPackages: number): Package[] => {
+    
     const packages: Package[] = [];
     for (let i = 0; i < numPackages; i++) {
         const priorities: PriorityType[] = ["Redelivery", "Express", "Standard", "Return"];

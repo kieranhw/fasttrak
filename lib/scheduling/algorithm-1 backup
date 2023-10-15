@@ -470,15 +470,6 @@ function checkEstimatedTime(packageToAdd: Package, schedule: DeliverySchedule | 
 
 
 
-
-/*
-// Function to calculate the time required for a package (Placeholder)
-function calculateTimeForPackage(packageToAdd: Package): number {
-    // Calculate the time required for a package
-    return 0;
-}
-*/
-
 // Function to calculate the total time to deliver all packages in a route (DeliverySchedule)
 function calculateTotalTime(schedule: DeliverySchedule): number {
     // Calculate the total time required for a route
@@ -488,21 +479,44 @@ function calculateTotalTime(schedule: DeliverySchedule): number {
     for (let i = 0; i < schedule.num_packages; i++) {
         const packageItem = schedule.package_order[i];
         if (packageItem) {
-            // If first package, calculate time from depot to packageItem[i]
-            if (i === 0) {
-                // Calculate travel time of depot to first package
+            if (schedule.num_packages == 1) {
+                // If and only if one package
+                // Calculate time from depot to packageItem[i] and back to depot
+
                 // calculateTravelTime(depot, packageItem[i])
                 time += 1;
-            } else if (i === schedule.num_packages - 1) {
-                // Calcualte travel time of last package to depot, and from previous package to current package
+
                 // calculateTravelTime(packageItem[i], depot)
+                time += 1;
+
+                console.log(1)
+            } else if (i === 0) {
+                // If first package
+                // Calculate time from depot to packageItem[i]
+
+                // calculateTravelTime(depot, packageItem[i])
+                time += 1;
+                
+                console.log(2)
+            } else if (i === schedule.num_packages - 1) {
+                // If last package
+                // Calculate travel time from previous package to current package, and from current package (last package) back to depot
+
                 // calculateTravelTime(packageItem[i-1], packageItem[i]])
                 time += 1;
+
+                // calculateTravelTime(packageItem[i], depot)
                 time += 1;
+
+                console.log(3)
             } else {
+                // If package, but not first or last package
                 // Calculate travel time of packageItem[i-1] to packageItem[i]
+                
                 // calculateTravelTime(packageItem[i], packageItem[i-1])
                 time += 1;
+
+                console.log(4)
             }
         }
     }

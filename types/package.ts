@@ -9,9 +9,11 @@ export type Package = {
     tracking_id: string;
     recipient_name: string
     recipient_address: string
+    recipient_address_location?: string
     recipient_phone: string
     sender_name: string
     sender_address: string
+    sender_address_location?: string
     sender_phone: string
     status: "Pending" | "In Transit" | "Delivered"
     weight: string

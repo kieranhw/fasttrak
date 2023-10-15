@@ -131,7 +131,7 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>Edit Information</DropdownMenuItem>
+                            <DropdownMenuItem>Export Directions</DropdownMenuItem>
                             <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
                                 <AlertDialogTrigger asChild>
                                     <Button variant="ghost" className="relative h-8 font-normal flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">Remove Package</Button>

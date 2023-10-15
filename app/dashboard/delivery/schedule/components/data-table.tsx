@@ -106,7 +106,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No delivery scheduled on this date. <br/><br/> Deliveries are scheduled at XX:XX on the day of delivery, or can be scheduled manually above.
+                  No delivery scheduled for this date.
                 </TableCell>
               </TableRow>
             )}
@@ -116,7 +116,7 @@ export function DataTable<TData, TValue>({
 
           <div className="text-foreground/50 text-sm">
             {table.getFilteredRowModel().rows?.length || 0}
-            {table.getFilteredRowModel().rows?.length >= 1 ? ' Item' : ' Items'}
+            {table.getFilteredRowModel().rows?.length >= 1 ? ' Items' : ' Item'}
           </div>
 
           <div className="inline-flex items-center space-x-2">
