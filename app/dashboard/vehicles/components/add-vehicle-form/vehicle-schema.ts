@@ -22,5 +22,5 @@ export const VehicleSchema = z.object({
         .max(50000, { message: "Max load cannot exceed 50000 kg" }),
     max_volume: z.number()
         .positive({ message: "Max volume must be a positive number" })
-        .max(100000, { message: "Max volume cannot exceed 100000 cm³" }),
+        .max(1000, { message: "Max volume cannot exceed 1000 m³" }),
 });
