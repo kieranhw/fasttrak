@@ -27,10 +27,10 @@ import {
 } from "@/components/ui/alert-dialog"
 import Link from "next/link"
 import { useState } from "react"
-import { removePackageById } from "@/lib/db/packages"
 import { UUID } from "crypto"
 import { DeliverySchedule } from "@/types/delivery-schedule"
 import { Vehicle } from "@/types/vehicle"
+import { db } from "@/lib/db/db"
 
 
 export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] => [
@@ -70,7 +70,7 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
         ),
         cell: ({ row }) => {
             const distance = row.getValue("distance_miles")?.toString()
-            
+
             return (
                 <div className="flex flex-col w-fit">
                     <p>{distance} mi</p>
@@ -109,8 +109,12 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
             const p = row.original
             const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
 
-            async function handleRemovePackage(package_id: UUID): Promise<void> {
-                await removePackageById(package_id);
+            async function handleRemovePackage(id?: UUID) {
+                if (!id) {
+                    console.warn("Schedule ID is undefined. Cannot remove package.");
+                    return;
+                }
+                await db.packages.remove.byId(id);
                 refreshData();
             }
 

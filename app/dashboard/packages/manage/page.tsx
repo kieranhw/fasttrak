@@ -8,6 +8,7 @@ import { Package } from '@/types/package';
 import { supabase } from '@/pages/api/supabase-client';
 import { DataTable } from './components/data-table';
 import { columns } from './components/columns';
+import { db } from '@/lib/db/db';
 
 export default function ManagePackage() {
   const [data, setData] = useState<Package[]>([]);
@@ -15,9 +16,9 @@ export default function ManagePackage() {
 
   useEffect(() => {
     async function fetchData() {
-      const { data: packages } = await supabase.from("packages").select();
+      const packages = await db.packages.fetch.all();
       if (packages) {
-        setData(packages as Package[]);
+        setData(packages);
         console.log(packages);
       }
     }
@@ -25,7 +26,6 @@ export default function ManagePackage() {
   }, [reload]);
 
   const refreshData = () => setReload(prev => !prev);
-
 
   return (
     <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1500px]">

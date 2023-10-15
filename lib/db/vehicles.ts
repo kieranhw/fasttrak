@@ -2,8 +2,27 @@ import { supabase } from "@/pages/api/supabase-client";
 import { Vehicle } from "@/types/vehicle";
 import { UUID } from "crypto";
 
+// Fetch Vehicles
+const fetchVehicles = async () => {
+
+    const { data, error } = await supabase
+        .from('vehicles')
+        .select('*');
+
+    if (error) {
+        console.error("Error fetching vehicles: ", error);
+        return null;
+    } else if (data && data.length > 0) {
+        // Convert vehicles to Vehicle type
+        const vehicles: Vehicle[] = data as Vehicle[];
+        return vehicles;
+    }
+
+    return null;
+}
+
 // Fetch vehicle by ID
-export const fetchVehicleById = async (id: UUID[]) => {
+const fetchVehicleById = async (id: UUID[]) => {
 
     const { data, error } = await supabase
         .from('vehicles')
@@ -22,21 +41,11 @@ export const fetchVehicleById = async (id: UUID[]) => {
     return null;
 }
 
-// Fetch Vehicles
-export const fetchVehicles = async () => {
 
-    const { data, error } = await supabase
-        .from('vehicles')
-        .select('*');
 
-    if (error) {
-        console.error("Error fetching vehicles: ", error);
-        return null;
-    } else if (data && data.length > 0) {
-        // Convert vehicles to Vehicle type
-        const vehicles: Vehicle[] = data as Vehicle[];
-        return vehicles;
+export const vehicles = {
+    fetch: {
+        all: fetchVehicles,
+        byId: fetchVehicleById,
     }
-
-    return null;
-}
+};

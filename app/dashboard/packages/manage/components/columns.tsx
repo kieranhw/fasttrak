@@ -27,8 +27,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import Link from "next/link"
 import { useState } from "react"
-import { removePackageById } from "@/lib/db/packages"
 import { UUID } from "crypto"
+import { db } from "@/lib/db/db"
 
 
 export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
@@ -86,8 +86,13 @@ export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
             const p = row.original
             const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
 
-            async function handleRemovePackage(package_id: UUID): Promise<void> {
-                await removePackageById(package_id);
+
+            async function handleRemovePackage(id?: UUID) {
+                if (!id) {
+                    console.warn("Schedule ID is undefined. Cannot remove package.");
+                    return;
+                }
+                await db.packages.remove.byId(id);
                 refreshData();
             }
 

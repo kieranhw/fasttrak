@@ -94,7 +94,7 @@ export default function AddPackage() {
 
       <div className="inline-flex gap-2 pt-2">
 
-        <div className="h-10 rounded-md bg-primary/100 items-center w-full justify-between text-white text-md p-2 truncate">
+        <div className="h-10 rounded-md bg-secondary items-center w-full justify-between text-black text-md p-2 truncate">
           <b>DEMO: </b>
           Generate 10 packages
         </div>

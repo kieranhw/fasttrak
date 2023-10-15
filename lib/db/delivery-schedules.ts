@@ -2,9 +2,7 @@ import { supabase } from "@/pages/api/supabase-client";
 import { Package } from "@/types/package";
 import { DeliverySchedule } from "@/types/delivery-schedule";
 import { UUID } from "crypto";
-import { fetchPackagesByIds } from "./packages";
-import { fetchVehicleById } from "./vehicles";
-
+import { db } from "./db";
 
 // Fetch all schedules for a date
 export const fetchSchedulesByDate = async (date: Date) => {
@@ -24,8 +22,8 @@ export const fetchSchedulesByDate = async (date: Date) => {
         // For all schedules, convert the array of packageId UUIDs to array of Package objects using fetchPackagesByIds
         if (schedules) {
             for (let i = 0; i < schedules.length; i++) {
-                schedules[i].package_order = await fetchPackagesByIds(schedules[i].package_order);
-                schedules[i].vehicle = await fetchVehicleById(schedules[i].vehicle_id);
+                schedules[i].package_order = await db.packages.fetch.byIds(schedules[i].package_order);
+                schedules[i].vehicle = await db.vehicles.fetch.byId(schedules[i].vehicle_id);
             }
 
 

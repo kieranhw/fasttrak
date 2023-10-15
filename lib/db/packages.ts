@@ -4,7 +4,7 @@ import { UUID } from "crypto";
 
 
 // Fetch all packages for a user
-export const fetchPackages = async () => {
+const fetchPackages = async () => {
 
     let { data: packages, error } = await supabase
         .from('packages')
@@ -12,7 +12,24 @@ export const fetchPackages = async () => {
         .order('created_at', { ascending: false });
 
     if (error) {
-        console.error("Error fetching bins: ", error);
+        console.error("Error fetching packages: ", error);
+        return;
+    } else {
+        return (packages as Package[]);
+    }
+}
+
+// Fetch all packages for a user where "status" is "Pending" (i.e. not scheduled for delivery)
+const fetchPackagesByPending = async () => {
+
+    let { data: packages, error } = await supabase
+        .from('packages')
+        .select('*')
+        .eq('status', 'Pending')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Error fetching packages: ", error);
         return;
     } else {
         return (packages as Package[]);
@@ -20,7 +37,7 @@ export const fetchPackages = async () => {
 }
 
 // Fetch packages by Ids
-export const fetchPackagesByIds = async (ids: UUID[]) => {
+const fetchPackagesByIds = async (ids: UUID[]) => {
     if (!ids) {
         return ([] as Package[]);
     }
@@ -31,7 +48,7 @@ export const fetchPackagesByIds = async (ids: UUID[]) => {
         .in('package_id', ids);
 
     if (error) {
-        console.error("Error fetching bins: ", error);
+        console.error("Error fetching packages: ", error);
         return;
     } else {
         return (packages as Package[]);
@@ -40,7 +57,8 @@ export const fetchPackagesByIds = async (ids: UUID[]) => {
 
 
 // Remove package by ID
-export const removePackageById = async (id: UUID) => {
+// TODO: Ensure data consistency by removing package from all delivery schedules
+const removePackageById = async (id: UUID) => {
     console.log("Removing package: " + id)
     const { error } = await supabase
         .from('packages')
@@ -54,3 +72,15 @@ export const removePackageById = async (id: UUID) => {
         return
     }
 }
+
+
+export const packages = {
+    fetch: {
+        all: fetchPackages,
+        pending: fetchPackagesByPending,
+        byIds: fetchPackagesByIds,
+    },
+    remove: {
+        byId: removePackageById,
+    }
+};
