@@ -105,9 +105,6 @@ export default function ScheduleDeliveries() {
     }
 
     if (deliverySchedule && deliverySchedule.length > 0) {
-
-
-
       for (const schedule in deliverySchedule) {
         let packageOrderIds = [];
 
@@ -115,31 +112,29 @@ export default function ScheduleDeliveries() {
           packageOrderIds.push(deliverySchedule[schedule].package_order[pkg].package_id)
         }
 
-        // update scheduledPackageIds status to scheduled
+        // Try upload schedules to database
         const { error } = await supabase
-          .from('packages')
-          .update({ status: 'Scheduled' })
-          .in('package_id', packageOrderIds)
+          .from('delivery_schedules')
+          .insert({
+            vehicle_id: deliverySchedule[schedule].vehicle_id,
+            package_order: packageOrderIds,
+            delivery_date: deliverySchedule[schedule].delivery_date,
+            start_time: deliverySchedule[schedule].start_time,
+            status: deliverySchedule[schedule].status,
+            num_packages: deliverySchedule[schedule].num_packages,
+            estimated_duration_mins: deliverySchedule[schedule].estimated_duration_mins,
+            distance_miles: deliverySchedule[schedule].distance_miles,
+            load_weight: deliverySchedule[schedule].load_weight,
+            load_volume: deliverySchedule[schedule].load_volume,
+          })
         if (error) {
           alert(error.message)
         } else {
-          // upload insert to supabase for schedule
-          console.log("updated packages")
+          // If successfully scheduled, update scheduledPackageIds status to scheduled
           const { error } = await supabase
-            .from('delivery_schedules')
-            .insert({
-              vehicle_id: deliverySchedule[schedule].vehicle_id,
-              package_order: packageOrderIds,
-              delivery_date: deliverySchedule[schedule].delivery_date,
-              start_time: deliverySchedule[schedule].start_time,
-              status: deliverySchedule[schedule].status,
-              num_packages: deliverySchedule[schedule].num_packages,
-              estimated_duration_mins: deliverySchedule[schedule].estimated_duration_mins,
-              distance_miles: deliverySchedule[schedule].distance_miles,
-              load_weight: deliverySchedule[schedule].load_weight,
-              load_volume: deliverySchedule[schedule].load_volume,
-            })
-
+            .from('packages')
+            .update({ status: 'Scheduled' })
+            .in('package_id', packageOrderIds)
           if (error) {
             alert(error.message)
           }

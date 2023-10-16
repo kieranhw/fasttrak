@@ -106,6 +106,7 @@ export function SchedulePackages(vehiclesData: Vehicle[], packagesData: Package[
                     currentSchedule.num_packages += 1;
                     currentSchedule.load_weight = newLoadWeight;
                     currentSchedule.load_volume = newLoadVolume;
+                    currentSchedule.distance_miles = calculateTotalDistance(currentSchedule);
                     currentSchedule.estimated_duration_mins = calculateTotalTime(currentSchedule);
                 } else {
                     // Try next schedule
@@ -121,7 +122,7 @@ export function SchedulePackages(vehiclesData: Vehicle[], packagesData: Package[
         currentScheduleIndex = (currentScheduleIndex + 1) % vehiclesData.length;
     }
 
-
+    //
 
 
 
@@ -147,70 +148,140 @@ function checkEstimatedTime(packageToAdd: Package, schedule: DeliverySchedule | 
 }
 
 
-
-
-
-/*
-// Function to calculate the time required for a package (Placeholder)
-function calculateTimeForPackage(packageToAdd: Package): number {
-    // Calculate the time required for a package
-    return 0;
+interface Location {
+    lat: number;
+    lng: number;
 }
-*/
+
+function calculateDistance(location1: Location, location2: Location): number {
+    const R = 3958.8; // Radius of Earth in miles
+    const dLat = toRadians(location2.lat - location1.lat);
+    const dLng = toRadians(location2.lng - location1.lng);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRadians(location1.lat)) * Math.cos(toRadians(location2.lat)) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+
+    return Number(distance.toFixed(2));
+}
+
+function toRadians(degrees: number): number {
+    return degrees * (Math.PI / 180);
+}
+
+
+function estimateTravelTime(location1: Location, location2: Location): number {
+    // Calculate the estimated travel time and distance between two locations
+    const distance = calculateDistance(location1, location2);
+    console.log("distance: " + distance)
+
+    // Average speed in mph
+    const speed = 10;
+
+    // Calculate the estimated travel time in minutes
+    const time = (distance / speed) * 60;
+
+
+
+    return time;
+}
+
+
+
 
 // Function to calculate the total time to deliver all packages in a route (DeliverySchedule)
 function calculateTotalTime(schedule: DeliverySchedule): number {
     // Calculate the total time required for a route
+    let depot: Location = { lat: 53.403782, lng: -2.971970 };
 
     let time = 0;
     // for all packages in delivery schedule, calculate time from depot to package, ..., to depot and return total time
     for (let i = 0; i < schedule.num_packages; i++) {
         const packageItem = schedule.package_order[i];
+        let packageItemLocation = { lat: 0, lng: 0 };
+        if (packageItem.recipient_address_lat && packageItem.recipient_address_lng) {
+            packageItemLocation = { lat: packageItem.recipient_address_lat, lng: packageItem.recipient_address_lng }
+        }
+
         if (packageItem) {
             if (schedule.num_packages == 1) {
                 // If and only if one package
                 // Calculate time from depot to packageItem[i] and back to depot
-
-                // calculateTravelTime(depot, packageItem[i])
-                time += 1;
-
-                // calculateTravelTime(packageItem[i], depot)
-                time += 1;
-
-                console.log(1)
+                time += estimateTravelTime(depot, packageItemLocation)
+                time += estimateTravelTime(packageItemLocation, depot)
             } else if (i === 0) {
                 // If first package
                 // Calculate time from depot to packageItem[i]
-
-                // calculateTravelTime(depot, packageItem[i])
-                time += 1;
-                
-                console.log(2)
+                time += estimateTravelTime(depot, packageItemLocation);
             } else if (i === schedule.num_packages - 1) {
                 // If last package
                 // Calculate travel time from previous package to current package, and from current package (last package) back to depot
+                const prevPackageItem = schedule.package_order[i - 1];
+                const prevPackageItemLocation: Location = { lat: prevPackageItem.recipient_address_lat!, lng: prevPackageItem.recipient_address_lng! };
 
-                // calculateTravelTime(packageItem[i-1], packageItem[i]])
-                time += 1;
-
-                // calculateTravelTime(packageItem[i], depot)
-                time += 1;
-
-                console.log(3)
+                time += estimateTravelTime(prevPackageItemLocation, packageItemLocation);
+                time += estimateTravelTime(packageItemLocation, depot);
             } else {
                 // If package, but not first or last package
                 // Calculate travel time of packageItem[i-1] to packageItem[i]
-                
-                // calculateTravelTime(packageItem[i], packageItem[i-1])
-                time += 1;
+                const prevPackageItem = schedule.package_order[i - 1];
+                const prevPackageItemLocation: Location = { lat: prevPackageItem.recipient_address_lat!, lng: prevPackageItem.recipient_address_lng! };
 
-                console.log(4)
+                time += estimateTravelTime(prevPackageItemLocation, packageItemLocation);
             }
         }
     }
 
     return time;
 }
+
+function calculateTotalDistance(schedule: DeliverySchedule): number {
+    // Calculate the total time required for a route
+    let depot: Location = { lat: 53.403782, lng: -2.971970 };
+
+    let distance = 0;
+    // for all packages in delivery schedule, calculate time from depot to package, ..., to depot and return total time
+    for (let i = 0; i < schedule.num_packages; i++) {
+        const packageItem = schedule.package_order[i];
+        let packageItemLocation = { lat: 0, lng: 0 };
+        if (packageItem.recipient_address_lat && packageItem.recipient_address_lng) {
+            packageItemLocation = { lat: packageItem.recipient_address_lat, lng: packageItem.recipient_address_lng }
+        }
+
+        if (packageItem) {
+            if (schedule.num_packages == 1) {
+                // If and only if one package
+                // Calculate time from depot to packageItem[i] and back to depot
+                distance += calculateDistance(depot, packageItemLocation)
+                distance += calculateDistance(packageItemLocation, depot)
+            } else if (i === 0) {
+                // If first package
+                // Calculate time from depot to packageItem[i]
+                distance += calculateDistance(depot, packageItemLocation);
+            } else if (i === schedule.num_packages - 1) {
+                // If last package
+                // Calculate travel time from previous package to current package, and from current package (last package) back to depot
+                const prevPackageItem = schedule.package_order[i - 1];
+                const prevPackageItemLocation: Location = { lat: prevPackageItem.recipient_address_lat!, lng: prevPackageItem.recipient_address_lng! };
+
+                distance += calculateDistance(prevPackageItemLocation, packageItemLocation);
+                distance += calculateDistance(packageItemLocation, depot);
+            } else {
+                // If package, but not first or last package
+                // Calculate travel time of packageItem[i-1] to packageItem[i]
+                const prevPackageItem = schedule.package_order[i - 1];
+                const prevPackageItemLocation: Location = { lat: prevPackageItem.recipient_address_lat!, lng: prevPackageItem.recipient_address_lng! };
+
+                distance += calculateDistance(prevPackageItemLocation, packageItemLocation);
+            }
+        }
+    }
+
+    return distance;
+}    
+
 
 function findSuitableVehicle(packageItem: Package, deliverySchedules: DeliverySchedule[]): boolean {
     for (const schedule of deliverySchedules) {
@@ -228,6 +299,7 @@ function findSuitableVehicle(packageItem: Package, deliverySchedules: DeliverySc
     return false;
 }
 
+// Search for a schedule that can fit the package in round robin fashion
 function findScheduleForPackage(packageItem: Package, deliverySchedules: DeliverySchedule[]): boolean {
     for (const schedule of deliverySchedules) {
         const newLoadWeight = schedule.load_weight + parseInt(packageItem.weight);
@@ -239,6 +311,7 @@ function findScheduleForPackage(packageItem: Package, deliverySchedules: Deliver
                 schedule.num_packages += 1;
                 schedule.load_weight = newLoadWeight;
                 schedule.load_volume = newLoadVolume;
+                schedule.distance_miles = calculateTotalDistance(schedule);
                 schedule.estimated_duration_mins = calculateTotalTime(schedule);
                 return true;
             } else {

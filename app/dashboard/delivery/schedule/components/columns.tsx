@@ -131,6 +131,9 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
+                            <DropdownMenuItem>Set In-Transit</DropdownMenuItem>
+                            <DropdownMenuItem>Mark Complete</DropdownMenuItem>
+                            <DropdownMenuSeparator />
                             <DropdownMenuItem>Export Directions</DropdownMenuItem>
                             <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
                                 <AlertDialogTrigger asChild>
