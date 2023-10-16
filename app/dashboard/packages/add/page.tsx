@@ -152,7 +152,7 @@ export default function AddPackage() {
 
   async function handleGeneratePackages() {
     setLoadingPackages(true);
-    const packages = generatePackages(1);
+    const packages = await generatePackages(1);
 
     const { error } = await supabase
       .from('packages')

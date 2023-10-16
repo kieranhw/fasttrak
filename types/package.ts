@@ -15,7 +15,7 @@ export type Package = {
     sender_name: string
     sender_address: string
     sender_address_lat?: number
-    sender_addres_lng?: number
+    sender_address_lng?: number
     sender_phone: string
     status: "Pending" | "In Transit" | "Delivered"
     weight: string

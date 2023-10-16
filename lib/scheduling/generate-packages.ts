@@ -5,10 +5,13 @@ import { UUID } from "crypto"
 import { faker } from '@faker-js/faker';
 import { generateId } from "@/lib/generate-id";
 
+import { addressData } from "./liverpool-addresses";
 
-export const generatePackages = (numPackages: number): Package[] => {
-    
+
+export const generatePackages = async (numPackages: number): Promise<Package[]> => {
     const packages: Package[] = [];
+    const addresses: { address: string, lat: number, lng: number }[] = addressData;
+
     for (let i = 0; i < numPackages; i++) {
         const priorities: PriorityType[] = ["Redelivery", "Express", "Standard", "Return"];
         const randomNumber = faker.number.int({
@@ -16,24 +19,32 @@ export const generatePackages = (numPackages: number): Package[] => {
             'max': priorities.length - 1
         });
 
+        // Ensure recipient and sender addresses are different
+        const [recipientAddress, senderAddress] = faker.helpers.shuffle(addresses).slice(0, 2);
+
         packages.push({
             package_id: faker.string.uuid() as UUID,
-            store_id: undefined,
             tracking_id: generateId("FT")!,
+            store_id: undefined,
             recipient_name: faker.person.fullName(),
-            recipient_address: faker.location.streetAddress(),
-            recipient_phone: "07" + faker.number.int({ min: 0o0, max: 999999999}),
+            recipient_address: recipientAddress.address,
+            recipient_address_lat: recipientAddress.lat,
+            recipient_address_lng: recipientAddress.lng,
+            recipient_phone: "07" + faker.number.int({ min: 0o0, max: 999999999 }),
             sender_name: faker.person.fullName(),
-            sender_address: faker.location.streetAddress(),
-            sender_phone: "07" + faker.number.int({ min: 0o0, max: 999999999}),
+            sender_address: senderAddress.address,
+            sender_address_lat: senderAddress.lat,
+            sender_address_lng: senderAddress.lng,
+            sender_phone: "07" + faker.number.int({ min: 0o0, max: 999999999 }),
             status: "Pending",
             weight: faker.number.int({ min: 5, max: 20 }).toString(),
             volume: faker.number.float({ min: 0.5, max: 2 }).toPrecision(2).toString(),
             fragile: false,
             priority: priorities[randomNumber],
-            delivery_notes: faker.word.words(10),
-            date_added: faker.date.between({from: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), to: new Date().getTime()}),
+            delivery_notes: faker.lorem.words(10),
+            date_added: faker.date.between({ from: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), to: new Date().getTime() }),
         });
     }
+
     return packages;
 }

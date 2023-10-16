@@ -122,9 +122,6 @@ export function SchedulePackages(vehiclesData: Vehicle[], packagesData: Package[
         currentScheduleIndex = (currentScheduleIndex + 1) % vehiclesData.length;
     }
 
-    //
-
-
 
     // Return the delivery schedules
     return deliverySchedules;
@@ -175,15 +172,12 @@ function toRadians(degrees: number): number {
 function estimateTravelTime(location1: Location, location2: Location): number {
     // Calculate the estimated travel time and distance between two locations
     const distance = calculateDistance(location1, location2);
-    console.log("distance: " + distance)
 
     // Average speed in mph
     const speed = 10;
 
     // Calculate the estimated travel time in minutes
     const time = (distance / speed) * 60;
-
-
 
     return time;
 }
@@ -279,7 +273,7 @@ function calculateTotalDistance(schedule: DeliverySchedule): number {
         }
     }
 
-    return distance;
+    return Number(distance.toFixed(2));
 }    
 
 
