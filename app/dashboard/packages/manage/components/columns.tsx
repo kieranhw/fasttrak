@@ -29,6 +29,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { UUID } from "crypto"
 import { db } from "@/lib/db/db"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 
 export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
@@ -85,6 +86,7 @@ export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
         cell: ({ row }) => {
             const p = row.original
             const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
+            const [editDialogOpen, setEditDialogOpen] = useState(false)
 
 
             async function handleRemovePackage(id?: UUID) {
@@ -109,10 +111,12 @@ export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>Edit Information</DropdownMenuItem>
+
                             <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
                                 <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" className="relative h-8 font-normal flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">Remove Package</Button>
+                                    <Button variant="ghost" className="relative h-8 font-normal text-black bg-card flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+                                        Remove Package
+                                    </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>

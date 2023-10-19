@@ -13,12 +13,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import { VehicleSchema } from "./vehicle-schema";
+import { Vehicle } from "@/types/vehicle";
+import { useEffect } from "react";
 
 interface VehicleFormProps {
     onSubmit: (values: z.infer<typeof VehicleSchema>) => void;
+    vehicle?: Vehicle;
 }
 
-export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
+export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit, vehicle }) => {
     const form = useForm<z.infer<typeof VehicleSchema>>({
         resolver: zodResolver(VehicleSchema),
         defaultValues: {
@@ -32,6 +35,19 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
     })
 
     const { setValue } = form;
+
+    // If vehicle, set values to vehicle values and update the form to show in the inputs
+    useEffect(() => {
+        if (vehicle) {
+            setValue("manufacturer", vehicle.manufacturer);
+            setValue("model", vehicle.model);
+            setValue("manufacture_year", vehicle.manufacture_year);
+            setValue("registration", vehicle.registration);
+            setValue("max_load", vehicle.max_load);
+            setValue("max_volume", vehicle.max_volume);
+        }
+    }, [vehicle]);
+
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -128,7 +144,7 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit }) => {
                                 <FormControl>
                                     <Input
                                         {...field}
-                                        value={field.value?.toString() || ''}
+                                        value={Number(field.value) || ''}
                                         placeholder="YYYY"
                                         type="number"
                                         onKeyDown={yearInput}
