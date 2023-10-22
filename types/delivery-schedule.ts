@@ -3,7 +3,6 @@ import { Package } from "./package";
 import { Vehicle } from "./vehicle";
 
 export enum DeliveryStatus {
-    Pending = "Pending",
     Scheduled = "Scheduled",
     InProgress = "In Progress",
     Completed = "Completed",

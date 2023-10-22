@@ -41,11 +41,29 @@ const fetchVehicleById = async (id: UUID[]) => {
     return null;
 }
 
+// Delete vehicle by ID
+const deleteVehicleById = async (id: UUID) => {
 
+    const { error } = await supabase
+        .from('vehicles')
+        .delete()
+        .eq('vehicle_id', id);
+
+    if (error) {
+        console.error();
+        return (false);
+    } else {
+        return (true);
+    }
+
+}
 
 export const vehicles = {
     fetch: {
         all: fetchVehicles,
         byId: fetchVehicleById,
+    },
+    delete: {
+        byId: deleteVehicleById,
     }
 };

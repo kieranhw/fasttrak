@@ -28,10 +28,14 @@ import {
 import Link from "next/link"
 import { useState } from "react"
 import { UUID } from "crypto"
-import { DeliverySchedule } from "@/types/delivery-schedule"
+import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule"
 import { Vehicle } from "@/types/vehicle"
 import { db } from "@/lib/db/db"
-
+import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from "@/components/ui/hover-card"
 
 export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] => [
     {
@@ -42,7 +46,29 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
 
             return (
                 <div className="flex flex-col w-fit">
-                    <p>{vehicle.registration}</p>
+                    <HoverCard>
+                        <HoverCardTrigger asChild>
+                            <Link href={`/dashboard/vehicles/record/${vehicle.vehicle_id}`}>
+                                <p className="hover:text-blue-500 hover:underline hover:cursor-pointer">{vehicle.registration}</p>
+
+                            </Link>
+                        </HoverCardTrigger>
+                        <HoverCardContent className="w-50">
+                            <div className="flex justify-between space-x-4">
+                                <div className="space-y-1">
+                                    <h4 className="text-sm font-semibold">{vehicle.registration}</h4>
+                                    <p className="text-sm">
+                                        {vehicle.manufacturer} {vehicle.model} {vehicle.manufacture_year}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                        Max load: {vehicle.max_load} kg
+                                        <br />
+                                        Max volume: {vehicle.max_volume} m<sup>3</sup>
+                                    </p>
+                                </div>
+                            </div>
+                        </HoverCardContent>
+                    </HoverCard>
                     <p className="text-sm text-foreground/50 w-fit">{vehicle.manufacturer} {vehicle.model}</p>
                 </div>
             )
@@ -108,6 +134,9 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
         cell: ({ row }) => {
             const p = row.original
             const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
+            const [inProgressAlertOpen, setInProgressAlertOpen] = useState(false)
+            const [completeAlertOpen, setCompleteAlertOpen] = useState(false)
+
 
             async function handleRemovePackage(id?: UUID) {
                 if (!id) {
@@ -115,6 +144,18 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                     return;
                 }
                 await db.packages.remove.byId(id);
+                refreshData();
+            }
+
+            async function handleUpdateStatus(id: UUID, status: DeliveryStatus) {
+                console.log(id)
+                const res = await db.schedules.update.status(id, status)
+                if (res) {
+                    console.log("Delivery status updated successfully.")
+                } else {
+                    console.warn("Failed to update delivery status.");
+                }
+
                 refreshData();
             }
 
@@ -131,8 +172,61 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>Set In-Transit</DropdownMenuItem>
-                            <DropdownMenuItem>Mark Complete</DropdownMenuItem>
+                            <AlertDialog open={inProgressAlertOpen} onOpenChange={setInProgressAlertOpen}>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        disabled={p.status != DeliveryStatus.Scheduled}
+                                        variant="ghost"
+                                        className="relative w-full justify-start h-8 font-normal flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                    >
+                                        Set In-Progress
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Delivery In Progress</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Are you sure? This update cannot be undone.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction disabled={p.status != DeliveryStatus.Scheduled}
+                                            onClick={() => handleUpdateStatus(p.schedule_id!, DeliveryStatus.InProgress)}
+                                        >
+                                            Continue
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                            <AlertDialog open={completeAlertOpen} onOpenChange={setCompleteAlertOpen}>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        disabled={p.status == DeliveryStatus.Scheduled || p.status == DeliveryStatus.Completed || p.status == DeliveryStatus.Cancelled}
+                                        variant="ghost"
+                                        className="relative w-full justify-start h-8 font-normal flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                    >
+                                        Mark Complete
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Delivery Complete</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Are you sure? This update cannot be undone.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={() => handleUpdateStatus(p.schedule_id!, DeliveryStatus.Completed)}
+                                        >
+                                            Continue
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+
                             <DropdownMenuSeparator />
                             <DropdownMenuItem>Export Directions</DropdownMenuItem>
                             <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
@@ -158,9 +252,6 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                             </AlertDialog>
                         </DropdownMenuContent>
                     </DropdownMenu>
-
-                    {/* Remove Package Alert */}
-
                 </>
 
             )

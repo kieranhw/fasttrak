@@ -56,7 +56,7 @@ export function SchedulePackages(vehiclesData: Vehicle[], packagesData: Package[
             package_order: [],  // Initialize as empty; will populate later
             delivery_date: date,  // Placeholder for now, replace with date of schedule
             start_time: date,  // Placeholder, replace with start date/time of first delivery
-            status: DeliveryStatus.Pending,
+            status: DeliveryStatus.Scheduled,
             num_packages: 0,
             estimated_duration_mins: 0,
             actual_duration_mins: 0,

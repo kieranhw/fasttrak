@@ -14,12 +14,25 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { VehicleForm } from "./add-vehicle-form/vehicle-form"
 import { VehicleSchema } from "./add-vehicle-form/vehicle-schema"
 import { supabase } from "@/pages/api/supabase-client"
 import { z } from "zod"
+import { UUID } from "crypto"
+import { db } from "@/lib/db/db"
 
 export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
     {
@@ -57,13 +70,10 @@ export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
         cell: ({ row }) => {
             const vehicle = row.original
             const [editDialogOpen, setEditDialogOpen] = useState(false)
+            const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
 
             async function onSubmit(values: z.infer<typeof VehicleSchema>) {
 
-                console.log("on Submit called")
-                console.log(values)
-                console.log(vehicle.vehicle_id)
-                
                 const { error } = await supabase
                     .from('vehicles')
                     .update({
@@ -82,6 +92,21 @@ export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
                     refreshData();
                     setEditDialogOpen(false);
                 }
+            }
+
+            async function onRemoveVehicle(id: UUID) {
+
+                const res = await db.vehicles.delete.byId(id);
+
+                if (res) {
+                    console.log("Vehicle removed successfully.")
+                    // TODO: CANCEL ALL DELIVERIES SCHEDULED FOR VEHICLE
+                } else {
+                    console.warn("Failed to remove vehicle.");
+                }
+
+                refreshData();
+                setRemoveDialogOpen(false);
             }
 
 
@@ -109,18 +134,41 @@ export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
                                         Make your changes and click 'save' to update the details.
                                     </DialogDescription>
                                     <VehicleForm vehicle={vehicle} onSubmit={onSubmit} />
-
                                 </DialogHeader>
-                                <DialogFooter>
-                                    {/*<Button variant="outline" onClick={e => setEditDialogOpen(!editDialogOpen)}>Cancel</Button>*/}
 
-                                </DialogFooter>
                             </DialogContent>
                         </Dialog>
-                        <DropdownMenuItem>Schedule Maintenance</DropdownMenuItem>
-                        <DropdownMenuItem>Remove Vehicle</DropdownMenuItem>
+                        <DropdownMenuItem>Vehicle Record</DropdownMenuItem>
+                        <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="ghost" className="relative w-full justify-start h-8 font-normal text-black bg-card flex cursor-default select-none items-center rounded-sm px-2 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+                                    Remove Vehicle
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Remove Vehicle</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will remove the vehicle from
+                                        the system and cancel any scheduled deliveries.
+                                    </AlertDialogDescription>
+                                    <AlertDialogDescription
+                                        className="text-foreground/50 hover:underline hover:text-blue-500 hover:cursor-pointer w-fit"
+                                        onClick={() => {
+                                            setRemoveDialogOpen(false);
+                                            setEditDialogOpen(true);
+                                        }}>
+                                        Made a mistake? Amend the vehicle information instead.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => onRemoveVehicle(vehicle.vehicle_id)}>Continue</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </DropdownMenuContent>
-                </DropdownMenu>
+                </DropdownMenu >
             )
         },
     },

@@ -21,6 +21,18 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { HiOutlineCog } from "react-icons/hi";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
 
 import { SchedulePackages } from "@/lib/scheduling/algorithm-1";
 import { db } from "@/lib/db/db";
@@ -256,12 +268,22 @@ export default function ScheduleDeliveries() {
           </div>
 
           <div className="inline-flex justify-between gap-1">
-            <Button variant="outline"
-              disabled={isLoading == true || isScheduledToday == false || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01")}
-              onClick={e => handleDeleteSchedule()}
-            >
-              Delete
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline"
+                    disabled={isLoading == true || isScheduledToday == false || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01")}
+                    onClick={e => handleDeleteSchedule()}
+                  >
+                    Delete
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Delete all schedules</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
 
 
             <Button className="" variant="outline">Info</Button>
@@ -278,12 +300,21 @@ export default function ScheduleDeliveries() {
               }
 
               {isScheduling == false &&
-                <Button className="rounded-l-none border-l-none border-y border-r"
-                  disabled={isLoading == true || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isScheduledToday == true}
-                  onClick={e => handleScheduleDelivery()}
-                >
-                  Schedule
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button className="rounded-l-none border-l-none border-y border-r"
+                        disabled={isLoading == true || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isScheduledToday != false}
+                        onClick={e => handleScheduleDelivery()}
+                      >
+                        Schedule
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Schedule deliveries</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               }
             </div>
           </div>

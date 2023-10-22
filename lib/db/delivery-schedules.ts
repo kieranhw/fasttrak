@@ -35,5 +35,29 @@ export const fetchSchedulesByDate = async (date: Date) => {
     }
 }
 
+// Update schedule status by ID
+const updateScheduleStatus = async (scheduleId: UUID, status: string) => {
+    let { data: packages, error } = await supabase
+        .from('delivery_schedules')
+        .update({ status: status })
+        .eq('schedule_id', scheduleId);
+
+    if (error) {
+        console.error("Error updating package status: ", error);
+        return("Error updating package status");
+    } else {
+        return true;
+    }
+}
 
 
+
+export const schedules = {
+    fetch: {
+    },
+    remove: {
+    },
+    update: {
+        status: updateScheduleStatus,
+    }
+};
