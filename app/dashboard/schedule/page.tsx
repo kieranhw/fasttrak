@@ -112,7 +112,7 @@ export default function ScheduleDeliveries() {
     console.log("Scheduling for date:", date)
     // schedule packages
     if (vehicles && packages) {
-      deliverySchedule = SchedulePackages(vehicles, packages, date);
+      deliverySchedule = await SchedulePackages(vehicles, packages, date);
       console.log(deliverySchedule)
     }
 
@@ -194,9 +194,8 @@ export default function ScheduleDeliveries() {
   return (
     <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1500px]">
       <div className="inline-flex justify-between">
-        <h1 className="text-foreground font-bold text-3xl my-auto">Schedule</h1>
+        <h1 className="text-foreground font-bold text-3xl my-auto">Delivery Schedule</h1>
       </div>
-
 
       <div className="flex items-center justify-between py-4">
         <div className="inline-flex justify-between w-full">
@@ -318,12 +317,10 @@ export default function ScheduleDeliveries() {
               }
             </div>
           </div>
-
         </div>
       </div>
 
       <DataTable columns={columns(refreshData)} data={data} />
-
 
     </div>
   )

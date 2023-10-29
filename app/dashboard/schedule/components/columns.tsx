@@ -138,14 +138,7 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
             const [completeAlertOpen, setCompleteAlertOpen] = useState(false)
 
 
-            async function handleRemovePackage(id?: UUID) {
-                if (!id) {
-                    console.warn("Schedule ID is undefined. Cannot remove package.");
-                    return;
-                }
-                await db.packages.remove.byId(id);
-                refreshData();
-            }
+
 
             async function handleUpdateStatus(id: UUID, status: DeliveryStatus) {
                 console.log(id)
@@ -172,6 +165,7 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
+
                             <AlertDialog open={inProgressAlertOpen} onOpenChange={setInProgressAlertOpen}>
                                 <AlertDialogTrigger asChild>
                                     <Button
@@ -199,6 +193,8 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
+
+                            {/* TODO: Show dialog to select any packages which were failed to be delivered */}
                             <AlertDialog open={completeAlertOpen} onOpenChange={setCompleteAlertOpen}>
                                 <AlertDialogTrigger asChild>
                                     <Button
@@ -228,28 +224,14 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                             </AlertDialog>
 
                             <DropdownMenuSeparator />
+                            <DropdownMenuItem>View Route</DropdownMenuItem>
                             <DropdownMenuItem>Export Directions</DropdownMenuItem>
-                            <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" className="relative h-8 font-normal flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">Remove Package</Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Remove Package</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            This action cannot be undone. This will remove the package from
-                                            the system and cancel any scheduled deliveries.
-                                        </AlertDialogDescription>
-                                        <AlertDialogDescription className="text-foreground/50 hover:underline hover:text-blue-500 hover:cursor-pointer w-fit">
-                                            Made a mistake? Amend the package instead.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => handleRemovePackage(p.schedule_id)}>Continue</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
+
+                            {/* If delivery already in progress, show dialog to select any items that have already been delivered */}
+                            {/* else, show alert dialog to confirm that the delivery will be cancelled */}
+
+                            <DropdownMenuItem>Cancel Deliveries</DropdownMenuItem>
+
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </>
