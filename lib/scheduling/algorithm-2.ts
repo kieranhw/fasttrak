@@ -1,11 +1,10 @@
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
-import { createGraph } from "./graph";
 
 
 
-export async function SchedulePackages(vehiclesData: Vehicle[], packagesData: Package[], date: Date) {
+export function SchedulePackages(vehiclesData: Vehicle[], packagesData: Package[], date: Date) {
     console.log("Scheduling packages...")
     // Initialize variables for tracking total volume and weight
     let totalVolume = 0;
@@ -123,7 +122,6 @@ export async function SchedulePackages(vehiclesData: Vehicle[], packagesData: Pa
         currentScheduleIndex = (currentScheduleIndex + 1) % vehiclesData.length;
     }
 
-    console.log("Graph: " + await createGraph(packagesData, [53.403782, -2.971970]));
 
     // Return the delivery schedules
     return deliverySchedules;
