@@ -15,6 +15,7 @@ import { PiPackageBold } from 'react-icons/pi'
 import { RiRouteFill } from 'react-icons/ri'
 import { FaWarehouse } from 'react-icons/fa'
 import { useEffect } from 'react'
+import { Separator } from '@radix-ui/react-select'
 
 export default function Sidebar() {
     const router = usePathname();
@@ -51,27 +52,14 @@ export default function Sidebar() {
                     <p>Dashboard</p>
                 </div>
             </Link>
+            <Link draggable="false" href="/dashboard/schedule">
+                <div className={`${buttonStyle} ${isActive("/dashboard/schedule") ? activeButton : ''}`}>
+                    <RiRouteFill />
+                    <p>Schedule</p>
+                </div>
+            </Link>
             <Accordion type="single" collapsible>
                 <AccordionItem value="item-1">
-                    <AccordionTrigger className={`${buttonStyle} ${isActive("/dashboard/delivery") ? activeButton : ''}`}>
-                        <div className="inline-flex justify-start items-center gap-2">
-                            <RiRouteFill />
-                            Delivery
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                        <Link draggable="false" href="/dashboard/delivery/schedule">
-                            <Button className={`${linkStyle} ${isActive("/dashboard/delivery/schedule") ? activeLink : ''}`} variant="link">Delivery Schedule</Button>
-                        </Link>
-                        <Link draggable="false" href="/dashboard/delivery/manage">
-                            <Button className={`${linkStyle} ${isActive("/dashboard/delivery/manage") ? activeLink : ''}`} variant="link">Route Configuration</Button>
-                        </Link>
-                        <Link draggable="false" href="/dashboard/delivery/history">
-                            <Button className={`${linkStyle} ${isActive("/dashboard/delivery/history") ? activeLink : ''}`} variant="link">Delivery History</Button>
-                        </Link>
-                    </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-2">
                     <AccordionTrigger className={`${buttonStyle} ${isActive("/dashboard/packages") ? activeButton : ''}`}>
                         <div className="inline-flex justify-start items-center gap-2">
                             <PiPackageBold />
@@ -88,16 +76,17 @@ export default function Sidebar() {
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
-            <Link draggable="false" href="/dashboard/depot">
-                <div className={`${buttonStyle} ${isActive("/dashboard/depot") ? activeButton : ''}`}>
-                    <FaWarehouse />
-                    <p>Depot</p>
-                </div>
-            </Link>
+
             <Link draggable="false" href="/dashboard/vehicles">
                 <div className={`${buttonStyle} ${isActive("/dashboard/vehicles") ? activeButton : ''}`}>
                     <BiSolidTruck />
                     <p>Vehicles</p>
+                </div>
+            </Link>
+            <Link draggable="false" href="/dashboard/depot">
+                <div className={`${buttonStyle} ${isActive("/dashboard/depot") ? activeButton : ''}`}>
+                    <FaWarehouse />
+                    <p>Depot</p>
                 </div>
             </Link>
             <Link draggable="false" href="/dashboard/reports">
