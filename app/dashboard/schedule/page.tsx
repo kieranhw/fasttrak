@@ -28,16 +28,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card"
-
 import { createGraphAndSolutionFromSchedule, createSchedules } from "@/lib/routing/create-schedules";
 import { db } from "@/lib/db/db";
-import { UUID } from "crypto";
 import { displayGraph } from "@/lib/routing/model/cytoscape";
+import { CytoscapeGraph } from "@/app/dashboard/schedule/components/cytoscape-graph";
 
 export default function ScheduleDeliveries() {
 
@@ -69,7 +63,8 @@ export default function ScheduleDeliveries() {
   const [isScheduledToday, setIsScheduledToday] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
-
+  const [graph, setGraph] = useState<any>(null);
+  const [solution, setSolution] = useState<any>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -85,9 +80,10 @@ export default function ScheduleDeliveries() {
         setIsScheduledToday(false);
       }
 
+      // Create graph and solution
       const [graph, solution] = await createGraphAndSolutionFromSchedule(schedules as DeliverySchedule[]);
-      displayGraph(graph, solution);
-
+      setGraph(graph);
+      setSolution(solution);
 
       setIsLoading(false); // Set loading to false after fetching data
     }
@@ -95,8 +91,12 @@ export default function ScheduleDeliveries() {
     fetchData();
   }, [reload, date]);
 
-
-
+  // Generate graph once data is loaded
+  useEffect(() => {
+    if (graph && solution) {
+      displayGraph(graph, solution);
+    }
+  }, [graph, solution])
 
   const refreshData = () => setReload(prev => !prev);
 
@@ -329,12 +329,15 @@ export default function ScheduleDeliveries() {
 
       <DataTable columns={columns(refreshData)} data={data} />
 
+      {data.length > 0 &&
+        <div className="flex flex-col justify-between mt-8">
+          <h1 className="text-foreground font-semibold text-xl my-auto">Analysis</h1>
+          <div className="grid grid-cols-1 lg:grid-cols-2">
+            <CytoscapeGraph graph={graph} solution={solution} />
+          </div>
 
-      <div className="inline-flex justify-between mt-8">
-        <h1 className="text-foreground font-bold text-xl my-auto">Analysis</h1>
-      </div>
-      <div id="cy" className="w-1/2 h-[600px] border-divider border rounded-md my-2"></div>
-
+        </div>
+      }
 
     </div>
   )

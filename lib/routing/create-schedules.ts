@@ -54,14 +54,12 @@ export function estimateDuration(distance: number): number {
     return (distance / averageSpeed) * 60; // minutes
 }
 
-
-
 export async function createGraphAndSolutionFromSchedule(schedules: DeliverySchedule[]): Promise<[Graph, VRPSolution]> {
     const graph = new Graph();
     const solution = new VRPSolution();
 
     // Create nodes for depot, assuming all schedules share the same depot
-    const depotCoordinates = { lat: 53.403782, lng: -2.971970 };  // Replace with actual depot coordinates
+    const depotCoordinates = { lat: 53.403782, lng: -2.971970 }; 
     const depotNode = new Node(null, depotCoordinates, true);
     graph.addNode(depotNode);
     console.log(schedules)
@@ -94,6 +92,3 @@ export async function createGraphAndSolutionFromSchedule(schedules: DeliverySche
 
     return [graph, solution];
 }
-
-// Usage:
-
