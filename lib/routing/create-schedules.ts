@@ -2,7 +2,8 @@ import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
 import { roundRobinAllocation } from "./algorithms/algorithm-2";
-import { createGraph } from "./model/graph";
+import { Edge, Graph, Node, calculateDistance, createGraph } from "./model/graph";
+import { VRPSolution, VehicleRoute } from "./model/vrp";
 
 
 export async function createSchedules(vehiclesData: Vehicle[], packagesData: Package[], date: Date) {
@@ -40,9 +41,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
             created_at: new Date()
         };
 
-
         schedules.push(schedule);
-
     }
 
     console.log("Schedules: ", schedules);
@@ -54,3 +53,47 @@ export function estimateDuration(distance: number): number {
     const averageSpeed = 10; // mph
     return (distance / averageSpeed) * 60; // minutes
 }
+
+
+
+export async function createGraphAndSolutionFromSchedule(schedules: DeliverySchedule[]): Promise<[Graph, VRPSolution]> {
+    const graph = new Graph();
+    const solution = new VRPSolution();
+
+    // Create nodes for depot, assuming all schedules share the same depot
+    const depotCoordinates = { lat: 53.403782, lng: -2.971970 };  // Replace with actual depot coordinates
+    const depotNode = new Node(null, depotCoordinates, true);
+    graph.addNode(depotNode);
+    console.log(schedules)
+
+    // Create nodes for packages and edges from depot to each package
+    for (const schedule of schedules) {
+        console.log(schedule.package_order)
+
+        for (const pkg of schedule.package_order) {
+            const coordinates = { lat: pkg.recipient_address_lat as number, lng: pkg.recipient_address_lng as number };
+            const pkgNode = new Node(pkg, coordinates);
+            graph.addNode(pkgNode);
+            graph.addEdge(new Edge(depotNode, pkgNode, calculateDistance(depotNode, pkgNode)));
+        }
+    }
+
+    // Create VehicleRoutes and VRPSolution from schedules
+    for (const schedule of schedules) {
+        const route = new VehicleRoute(schedule.vehicle, depotNode);
+        for (const pkg of schedule.package_order) {
+            const pkgNode = graph.nodes.find(node => node.pkg?.package_id === pkg.package_id);
+            if (pkgNode) {
+                const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode);
+                route.addNode(pkgNode, travelCost, 0);  // Assume timeRequired is 0 for simplicity
+            }
+        }
+        route.closeRoute(depotNode);
+        solution.addRoute(route);
+    }
+
+    return [graph, solution];
+}
+
+// Usage:
+

@@ -34,9 +34,10 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
 
-import { createSchedules } from "@/lib/routing/create-schedules";
+import { createGraphAndSolutionFromSchedule, createSchedules } from "@/lib/routing/create-schedules";
 import { db } from "@/lib/db/db";
 import { UUID } from "crypto";
+import { displayGraph } from "@/lib/routing/model/cytoscape";
 
 export default function ScheduleDeliveries() {
 
@@ -83,6 +84,10 @@ export default function ScheduleDeliveries() {
         setData([]);
         setIsScheduledToday(false);
       }
+
+      const [graph, solution] = await createGraphAndSolutionFromSchedule(schedules as DeliverySchedule[]);
+      displayGraph(graph, solution);
+
 
       setIsLoading(false); // Set loading to false after fetching data
     }
@@ -318,9 +323,9 @@ export default function ScheduleDeliveries() {
                 </TooltipProvider>
               }
             </div>
-              </div>
-            </div>
           </div>
+        </div>
+      </div>
 
       <DataTable columns={columns(refreshData)} data={data} />
 
@@ -328,7 +333,7 @@ export default function ScheduleDeliveries() {
       <div className="inline-flex justify-between mt-8">
         <h1 className="text-foreground font-bold text-xl my-auto">Analysis</h1>
       </div>
-      <div id="cy" className="w-1/2 h-[800px] border-divider border rounded-md my-2"></div>
+      <div id="cy" className="w-1/2 h-[600px] border-divider border rounded-md my-2"></div>
 
 
     </div>

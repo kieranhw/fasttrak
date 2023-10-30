@@ -68,6 +68,8 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
     // Create a cytoscape instance
     const cy = cytoscape({
         container: document.getElementById('cy'),
+        maxZoom: 1.25,
+        minZoom: 0.55,
         elements: {
             nodes: cyNodes,
             edges: cyEdges,
@@ -98,3 +100,4 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
         ]
     });
 }
+
