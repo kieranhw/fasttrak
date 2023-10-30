@@ -2,20 +2,20 @@ import { Vehicle } from "@/types/vehicle";
 import { calculateDistance } from "./graph";
 import { Package } from "@/types/package";
 import { Node } from "./graph";
-import { estimateDuration } from "./create-schedules";
+import { estimateDuration } from "../create-schedules";
 
 export class VehicleRoute {
     public nodes: Node[] = [];
-    public totalCost: number = 0;
+    public totalCost: number = 0; // distance
     public currentWeight: number = 0;
     public currentVolume: number = 0;
     public totalTime: number = 0;  // in minutes
 
     constructor(
         public vehicle: Vehicle,
-        public startingNode: Node, // depot node
+        public depotNode: Node, // depot node
     ) {
-        this.nodes.push(startingNode);
+        this.nodes.push(depotNode);
     }
 
     canAddPackage(pkg: Package, pkgNode: Node, timeRequired: number, timeWindow: number): boolean {
@@ -28,9 +28,10 @@ export class VehicleRoute {
             maxVolume: this.vehicle.max_volume
         });
 
-        // calculate distance to travel from last node to startingNode
-        const travelCost = calculateDistance(pkgNode, this.startingNode);
-        // calculate time required to travel from last node to startingNode
+        // calculate distance to travel from last node to depot
+        const travelCost = calculateDistance(pkgNode, this.depotNode);
+
+        // calculate time required to travel from last node to depot
         const timeRequiredToDepot = estimateDuration(travelCost);
 
         return (

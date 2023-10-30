@@ -1,7 +1,7 @@
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
-import { createGraph } from "../graph";
+import { createGraph } from "../model/graph";
 
 
 

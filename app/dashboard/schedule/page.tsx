@@ -318,11 +318,18 @@ export default function ScheduleDeliveries() {
                 </TooltipProvider>
               }
             </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
       <DataTable columns={columns(refreshData)} data={data} />
+
+
+      <div className="inline-flex justify-between mt-8">
+        <h1 className="text-foreground font-bold text-xl my-auto">Analysis</h1>
+      </div>
+      <div id="cy" className="w-1/2 h-[800px] border-divider border rounded-md my-2"></div>
+
 
     </div>
   )

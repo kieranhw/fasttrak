@@ -1,21 +1,24 @@
-
-
-import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
-import { Graph, Node, Edge, createGraph, calculateDistance } from '../graph';
-import { VehicleRoute, VRPSolution } from '../vrp';
+import { Graph, Node, Edge, createGraph, calculateDistance } from '../model/graph';
+import { VehicleRoute, VRPSolution } from '../model/vrp';
 import { estimateDuration } from "../create-schedules";
+import { displayGraph } from "../model/cytoscape";
 
-
-
-export function roundRobinAllocation(
-    graph: Graph,
-    vehicles: Vehicle[],
-    timeWindow: number,
-): VRPSolution {
+/***
+ * Round Robin Allocation
+ * Sort packages into FIFO, then allocate to vehicles in a round robin fashion
+ * Constraints: time window, vehicle capacity (weight and volume)
+ * 
+ * @param graph Graph of packages and depot
+ * @param vehicles Array of available vehicles
+ * @param timeWindow Number of hours to deliver packages
+ * @returns VRPSolution, results in the minimum required number of vehicles to service all packages
+ */
+export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], timeWindow: number): Promise<VRPSolution> {
     const solution = new VRPSolution();
     const availableVehicles = [...vehicles];
+
     const sortedPackages = graph.nodes
         .filter(node => !node.isDepot)
         .sort((a, b) =>
@@ -29,7 +32,7 @@ export function roundRobinAllocation(
         while (vehiclesChecked < availableVehicles.length) {
             const route = solution.routes[vehicleIndex] || new VehicleRoute(availableVehicles[vehicleIndex], graph.depot as Node);
             const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode);
-            const timeRequired = estimateDuration(travelCost); 
+            const timeRequired = estimateDuration(travelCost);
             if (route.canAddPackage(pkgNode.pkg as Package, pkgNode, timeRequired, timeWindow)) {
                 route.addNode(pkgNode, travelCost, timeRequired);
                 if (!solution.routes[vehicleIndex]) {
@@ -46,10 +49,12 @@ export function roundRobinAllocation(
         }
     }
 
-    // Return back to depot
+    // Close routes back to depot
     for (const route of solution.routes) {
         route.closeRoute(graph.depot as Node);
     }
+
+    displayGraph(graph, solution);
 
     return solution;
 }

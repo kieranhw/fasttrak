@@ -2,7 +2,7 @@ import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
 import { roundRobinAllocation } from "./algorithms/algorithm-2";
-import { createGraph } from "./graph";
+import { createGraph } from "./model/graph";
 
 
 export async function createSchedules(vehiclesData: Vehicle[], packagesData: Package[], date: Date) {
@@ -10,7 +10,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
 
     // Create a graph where each node represents a package, and each edge represents a delivery location
     // Nodes are connected to the depot node (depot node is the starting point and end point), and 5 nearest neighbors
-    const graph = await createGraph(packagesData, { lat: 53.403782, lng: -2.971970 });
+    const graph = await createGraph(packagesData, { lat: 53.403782, lng: -2.971970 }, true);
 
     if (graph) {
         console.log("Graph created successfully!");
@@ -21,7 +21,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
     // Initialize an empty array to hold delivery schedules for each vehicle
     let schedules: DeliverySchedule[] = [];
 
-    const vrpSolution = roundRobinAllocation(graph, vehiclesData, 8);
+    const vrpSolution = await roundRobinAllocation(graph, vehiclesData, 8);
 
     for (const route of vrpSolution.routes) {
         let schedule: DeliverySchedule = {
@@ -51,6 +51,6 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
 
 // Function to estimate duration to travel from miles, average speed
 export function estimateDuration(distance: number): number {
-    const averageSpeed = 15; // mph
+    const averageSpeed = 10; // mph
     return (distance / averageSpeed) * 60; // minutes
 }

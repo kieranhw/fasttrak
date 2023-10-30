@@ -7,6 +7,23 @@ interface Location {
     lng: number;
 }
 
+export class Graph {
+    public nodes: Node[] = [];
+    public edges: Edge[] = [];
+    public depot: Node | null = null;  // Reference to the depot node
+
+    addNode(node: Node): void {
+        this.nodes.push(node);
+        if (node.isDepot) {
+            this.depot = node;  // Update the depot reference if the node is a depot
+        }
+    }
+
+    addEdge(edge: Edge): void {
+        this.edges.push(edge);
+    }
+}
+
 export class Node {
     constructor(
         public pkg: Package | null,
@@ -38,30 +55,12 @@ export class Node {
     }
 }
 
-
 export class Edge {
     constructor(
         public node1: Node,
         public node2: Node,
         public cost: number
     ) { }
-}
-
-export class Graph {
-    public nodes: Node[] = [];
-    public edges: Edge[] = [];
-    public depot: Node | null = null;  // Reference to the depot node
-
-    addNode(node: Node): void {
-        this.nodes.push(node);
-        if (node.isDepot) {
-            this.depot = node;  // Update the depot reference if the node is a depot
-        }
-    }
-
-    addEdge(edge: Edge): void {
-        this.edges.push(edge);
-    }
 }
 
 // Helper function to calculate distance between two nodes
@@ -77,7 +76,7 @@ export function calculateDistance(node1: Node, node2: Node): number {
 }
 
 // Exported function to create graph from supplied data
-export async function createGraph(packages: Package[], depotCoordinates: Location): Promise<Graph> {
+export async function createGraph(packages: Package[], depotCoordinates: Location, complete: boolean = false): Promise<Graph> {
     const graph = new Graph();
 
     // Create node for depot, starting point and end point
@@ -94,24 +93,35 @@ export async function createGraph(packages: Package[], depotCoordinates: Locatio
         graph.addNode(new Node(pkg, coordinates));
     }
 
-    // Connect edges to the nearest 5 neighbours for each node, including the depot
-    for (const node of graph.nodes) {
-        if (node !== depotNode) {
-            const distances = graph.nodes.map(otherNode => ({
-                node: otherNode,
-                distance: calculateDistance(node, otherNode)
-            })).filter(distObj => distObj.node !== node && distObj.node !== depotNode);  // Exclude current node and depot node
+    if (complete) {
+        // Connect edges to all nodes
+        for (const node1 of graph.nodes) {
+            for (const node2 of graph.nodes) {
+                if (node1 !== node2) {
+                    graph.addEdge(new Edge(node1, node2, calculateDistance(node1, node2)));
+                }
+            }
+        }
+    } else {
+        // Connect edges to the nearest 5 neighbours for each node, including the depot
+        for (const node of graph.nodes) {
+            if (node !== depotNode) {
+                const distances = graph.nodes.map(otherNode => ({
+                    node: otherNode,
+                    distance: calculateDistance(node, otherNode)
+                })).filter(distObj => distObj.node !== node && distObj.node !== depotNode);  // Exclude current node and depot node
 
-            distances.sort((a, b) => a.distance - b.distance);
+                distances.sort((a, b) => a.distance - b.distance);
 
-            // Connect to the depot node
-            graph.addEdge(new Edge(node, depotNode, calculateDistance(node, depotNode)));
+                // Connect to the depot node
+                graph.addEdge(new Edge(node, depotNode, calculateDistance(node, depotNode)));
 
-            // Connect to the five nearest neighbors
-            for (let i = 0; i < 5; i++) {
-                if (distances[i]) {  // Check if distances[i] exists before accessing its properties
-                    const nearestNode = distances[i].node;
-                    graph.addEdge(new Edge(node, nearestNode, distances[i].distance));
+                // Connect to the five nearest neighbors
+                for (let i = 0; i < 5; i++) {
+                    if (distances[i]) {  // Check if distances[i] exists before accessing its properties
+                        const nearestNode = distances[i].node;
+                        graph.addEdge(new Edge(node, nearestNode, distances[i].distance));
+                    }
                 }
             }
         }
