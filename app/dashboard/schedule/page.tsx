@@ -34,7 +34,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
 
-import { SchedulePackages } from "@/lib/scheduling/algorithm-1";
+import { createSchedules } from "@/lib/routing/create-schedules";
 import { db } from "@/lib/db/db";
 import { UUID } from "crypto";
 
@@ -112,7 +112,7 @@ export default function ScheduleDeliveries() {
     console.log("Scheduling for date:", date)
     // schedule packages
     if (vehicles && packages) {
-      deliverySchedule = await SchedulePackages(vehicles, packages, date);
+      deliverySchedule = await createSchedules(vehicles, packages, date);
       console.log(deliverySchedule)
     }
 
@@ -121,7 +121,9 @@ export default function ScheduleDeliveries() {
         let packageOrderIds = [];
 
         for (const pkg in deliverySchedule[schedule].package_order) {
-          packageOrderIds.push(deliverySchedule[schedule].package_order[pkg].package_id)
+          if (deliverySchedule[schedule].package_order[pkg]) {
+            packageOrderIds.push(deliverySchedule[schedule].package_order[pkg].package_id)
+          }
         }
 
         // Try upload schedules to database

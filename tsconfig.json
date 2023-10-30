@@ -23,6 +23,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "lib/scheduling/algorithm-1 backup", "lib/scheduling/algorithm1.mjs", "lib/scheduling/graph.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "lib/routing/algorithm-1 backup", "lib/routing/algorithm1.mjs", "lib/routing/graph.ts"],
   "exclude": ["node_modules"]
 }

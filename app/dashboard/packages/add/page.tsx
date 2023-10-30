@@ -11,7 +11,7 @@ import { useState } from "react";
 import { generateId } from "@/lib/generate-id";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { generatePackages } from "@/lib/scheduling/generate-packages";
+import { generatePackages } from "@/lib/generate-packages";
 import { Loader } from '@googlemaps/js-api-loader';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
