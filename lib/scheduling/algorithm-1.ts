@@ -92,12 +92,12 @@ export async function SchedulePackages(vehiclesData: Vehicle[], packagesData: Pa
             continue;
         }
 
-        totalVolume += parseInt(packageItem.volume);
-        totalWeight += parseInt(packageItem.weight);
+        totalVolume += packageItem.volume;
+        totalWeight += packageItem.weight;
 
         if (currentSchedule) {
-            const newLoadWeight = currentSchedule.load_weight + parseInt(packageItem.weight);
-            const newLoadVolume = currentSchedule.load_volume + parseInt(packageItem.volume);
+            const newLoadWeight = currentSchedule.load_weight + packageItem.weight;
+            const newLoadVolume = currentSchedule.load_volume + packageItem.volume;
 
             if (newLoadWeight <= currentSchedule.vehicle.max_load && newLoadVolume <= currentSchedule.vehicle.max_load) {
                 if (checkEstimatedTime(packageItem, currentSchedule, 8)) {
@@ -123,7 +123,6 @@ export async function SchedulePackages(vehiclesData: Vehicle[], packagesData: Pa
         currentScheduleIndex = (currentScheduleIndex + 1) % vehiclesData.length;
     }
 
-    console.log("Graph: " + await createGraph(packagesData, [53.403782, -2.971970]));
 
     // Return the delivery schedules
     return deliverySchedules;
@@ -282,8 +281,8 @@ function calculateTotalDistance(schedule: DeliverySchedule): number {
 function findSuitableVehicle(packageItem: Package, deliverySchedules: DeliverySchedule[]): boolean {
     for (const schedule of deliverySchedules) {
         if (schedule) {
-            const newLoadWeight = schedule.load_weight + parseInt(packageItem.weight);
-            const newLoadVolume = schedule.load_volume + parseInt(packageItem.volume);
+            const newLoadWeight = schedule.load_weight + packageItem.weight;
+            const newLoadVolume = schedule.load_volume + packageItem.volume;
 
             if (newLoadWeight <= schedule.vehicle.max_load && newLoadVolume <= schedule.vehicle.max_volume) {
                 if (checkEstimatedTime(packageItem, schedule, 8)) {
@@ -298,8 +297,8 @@ function findSuitableVehicle(packageItem: Package, deliverySchedules: DeliverySc
 // Search for a schedule that can fit the package in round robin fashion
 function findScheduleForPackage(packageItem: Package, deliverySchedules: DeliverySchedule[]): boolean {
     for (const schedule of deliverySchedules) {
-        const newLoadWeight = schedule.load_weight + parseInt(packageItem.weight);
-        const newLoadVolume = schedule.load_volume + parseInt(packageItem.volume);
+        const newLoadWeight = schedule.load_weight + packageItem.weight;
+        const newLoadVolume = schedule.load_volume + packageItem.volume;
 
         if (newLoadWeight <= schedule.vehicle.max_load && newLoadVolume <= schedule.vehicle.max_volume) {
             if (checkEstimatedTime(packageItem, schedule, 8)) {

@@ -18,8 +18,8 @@ export type Package = {
     sender_address_lng?: number
     sender_phone: string
     status: "Pending" | "In Transit" | "Delivered"
-    weight: string
-    volume: string
+    weight: number
+    volume: number
     fragile?: boolean
     priority: PriorityType
     delivery_notes: string
