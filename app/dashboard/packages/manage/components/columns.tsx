@@ -125,9 +125,6 @@ export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
                                             This action cannot be undone. This will remove the package from
                                             the system and cancel any scheduled deliveries.
                                         </AlertDialogDescription>
-                                        <AlertDialogDescription className="text-foreground/50 hover:underline hover:text-blue-500 hover:cursor-pointer w-fit">
-                                            Made a mistake? Amend the package instead.
-                                        </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
