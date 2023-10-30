@@ -12,9 +12,7 @@ export const fetchSchedulesByDate = async (date: Date) => {
         .from('delivery_schedules')
         .select('*')
         .eq('delivery_date', formattedDate)
-        // TODO: add store id
-        .order('created_at', { ascending: false });
-
+    // TODO: add store id
     if (error) {
         console.error("Error fetching schedules: ", error);
         return;
@@ -22,11 +20,16 @@ export const fetchSchedulesByDate = async (date: Date) => {
         // For all schedules, convert the array of packageId UUIDs to array of Package objects using fetchPackagesByIds
         if (schedules) {
             for (let i = 0; i < schedules.length; i++) {
-                schedules[i].package_order = await db.packages.fetch.byIds(schedules[i].package_order);
+                const packageIdOrder = schedules[i].package_order;
+                const packages = await db.packages.fetch.byIds(schedules[i].package_order);
+
+                // ensure packages are sorted in the same order as they are saved in the database
+                if (packages) {
+                    schedules[i].package_order = packageIdOrder.map((id: UUID) => packages.find(pkg => pkg.package_id === id) as Package);
+                }
+
                 schedules[i].vehicle = await db.vehicles.fetch.byId(schedules[i].vehicle_id);
             }
-
-
         }
 
         const deliverySchedule: DeliverySchedule[] = schedules as DeliverySchedule[];
@@ -44,7 +47,7 @@ const updateScheduleStatus = async (scheduleId: UUID, status: string) => {
 
     if (error) {
         console.error("Error updating package status: ", error);
-        return("Error updating package status");
+        return ("Error updating package status");
     } else {
         return true;
     }
