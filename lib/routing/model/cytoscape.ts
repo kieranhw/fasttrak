@@ -32,6 +32,10 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
     const visCenterX = document.getElementById('cy')!.clientWidth / 2;
     const visCenterY = document.getElementById('cy')!.clientHeight / 2;
 
+    // Count packages being delivered to the same address
+    const packageCounts = countPackagesByAddress(graph);
+
+
     // Prepare nodes and edges data for cytoscape
     const cyNodes = graph.nodes.map((node, index) => {
 
@@ -39,10 +43,25 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
         const x = visCenterX + (node.coordinates.lat - midLat) * 20000 * Math.cos(-45) - (node.coordinates.lng - midLng) * 20000 * Math.sin(-45);
         const y = visCenterY + (node.coordinates.lat - midLat) * 20000 * Math.sin(-45) + (node.coordinates.lng - midLng) * 20000 * Math.cos(-45);
 
+        let label: string;
+        if (node.isDepot) {
+            label = 'Depot';
+        } else if (node.pkg) {
+            label = node.pkg.recipient_address;
+            const count = packageCounts[node.pkg.recipient_address];
+            if (count > 1) {
+                label += `\n${count} Packages`;
+            } else if (count === 1) {
+                label += `\n1 Package`;
+            }
+        } else {
+            label = 'Unknown';
+        }
+
         return {
             data: {
                 id: index.toString(),
-                label: node.isDepot ? 'Depot' : `${node.pkg?.recipient_address}`,
+                label,
                 isDepot: node.isDepot ? 'true' : 'false'
             },
             position: { x, y }
@@ -86,6 +105,7 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
                 style: {
                     'label': '',  // Initially, labels are empty
                     'font-size': '24px',
+                    'text-wrap': 'wrap',
                 }
             },
             {
@@ -160,4 +180,15 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
         // Revert all other edges to their original text-opacity
         cy.edges().difference(edge).style({ 'text-opacity': 1 });
     });
+}
+
+function countPackagesByAddress(graph: Graph): Record<string, number> {
+    const addressCount: Record<string, number> = {};
+    graph.nodes.forEach((node) => {
+        if (!node.isDepot && node.pkg) {
+            const address = node.pkg.recipient_address;
+            addressCount[address] = (addressCount[address] || 0) + 1;
+        }
+    });
+    return addressCount;
 }
