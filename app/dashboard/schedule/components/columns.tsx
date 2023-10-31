@@ -50,7 +50,6 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                         <HoverCardTrigger asChild>
                             <Link href={`/dashboard/vehicles/record/${vehicle.vehicle_id}`}>
                                 <p className="hover:text-blue-500 hover:underline hover:cursor-pointer">{vehicle.registration}</p>
-
                             </Link>
                         </HoverCardTrigger>
                         <HoverCardContent className="w-50">
@@ -132,7 +131,7 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
     {
         id: "actions",
         cell: ({ row }) => {
-            const p = row.original
+            const schedule = row.original
             const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
             const [inProgressAlertOpen, setInProgressAlertOpen] = useState(false)
             const [completeAlertOpen, setCompleteAlertOpen] = useState(false)
@@ -169,7 +168,7 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                             <AlertDialog open={inProgressAlertOpen} onOpenChange={setInProgressAlertOpen}>
                                 <AlertDialogTrigger asChild>
                                     <Button
-                                        disabled={p.status != DeliveryStatus.Scheduled}
+                                        disabled={schedule.status != DeliveryStatus.Scheduled}
                                         variant="ghost"
                                         className="relative w-full justify-start h-8 font-normal flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
                                     >
@@ -185,8 +184,8 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction disabled={p.status != DeliveryStatus.Scheduled}
-                                            onClick={() => handleUpdateStatus(p.schedule_id!, DeliveryStatus.InProgress)}
+                                        <AlertDialogAction disabled={schedule.status != DeliveryStatus.Scheduled}
+                                            onClick={() => handleUpdateStatus(schedule.schedule_id!, DeliveryStatus.InProgress)}
                                         >
                                             Continue
                                         </AlertDialogAction>
@@ -198,7 +197,7 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                             <AlertDialog open={completeAlertOpen} onOpenChange={setCompleteAlertOpen}>
                                 <AlertDialogTrigger asChild>
                                     <Button
-                                        disabled={p.status == DeliveryStatus.Scheduled || p.status == DeliveryStatus.Completed || p.status == DeliveryStatus.Cancelled}
+                                        disabled={schedule.status == DeliveryStatus.Scheduled || schedule.status == DeliveryStatus.Completed || schedule.status == DeliveryStatus.Cancelled}
                                         variant="ghost"
                                         className="relative w-full justify-start h-8 font-normal flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
                                     >
@@ -215,7 +214,7 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                                     <AlertDialogFooter>
                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                                         <AlertDialogAction
-                                            onClick={() => handleUpdateStatus(p.schedule_id!, DeliveryStatus.Completed)}
+                                            onClick={() => handleUpdateStatus(schedule.schedule_id!, DeliveryStatus.Completed)}
                                         >
                                             Continue
                                         </AlertDialogAction>
@@ -224,7 +223,10 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                             </AlertDialog>
 
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>View Route</DropdownMenuItem>
+                            <Link href={`/dashboard/schedule/${schedule.schedule_id}`}>
+                                <DropdownMenuItem>Route Details</DropdownMenuItem>
+                            </Link>
+
                             <DropdownMenuItem>Export Directions</DropdownMenuItem>
 
                             {/* If delivery already in progress, show dialog to select any items that have already been delivered */}
