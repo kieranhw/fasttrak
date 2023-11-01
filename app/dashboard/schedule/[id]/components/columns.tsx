@@ -39,6 +39,19 @@ import {
 
 export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
     {
+        header: "Order",
+        cell: ({ row }) => {
+            // set delivery number based on number of row in the table
+            const deliveryNumber = row.index + 1            
+
+            return (
+                <div className="flex flex-col w-5">
+                    <p>{deliveryNumber}</p>
+                </div>
+            )
+        }
+    },
+    {
         accessorKey: "tracking_id",
         header: "Tracking ID",
         cell: ({ row }) => {
@@ -55,24 +68,19 @@ export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
         }
     },
     {
-        accessorKey: "weight",
-        header: "Weight (kg)",
-    },
-    {
-        accessorKey: "volume",
-        header: () => (
-            <div className="text-left">
-                Volume (m<sup>3</sup>)
-            </div>
-        ),
-    },
-    {
-        accessorKey: "priority",
-        header: "Priority",
-    },
-    {
-        accessorKey: "status",
-        header: "Status",
+        header: "Load",
+        cell: ({ row }) => {
+            const weight = row.original.weight?.toString();
+            const volume = row.original.volume?.toString();
+            
+            return (
+                <div className="flex flex-col w-fit">
+                    <p>{weight} kg</p>
+                    <p>{volume} m<sup>3</sup></p>
+
+                </div>
+            )
+        }
     },
     {
         accessorKey: "recipient_address",
@@ -86,65 +94,5 @@ export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
             return postcode;
         }
     },
-    {
-        id: "actions",
-        cell: ({ row }) => {
-            const p = row.original
-            const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
-            const [editDialogOpen, setEditDialogOpen] = useState(false)
-
-
-            async function handleRemovePackage(id?: UUID) {
-                if (!id) {
-                    console.warn("Schedule ID is undefined. Cannot remove package.");
-                    return;
-                }
-                await db.packages.remove.byId(id);
-                refreshData();
-            }
-
-
-            return (
-                <>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-
-                            <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" className="relative h-8 font-normal text-black bg-card flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
-                                        Remove Package
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Remove Package</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            This action cannot be undone. This will remove the package from
-                                            the system and cancel any scheduled deliveries.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => handleRemovePackage(p.package_id)}>Continue</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    {/* Remove Package Alert */}
-
-                </>
-
-            )
-        },
-    },
+    
 ]
