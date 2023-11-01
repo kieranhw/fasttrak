@@ -2,7 +2,6 @@
 
 import { fetchSchedulesByDate } from "@/lib/db/delivery-schedules";
 import { createGraphAndSolutionFromSchedule } from "@/lib/routing/create-schedules";
-import { displayGraph } from "@/lib/routing/model/cytoscape";
 import { DeliverySchedule } from "@/types/delivery-schedule";
 import { useState, useEffect } from "react";
 import { date } from "zod";
@@ -11,6 +10,10 @@ import { columns } from "./components/columns"
 import { db } from "@/lib/db/db";
 import { UUID } from "crypto";
 import { Package } from "@/types/package";
+import { Graph } from "@/lib/routing/model/graph";
+import { VRPSolution } from "@/lib/routing/model/vrp";
+import { displayGraph } from "../../../../lib/cytoscape-data";
+import { CytoscapeGraph } from "../../../../components/CytoscapeGraph";
 
 export default function ScheduleDetails() {
 
@@ -19,35 +22,29 @@ export default function ScheduleDetails() {
     const [packages, setPackages] = useState<Package[]>([]);
     const [reload, setReload] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [graph, setGraph] = useState<any>(null);
-    const [solution, setSolution] = useState<any>(null);
+    const [graph, setGraph] = useState<Graph>();
+    const [solution, setSolution] = useState<VRPSolution>();
 
     useEffect(() => {
-
-        async function fetchData() {
-            setIsLoading(true); // Set loading to true when starting to fetch data
-
-            const id = window.location.pathname.split("/")[3]
-
+        async function fetchDataAndCreateGraph() {
+            setIsLoading(true);
+            const id = window.location.pathname.split("/")[3];
             let schedule = await db.schedules.fetch.byId(id as UUID);
-
             if (schedule) {
                 setData(schedule as DeliverySchedule);
-
                 let packages = schedule.package_order;
-
                 if (packages) {
                     setPackages(packages);
                 }
-            } else {
-                setData(undefined);
+                const [graph, solution] = await createGraphAndSolutionFromSchedule(schedule);
+                setGraph(graph);
+                setSolution(solution);
             }
-
-            setIsLoading(false); // Set loading to false after fetching data
+            setIsLoading(false);
         }
-
-        fetchData();
+        fetchDataAndCreateGraph();
     }, [reload]);
+
 
     // Generate graph once data is loaded
     useEffect(() => {
@@ -67,7 +64,12 @@ export default function ScheduleDetails() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <DataTable columns={columns(refreshData)} data={packages!} />
-                <div className="border rounded-md border-divider">Map</div>
+                <div className="border rounded-md border-divider">
+                    {graph && solution &&
+                        <CytoscapeGraph graph={graph} solution={solution} />
+
+                    }
+                </div>
             </div>
         </div>
     )

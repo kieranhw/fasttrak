@@ -140,10 +140,30 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
 
 
             async function handleUpdateStatus(id: UUID, status: DeliveryStatus) {
-                console.log(id)
+
+                // Update schedule status
                 const res = await db.schedules.update.status(id, status)
+
                 if (res) {
                     console.log("Delivery status updated successfully.")
+
+                    let packageIds: UUID[] = []
+                    let packageStatus = ""
+
+                    schedule.package_order.forEach(e => {
+                        // Add package IDs to array
+                        packageIds.push(e.package_id)
+                    });
+
+                    if (status == DeliveryStatus.InProgress) {
+                        packageStatus = "In Transit"
+                    } else if (status == DeliveryStatus.Completed) {
+                        packageStatus = "Delivered"
+                    }
+
+                    // Update packages from schedule to updated status
+                    const packages = await db.packages.update.status(packageIds, packageStatus)
+
                 } else {
                     console.warn("Failed to update delivery status.");
                 }

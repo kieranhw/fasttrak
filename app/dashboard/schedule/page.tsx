@@ -28,10 +28,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-import { createGraphAndSolutionFromSchedule, createSchedules } from "@/lib/routing/create-schedules";
+import { createGraphAndSolutionFromScheduleArray, createSchedules } from "@/lib/routing/create-schedules";
 import { db } from "@/lib/db/db";
-import { displayGraph } from "@/lib/routing/model/cytoscape";
-import { CytoscapeGraph } from "@/app/dashboard/schedule/components/cytoscape-graph";
+import { displayGraph } from "@/lib/cytoscape-data";
+import { CytoscapeGraph } from "@/components/CytoscapeGraph";
 
 export default function ScheduleDeliveries() {
 
@@ -81,7 +81,7 @@ export default function ScheduleDeliveries() {
       }
 
       // Create graph and solution
-      const [graph, solution] = await createGraphAndSolutionFromSchedule(schedules as DeliverySchedule[]);
+      const [graph, solution] = await createGraphAndSolutionFromScheduleArray(schedules as DeliverySchedule[]);
       setGraph(graph);
       setSolution(solution);
 
@@ -331,9 +331,13 @@ export default function ScheduleDeliveries() {
 
       {data.length > 0 &&
         <div className="flex flex-col justify-between mt-8">
-          <h1 className="text-foreground font-semibold text-xl my-auto">Analysis</h1>
+          <h1 className="text-foreground font-semibold text-xl my-4">Analysis</h1>
           <div className="grid grid-cols-1 lg:grid-cols-2">
-            <CytoscapeGraph graph={graph} solution={solution} />
+            <div className="border rounded-md border-divider h-[500px]">
+              {graph && solution &&
+                <CytoscapeGraph graph={graph} solution={solution} />
+              }
+            </div>
           </div>
 
         </div>

@@ -1,7 +1,7 @@
 import cytoscape from "cytoscape";
-import { Graph, calculateDistance } from "./graph";
-import { VRPSolution } from "./vrp";
-import { estimateDuration } from "../create-schedules";
+import { Graph, calculateDistance } from "@/lib/routing/model/graph";
+import { VRPSolution } from "@/lib/routing/model/vrp";
+import { estimateDuration } from "@/lib/routing/create-schedules";
 
 interface CyEdge {
     data: {
@@ -40,8 +40,8 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
     const cyNodes = graph.nodes.map((node, index) => {
 
         // positions with rotate -45 degrees to view map from north orientation
-        const x = visCenterX + (node.coordinates.lat - midLat) * 20000 * Math.cos(-45) - (node.coordinates.lng - midLng) * 20000 * Math.sin(-45);
-        const y = visCenterY + (node.coordinates.lat - midLat) * 20000 * Math.sin(-45) + (node.coordinates.lng - midLng) * 20000 * Math.cos(-45);
+        const x = visCenterX + (node.coordinates.lat - midLat) * 25000 * Math.cos(-45) - (node.coordinates.lng - midLng) * 25000 * Math.sin(-45);
+        const y = visCenterY + (node.coordinates.lat - midLat) * 25000 * Math.sin(-45) + (node.coordinates.lng - midLng) * 25000 * Math.cos(-45);
 
         let label: string;
         if (node.isDepot) {
@@ -181,6 +181,7 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
         cy.edges().difference(edge).style({ 'text-opacity': 1 });
     });
 }
+
 
 function countPackagesByAddress(graph: Graph): Record<string, number> {
     const addressCount: Record<string, number> = {};

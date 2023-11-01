@@ -3,7 +3,7 @@ import { Vehicle } from "@/types/vehicle";
 import { Graph, Node, Edge, createGraph, calculateDistance } from '../model/graph';
 import { VehicleRoute, VRPSolution } from '../model/vrp';
 import { estimateDuration } from "../create-schedules";
-import { displayGraph } from "../model/cytoscape";
+import { displayGraph } from "../../cytoscape-data";
 
 /***
  * Round Robin Allocation 1

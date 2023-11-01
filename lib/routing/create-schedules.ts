@@ -54,7 +54,7 @@ export function estimateDuration(distance: number): number {
     return (distance / averageSpeed) * 60; // minutes
 }
 
-export async function createGraphAndSolutionFromSchedule(schedules: DeliverySchedule[]): Promise<[Graph, VRPSolution]> {
+export async function createGraphAndSolutionFromScheduleArray(schedules: DeliverySchedule[]): Promise<[Graph, VRPSolution]> {
     const graph = new Graph();
     const solution = new VRPSolution();
 
@@ -89,6 +89,39 @@ export async function createGraphAndSolutionFromSchedule(schedules: DeliverySche
         route.closeRoute(depotNode);
         solution.addRoute(route);
     }
+
+    return [graph, solution];
+}
+
+// Create graph and solution from singular schedule
+export async function createGraphAndSolutionFromSchedule(schedule: DeliverySchedule): Promise<[Graph, VRPSolution]> {
+    const graph = new Graph();
+    const solution = new VRPSolution();
+
+    // Create nodes for depot, assuming all schedules share the same depot
+    const depotCoordinates = { lat: 53.403782, lng: -2.971970 }; 
+    const depotNode = new Node(null, depotCoordinates, true);
+    graph.addNode(depotNode);
+
+    // Create nodes for packages and edges from depot to each package
+    for (const pkg of schedule.package_order) {
+        const coordinates = { lat: pkg.recipient_address_lat as number, lng: pkg.recipient_address_lng as number };
+        const pkgNode = new Node(pkg, coordinates);
+        graph.addNode(pkgNode);
+        graph.addEdge(new Edge(depotNode, pkgNode, calculateDistance(depotNode, pkgNode)));
+    }
+
+    // Create VehicleRoute and VRPSolution from schedule
+    const route = new VehicleRoute(schedule.vehicle, depotNode);
+    for (const pkg of schedule.package_order) {
+        const pkgNode = graph.nodes.find(node => node.pkg?.package_id === pkg.package_id);
+        if (pkgNode) {
+            const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode);
+            route.addNode(pkgNode, travelCost, 0);  // Assume timeRequired is 0 for simplicity
+        }
+    }
+    route.closeRoute(depotNode);
+    solution.addRoute(route);
 
     return [graph, solution];
 }

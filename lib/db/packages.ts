@@ -73,12 +73,30 @@ const removePackageById = async (id: UUID) => {
     }
 }
 
+// Update package status by IDs
+const updatePackageStatusByIds = async (ids: UUID[], status: string) => {
+    const { error } = await supabase
+        .from('packages')
+        .update({ status: status })
+        .eq('package_id', ids);
+
+    if (error) {
+        console.error("Error updating package status: ", error);
+        return
+    } else {
+        return
+    }
+}
+
 
 export const packages = {
     fetch: {
         all: fetchPackages,
         pending: fetchPackagesByPending,
         byIds: fetchPackagesByIds,
+    },
+    update: {
+        status: updatePackageStatusByIds,
     },
     remove: {
         byId: removePackageById,
