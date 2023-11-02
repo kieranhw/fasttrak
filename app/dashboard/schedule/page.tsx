@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { columns } from "./components/columns"
 import { DataTable } from "./components/data-table"
 import { Package } from "@/types/package";
-import { DeliverySchedule } from "@/types/delivery-schedule";
+import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { supabase } from "@/pages/api/supabase-client";
 import { fetchSchedulesByDate } from "@/lib/db/delivery-schedules";
 
@@ -65,6 +65,7 @@ export default function ScheduleDeliveries() {
   const [isScheduling, setIsScheduling] = useState(false);
   const [graph, setGraph] = useState<any>(null);
   const [solution, setSolution] = useState<any>(null);
+  const [isDeletable, setIsDeletable] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -75,6 +76,13 @@ export default function ScheduleDeliveries() {
       if (schedules && schedules.length > 0) {
         setData(schedules as DeliverySchedule[]);
         setIsScheduledToday(true);
+
+        schedules.forEach(schedule => {
+          if (schedule.status !== DeliveryStatus.Scheduled) {
+            setIsDeletable(false);
+          }
+        });
+
       } else {
         setData([]);
         setIsScheduledToday(false);
@@ -278,7 +286,7 @@ export default function ScheduleDeliveries() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="outline"
-                    disabled={isLoading == true || isScheduledToday == false || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01")}
+                    disabled={isLoading == true || isScheduledToday == false || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isDeletable == false}
                     onClick={e => handleDeleteSchedule()}
                   >
                     Delete
@@ -310,7 +318,7 @@ export default function ScheduleDeliveries() {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button className="rounded-l-none border-l-none border-y border-r"
-                        disabled={isLoading == true || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isScheduledToday != false}
+                        disabled={isLoading == true || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isScheduledToday != false }
                         onClick={e => handleScheduleDelivery()}
                       >
                         Schedule

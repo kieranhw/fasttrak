@@ -59,12 +59,14 @@ export default function ScheduleDetails() {
         <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1500px]">
             <p>Schedule &gt; 31/05/23 &gt; ABCD12E</p>
             <div className="inline-flex justify-between">
-                <h1 className="text-foreground font-bold text-2xl my-auto">Route</h1>
+                <h1 className="text-foreground font-bold text-2xl my-4">Route</h1>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <DataTable columns={columns(refreshData)} data={packages!} />
-                <div className="border rounded-md border-divider">
+                <div>
+                    <DataTable columns={columns(refreshData)} data={packages!} />
+                </div>
+                <div className="border rounded-md border-divider min-h-[500px]">
                     {graph && solution &&
                         <CytoscapeGraph graph={graph} solution={solution} />
 
