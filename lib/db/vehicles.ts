@@ -22,7 +22,7 @@ const fetchVehicles = async () => {
 }
 
 // Fetch vehicle by ID
-const fetchVehicleById = async (id: UUID[]) => {
+const fetchVehicleById = async (id: UUID) => {
 
     const { data, error } = await supabase
         .from('vehicles')
