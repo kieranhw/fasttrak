@@ -34,6 +34,7 @@ import { displayGraph } from "@/lib/cytoscape-data";
 import { CytoscapeGraph } from "@/components/CytoscapeGraph";
 
 export default function ScheduleDeliveries() {
+  
 
   // Date Picker
   const [date, setDate] = useState<Date>(new Date());
@@ -75,11 +76,15 @@ export default function ScheduleDeliveries() {
 
       if (schedules && schedules.length > 0) {
         setData(schedules as DeliverySchedule[]);
+        // sort data by route number
+        schedules.sort((a, b) => a.route_number - b.route_number);
         setIsScheduledToday(true);
 
         schedules.forEach(schedule => {
           if (schedule.status !== DeliveryStatus.Scheduled) {
             setIsDeletable(false);
+          } else {
+            setIsDeletable(true);
           }
         });
 
@@ -146,6 +151,7 @@ export default function ScheduleDeliveries() {
             vehicle_id: deliverySchedule[schedule].vehicle_id,
             package_order: packageOrderIds,
             delivery_date: deliverySchedule[schedule].delivery_date,
+            route_number: deliverySchedule[schedule].route_number,
             start_time: deliverySchedule[schedule].start_time,
             status: deliverySchedule[schedule].status,
             num_packages: deliverySchedule[schedule].num_packages,

@@ -39,6 +39,10 @@ import {
 
 export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] => [
     {
+        accessorKey: "route_number",
+        header: "Route",
+    },
+    {
         accessorKey: "vehicle",
         header: "Vehicle",
         cell: ({ row }) => {

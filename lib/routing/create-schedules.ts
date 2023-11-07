@@ -30,6 +30,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
             vehicle: route.vehicle,
             package_order: route.nodes.map(node => node.pkg as Package),
             delivery_date: date,
+            route_number: schedules.length + 1,
             start_time: date,
             status: DeliveryStatus.Scheduled,
             num_packages: route.nodes.length-2, // minus 2 to exclude depot nodes
