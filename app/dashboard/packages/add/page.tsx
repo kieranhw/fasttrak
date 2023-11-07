@@ -147,25 +147,7 @@ export default function AddPackage() {
   }
 
 
-  // Generate Packages
-  const [loadingPackages, setLoadingPackages] = useState<boolean>(false);
 
-  async function handleGeneratePackages() {
-    setLoadingPackages(true);
-    const packages = await generatePackages(1);
-
-    const { error } = await supabase
-      .from('packages')
-      .insert(packages)
-    if (error) {
-      alert(error.message)
-    }
-
-    // wait 2 seconds
-    setTimeout(() => {
-      setLoadingPackages(false);
-    }, 1000);
-  }
 
 
   return (
@@ -174,23 +156,6 @@ export default function AddPackage() {
         <h1 className="text-foreground font-bold text-3xl my-auto">Add Package</h1>
       </div>
 
-      <div className="inline-flex gap-2 pt-2">
-        <div className="h-10 rounded-md bg-secondary items-center w-full justify-between text-black text-md p-2 truncate">
-          <b>DEMO: </b>
-          Generate 1 package
-        </div>
-
-        {loadingPackages == true &&
-          <Button disabled>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Generating
-          </Button>
-        }
-
-        {loadingPackages == false &&
-          <Button onClick={e => handleGeneratePackages()}>Generate</Button>
-        }
-      </div>
 
 
       <div className="w-full h-4" />
