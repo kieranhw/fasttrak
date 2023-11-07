@@ -5,7 +5,7 @@ import { createGraphAndSolutionFromSchedule } from "@/lib/routing/create-schedul
 import { DeliverySchedule } from "@/types/delivery-schedule";
 import { useState, useEffect } from "react";
 import { date } from "zod";
-import { DataTable } from "../components/data-table"
+import { DataTable } from "./components/data-table"
 import { columns } from "./components/columns"
 import { db } from "@/lib/db/db";
 import { UUID } from "crypto";
@@ -14,6 +14,8 @@ import { Graph } from "@/lib/routing/model/graph";
 import { VRPSolution } from "@/lib/routing/model/vrp";
 import { displayGraph } from "../../../../lib/cytoscape-data";
 import { CytoscapeGraph } from "../../../../components/CytoscapeGraph";
+import { BreadcrumbLink } from "@/components/ui/breadcrumb-link";
+
 
 export default function ScheduleDetails() {
 
@@ -45,7 +47,6 @@ export default function ScheduleDetails() {
         fetchDataAndCreateGraph();
     }, [reload]);
 
-
     // Generate graph once data is loaded
     useEffect(() => {
         if (graph && solution) {
@@ -55,9 +56,26 @@ export default function ScheduleDetails() {
 
     const refreshData = () => setReload(prev => !prev);
 
+
+    // Format date as local date, e.g. DD/MM/YY or MM/DD/YY
+    const formatDate = (date: Date | undefined) => {
+        if (!date) {
+            return "No date";
+        } else {
+            return new Date(date).toLocaleDateString();
+        }
+    }
+
+
+
     return (
         <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1500px]">
-            <p>Schedule &gt; 31/05/23 &gt; ABCD12E</p>
+            <div>
+        
+                <BreadcrumbLink href="/dashboard/schedule" text="Schedule" />
+                <BreadcrumbLink text={formatDate(data?.delivery_date!)} />
+                <BreadcrumbLink href="/dashboard/schedule" text={`Route ${data?.route_number}`} lastItem />
+            </div>
             <div className="inline-flex justify-between">
                 <h1 className="text-foreground font-bold text-2xl my-4">Route</h1>
             </div>
@@ -73,6 +91,6 @@ export default function ScheduleDetails() {
                     }
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
