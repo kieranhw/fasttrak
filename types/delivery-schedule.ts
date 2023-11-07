@@ -16,6 +16,7 @@ export type DeliverySchedule = {
     store_id?: UUID;
     package_order: Package[];  // Convert array of UUIDs to array of Package objects
     delivery_date: Date;
+    route_number: number;
     start_time: Date;
     status: DeliveryStatus;
     num_packages: number;

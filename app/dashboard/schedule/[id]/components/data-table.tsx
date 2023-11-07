@@ -22,15 +22,6 @@ import {
 } from "@/components/ui/table"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -60,7 +51,7 @@ export function DataTable<TData, TValue>({
     },
     initialState: {
       pagination: {
-        pageSize: 8,
+        pageSize: 6,
       },
     },
   })
@@ -116,7 +107,7 @@ export function DataTable<TData, TValue>({
 
           <div className="text-foreground/50 text-sm">
             {table.getFilteredRowModel().rows?.length || 0}
-            {table.getFilteredRowModel().rows?.length >= 1 ? ' Items' : ' Item'}
+            {table.getFilteredRowModel().rows?.length >= 1 ? ' Deliveries' : ' Delivery'}
           </div>
 
           <div className="inline-flex items-center space-x-2">

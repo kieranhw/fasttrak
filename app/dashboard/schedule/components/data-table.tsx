@@ -116,7 +116,7 @@ export function DataTable<TData, TValue>({
 
           <div className="text-foreground/50 text-sm">
             {table.getFilteredRowModel().rows?.length || 0}
-            {table.getFilteredRowModel().rows?.length >= 1 ? ' Items' : ' Item'}
+            {table.getFilteredRowModel().rows?.length >= 1 ? ' Routes' : ' Route'}
           </div>
 
           <div className="inline-flex items-center space-x-2">
