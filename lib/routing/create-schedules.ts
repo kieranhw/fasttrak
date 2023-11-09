@@ -33,7 +33,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
             route_number: schedules.length + 1,
             start_time: date,
             status: DeliveryStatus.Scheduled,
-            num_packages: route.nodes.length-2, // minus 2 to exclude depot nodes
+            num_packages: route.nodes.length - 2, // minus 2 to exclude depot nodes
             estimated_duration_mins: estimateDuration(route.totalCost),
             actual_duration_mins: 0,
             distance_miles: route.totalCost.toFixed(2) as unknown as number,
@@ -60,7 +60,7 @@ export async function createGraphAndSolutionFromScheduleArray(schedules: Deliver
     const solution = new VRPSolution();
 
     // Create nodes for depot, assuming all schedules share the same depot
-    const depotCoordinates = { lat: 53.403782, lng: -2.971970 }; 
+    const depotCoordinates = { lat: 53.403782, lng: -2.971970 };
     const depotNode = new Node(null, depotCoordinates, true);
     graph.addNode(depotNode);
     console.log(schedules)
@@ -70,10 +70,15 @@ export async function createGraphAndSolutionFromScheduleArray(schedules: Deliver
         console.log(schedule.package_order)
 
         for (const pkg of schedule.package_order) {
-            const coordinates = { lat: pkg.recipient_address_lat as number, lng: pkg.recipient_address_lng as number };
-            const pkgNode = new Node(pkg, coordinates);
-            graph.addNode(pkgNode);
-            graph.addEdge(new Edge(depotNode, pkgNode, calculateDistance(depotNode, pkgNode)));
+            // catch error if pkg.recipient_address_lat or lng is null
+
+            if (pkg) {
+                const coordinates = { lat: pkg.recipient_address_lat as number, lng: pkg.recipient_address_lng as number };
+                const pkgNode = new Node(pkg, coordinates);
+                graph.addNode(pkgNode);
+                graph.addEdge(new Edge(depotNode, pkgNode, calculateDistance(depotNode, pkgNode)));
+            }
+
         }
     }
 
@@ -81,11 +86,14 @@ export async function createGraphAndSolutionFromScheduleArray(schedules: Deliver
     for (const schedule of schedules) {
         const route = new VehicleRoute(schedule.vehicle, depotNode);
         for (const pkg of schedule.package_order) {
-            const pkgNode = graph.nodes.find(node => node.pkg?.package_id === pkg.package_id);
-            if (pkgNode) {
-                const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode);
-                route.addNode(pkgNode, travelCost, 0);  // Assume timeRequired is 0 for simplicity
+            if (pkg) {
+                const pkgNode = graph.nodes.find(node => node.pkg?.package_id === pkg.package_id);
+                if (pkgNode) {
+                    const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode);
+                    route.addNode(pkgNode, travelCost, 0);  // Assume timeRequired is 0 for simplicity
+                }
             }
+
         }
         route.closeRoute(depotNode);
         solution.addRoute(route);
@@ -100,7 +108,7 @@ export async function createGraphAndSolutionFromSchedule(schedule: DeliverySched
     const solution = new VRPSolution();
 
     // Create nodes for depot, assuming all schedules share the same depot
-    const depotCoordinates = { lat: 53.403782, lng: -2.971970 }; 
+    const depotCoordinates = { lat: 53.403782, lng: -2.971970 };
     const depotNode = new Node(null, depotCoordinates, true);
     graph.addNode(depotNode);
 
