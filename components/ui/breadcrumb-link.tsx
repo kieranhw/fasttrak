@@ -7,8 +7,8 @@ interface BreadcrumbLinkProps {
 }
 
 export const BreadcrumbLink: React.FC<BreadcrumbLinkProps> = ({ href, text, lastItem }) => {
-    const textColor = lastItem ? "text-foreground" : "text-foreground/50";
-    const separator = !lastItem ? <div className="text-foreground/50">/</div> : null;
+    const textColor = lastItem ? "text-foreground" : "text-muted-foreground";
+    const separator = !lastItem ? <div className="text-muted-foreground">/</div> : null;
 
     return (
         <div className="inline-flex gap-2 mx-2 ml-0">

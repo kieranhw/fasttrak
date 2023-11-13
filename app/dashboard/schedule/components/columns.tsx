@@ -72,7 +72,7 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                             </div>
                         </HoverCardContent>
                     </HoverCard>
-                    <p className="text-sm text-foreground/50 w-fit">{vehicle.manufacturer} {vehicle.model}</p>
+                    <p className="text-sm text-muted-foreground w-fit">{vehicle.manufacturer} {vehicle.model}</p>
                 </div>
             )
         }

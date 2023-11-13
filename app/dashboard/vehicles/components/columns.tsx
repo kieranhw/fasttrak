@@ -153,7 +153,7 @@ export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
                                         the system and cancel any scheduled deliveries.
                                     </AlertDialogDescription>
                                     <AlertDialogDescription
-                                        className="text-foreground/50 hover:underline hover:text-blue-500 hover:cursor-pointer w-fit"
+                                        className="text-muted-foreground hover:underline hover:text-blue-500 hover:cursor-pointer w-fit"
                                         onClick={() => {
                                             setRemoveDialogOpen(false);
                                             setEditDialogOpen(true);

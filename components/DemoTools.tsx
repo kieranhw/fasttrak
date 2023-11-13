@@ -45,8 +45,8 @@ export default function DemoTools() {
             <DropdownMenuContent className="mr-4">
                 <DropdownMenuLabel>Demo Tools</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={e => handleGeneratePackages(1)}>Add Package</DropdownMenuItem>
-                <DropdownMenuItem onClick={e => handleGeneratePackages(5)}>Add 5 Packages</DropdownMenuItem>
+                <DropdownMenuItem onClick={e => handleGeneratePackages(1)}>Generate Package</DropdownMenuItem>
+                <DropdownMenuItem onClick={e => handleGeneratePackages(5)}>Generate 5 Packages</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Add Vehicle</DropdownMenuItem>
             </DropdownMenuContent>

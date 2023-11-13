@@ -156,14 +156,14 @@ export function DataTable<TData, TValue>({
         </Table>
         <div className="border-t flex items-center justify-between space-x-2 py-4 px-4">
 
-          <div className="text-foreground/50 text-sm">
+          <div className="text-muted-foreground text-sm">
             {table.getFilteredRowModel().rows?.length || 0}
             {table.getFilteredRowModel().rows?.length >= 1 ? ' Packages' : ' Package'}
           </div>
 
           <div className="inline-flex items-center space-x-2">
             {table.getFilteredRowModel().rows?.length >= 1 &&
-              <div className="text-foreground/50 text-sm pr-2">Page {table.getState().pagination.pageIndex + 1} of{" "} {table.getPageCount()}</div>
+              <div className="text-muted-foreground text-sm pr-2">Page {table.getState().pagination.pageIndex + 1} of{" "} {table.getPageCount()}</div>
             }
 
             <Button

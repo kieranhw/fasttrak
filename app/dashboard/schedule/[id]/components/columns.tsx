@@ -61,7 +61,7 @@ export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
                 <div className="flex flex-col w-fit">
                     <p>{trackingId}</p>
                     <Link target="_blank" href={`/track/${trackingId}`}>
-                        <p className="text-sm text-foreground/50 hover:text-blue-500 hover:underline w-fit">View Tracking</p>
+                        <p className="text-sm text-muted-foreground hover:text-blue-500 hover:underline w-fit">View Tracking</p>
                     </Link>
                 </div>
             )

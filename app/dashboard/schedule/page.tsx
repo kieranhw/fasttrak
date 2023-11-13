@@ -32,9 +32,9 @@ import { createGraphAndSolutionFromScheduleArray, createSchedules } from "@/lib/
 import { db } from "@/lib/db/db";
 import { displayGraph } from "@/lib/cytoscape-data";
 import { CytoscapeGraph } from "@/components/CytoscapeGraph";
-
+import { MdRefresh } from "react-icons/md"
 export default function ScheduleDeliveries() {
-  
+
 
   // Date Picker
   const [date, setDate] = useState<Date>(new Date());
@@ -59,7 +59,7 @@ export default function ScheduleDeliveries() {
   }, [])
 
   // Data
-  const [data, setData] = useState<DeliverySchedule[]>([]);
+  const [deliverySchedules, setDeliverySchedules] = useState<DeliverySchedule[]>([]);
   const [reload, setReload] = useState(false);
   const [isScheduledToday, setIsScheduledToday] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -75,7 +75,7 @@ export default function ScheduleDeliveries() {
       let schedules = await fetchSchedulesByDate(date);
 
       if (schedules && schedules.length > 0) {
-        setData(schedules as DeliverySchedule[]);
+        setDeliverySchedules(schedules as DeliverySchedule[]);
         // sort data by route number
         schedules.sort((a, b) => a.route_number - b.route_number);
         setIsScheduledToday(true);
@@ -88,15 +88,13 @@ export default function ScheduleDeliveries() {
           }
         });
 
+        buildGraph(schedules)
+
       } else {
-        setData([]);
+        setDeliverySchedules([]);
         setIsScheduledToday(false);
       }
 
-      // Create graph and solution
-      const [graph, solution] = await createGraphAndSolutionFromScheduleArray(schedules as DeliverySchedule[]);
-      setGraph(graph);
-      setSolution(solution);
 
       setIsLoading(false); // Set loading to false after fetching data
     }
@@ -112,6 +110,14 @@ export default function ScheduleDeliveries() {
   }, [graph, solution])
 
   const refreshData = () => setReload(prev => !prev);
+
+  async function buildGraph(schedules: DeliverySchedule[]) {
+    // Create graph and solution
+    const [graph, solution] = await createGraphAndSolutionFromScheduleArray(schedules as DeliverySchedule[]);
+    setGraph(graph);
+    setSolution(solution);
+
+  }
 
   // Schedule
   async function handleScheduleDelivery() {
@@ -180,12 +186,12 @@ export default function ScheduleDeliveries() {
   }
 
   async function handleDeleteSchedule() {
-    if (data && data.length > 0) {
-      for (const schedule in data) {
+    if (deliverySchedules && deliverySchedules.length > 0) {
+      for (const schedule in deliverySchedules) {
         let packageOrderIds = [];
 
-        for (const pkg in data[schedule].package_order) {
-          packageOrderIds.push(data[schedule].package_order[pkg].package_id)
+        for (const pkg in deliverySchedules[schedule].package_order) {
+          packageOrderIds.push(deliverySchedules[schedule].package_order[pkg].package_id)
         }
 
         // update scheduledPackageIds status to scheduled
@@ -200,7 +206,7 @@ export default function ScheduleDeliveries() {
           const { error } = await supabase
             .from('delivery_schedules')
             .delete()
-            .match({ schedule_id: data[schedule].schedule_id })
+            .match({ schedule_id: deliverySchedules[schedule].schedule_id })
 
           if (error) {
             alert(error.message)
@@ -324,7 +330,7 @@ export default function ScheduleDeliveries() {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button className="rounded-l-none border-l-none border-y border-r"
-                        disabled={isLoading == true || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isScheduledToday != false }
+                        disabled={isLoading == true || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isScheduledToday != false}
                         onClick={e => handleScheduleDelivery()}
                       >
                         Schedule
@@ -341,17 +347,35 @@ export default function ScheduleDeliveries() {
         </div>
       </div>
 
-      <DataTable columns={columns(refreshData)} data={data} />
+      <DataTable columns={columns(refreshData)} data={deliverySchedules} />
 
-      {data.length > 0 &&
-        <div className="flex flex-col justify-between mt-8">
-          <h1 className="text-foreground font-semibold text-xl my-4">Analysis</h1>
+      {deliverySchedules.length > 0 &&
+        <div className="flex flex-col justify-between mt-4">
           <div className="grid grid-cols-1 lg:grid-cols-2">
-            <div className="border rounded-md border-divider h-[500px]">
-              {graph && solution &&
-                <CytoscapeGraph graph={graph} solution={solution} />
-              }
+            <div>
+              <div className=" border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1">
+                <p className="text-muted-foreground text-sm m-2">Network Analysis</p>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" onClick={e => buildGraph(deliverySchedules)}>
+                        <MdRefresh className="text-muted-foreground" size={18} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Reset Graph</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+              </div>
+              <div className="border rounded-t-none rounded-md border-divider h-[500px]">
+                {graph && solution &&
+                  <CytoscapeGraph graph={graph} solution={solution} />
+                }
+              </div>
             </div>
+
           </div>
 
         </div>
