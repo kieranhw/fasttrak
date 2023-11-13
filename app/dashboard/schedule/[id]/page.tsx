@@ -20,7 +20,7 @@ import { BreadcrumbLink } from "@/components/ui/breadcrumb-link";
 export default function ScheduleDetails() {
 
     // Data
-    const [data, setData] = useState<DeliverySchedule>();
+    const [deliverySchedule, setDeliverySchedule] = useState<DeliverySchedule>();
     const [packages, setPackages] = useState<Package[]>([]);
     const [reload, setReload] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -33,7 +33,7 @@ export default function ScheduleDetails() {
             const id = window.location.pathname.split("/")[3];
             let schedule = await db.schedules.fetch.byId(id as UUID);
             if (schedule) {
-                setData(schedule as DeliverySchedule);
+                setDeliverySchedule(schedule as DeliverySchedule);
                 let packages = schedule.package_order;
                 if (packages) {
                     setPackages(packages);
@@ -71,13 +71,12 @@ export default function ScheduleDetails() {
     return (
         <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1500px]">
             <div>
-        
                 <BreadcrumbLink href="/dashboard/schedule" text="Schedule" />
-                <BreadcrumbLink text={formatDate(data?.delivery_date!)} />
-                <BreadcrumbLink href="/dashboard/schedule" text={`Route ${data?.route_number}`} lastItem />
+                <BreadcrumbLink text={formatDate(deliverySchedule?.delivery_date!)} />
+                <BreadcrumbLink href="/dashboard/schedule" text={`Route ${deliverySchedule?.route_number}`} lastItem />
             </div>
             <div className="inline-flex justify-between">
-                <h1 className="text-foreground font-bold text-2xl my-4">Route</h1>
+                <h1 className="text-foreground font-bold text-2xl my-2">Route</h1>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -87,9 +86,44 @@ export default function ScheduleDetails() {
                 <div className="border rounded-md border-divider min-h-[500px]">
                     {graph && solution &&
                         <CytoscapeGraph graph={graph} solution={solution} />
-
                     }
                 </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
+                <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
+                    <h1 className="font-bold text-xl">Vehicle</h1>
+                    <p>Registration</p>
+                    <p className="text-sm text-muted-foreground">Manufacturer Model Year</p>
+                    <br />
+                    <p className="text-sm">250 / 300 kg utilised</p>
+                    <p className="text-sm">12 / 15 m<sup>3</sup> utilised</p>
+                </div>
+                <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
+                    <h1 className="font-bold text-xl">Packages</h1>
+                    <p className="text-md">X Packages</p>
+                    <br />
+                    <p className="text-sm">Average Weight / Package: Xkg</p>
+                    <p className="text-sm">Average Volume / Package: Xkg</p>
+                </div>
+                <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
+                    <h1 className="font-bold text-xl">Route</h1>
+                    <p className="text-md">X Stops (Distinct Locations)</p>
+                    <br/>
+                    <p className="text-sm">Driving Time: Xh Xm</p>
+                    <p className="text-sm">Driving Distance: X miles</p>
+                </div>
+                <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
+                    <h1 className="font-bold text-xl">Optimisation</h1>
+                    <p className="text-md">Lowest Distance</p>
+                    <br />
+                    <p className="text-sm">This route has been optimised to reduce the amount of
+                    total distance travelled.</p>
+                </div>
+
+
+
+
             </div>
         </div >
     )
