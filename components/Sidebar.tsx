@@ -70,8 +70,11 @@ export default function Sidebar() {
                         <Link draggable="false" href="/dashboard/packages/add">
                             <Button className={`${linkStyle} ${isActive("/dashboard/packages/add") ? activeLink : ''}`} variant="link">Add Package</Button>
                         </Link>
-                        <Link draggable="false" href="/dashboard/packages/manage">
+                        <Link draggable="false" href="/dashboard/packages/inventory">
                             <Button className={`${linkStyle} ${isActive("/dashboard/packages/inventory") ? activeLink : ''}`} variant="link">Inventory</Button>
+                        </Link>
+                        <Link draggable="false" href="/dashboard/packages/history">
+                            <Button className={`${linkStyle} ${isActive("/dashboard/packages/history") ? activeLink : ''}`} variant="link">History</Button>
                         </Link>
                     </AccordionContent>
                 </AccordionItem>
