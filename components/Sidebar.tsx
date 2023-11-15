@@ -71,7 +71,7 @@ export default function Sidebar() {
                             <Button className={`${linkStyle} ${isActive("/dashboard/packages/add") ? activeLink : ''}`} variant="link">Add Package</Button>
                         </Link>
                         <Link draggable="false" href="/dashboard/packages/manage">
-                            <Button className={`${linkStyle} ${isActive("/dashboard/packages/manage") ? activeLink : ''}`} variant="link">Manage Inventory</Button>
+                            <Button className={`${linkStyle} ${isActive("/dashboard/packages/inventory") ? activeLink : ''}`} variant="link">Inventory</Button>
                         </Link>
                     </AccordionContent>
                 </AccordionItem>
