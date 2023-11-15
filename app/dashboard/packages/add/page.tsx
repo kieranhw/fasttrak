@@ -10,8 +10,6 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { generateId } from "@/lib/generate-id";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { generatePackages } from "@/lib/generate-packages";
 import { Loader } from '@googlemaps/js-api-loader';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
@@ -61,6 +59,21 @@ export default function AddPackage() {
   async function onSubmit(values: z.infer<typeof PackageSchema>) {
     console.log("submitted")
     console.log(values)
+
+    // Swap address lines to allow better geocoding results
+    if (values.recipient_address_2) {
+      // swap address 1 and 2
+      const temp = values.recipient_address_1;
+      values.recipient_address_1 = values.recipient_address_2;
+      values.recipient_address_2 = temp;
+    }
+
+    if (values.sender_address_2) {
+      // swap address 1 and 2
+      const temp = values.sender_address_1;
+      values.sender_address_1 = values.sender_address_2;
+      values.sender_address_2 = temp;
+    }
 
     try {
       await loader.importLibrary("geocoding");
@@ -146,10 +159,6 @@ export default function AddPackage() {
     });
   }
 
-
-
-
-
   return (
     <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1500px]">
       <div className="inline-flex justify-between">
@@ -172,6 +181,14 @@ export default function AddPackage() {
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col my-2">
+
+            <div className="flex flex-col gap-1 border-t py-2">
+              <p className="text-sm font-semibold">Package</p>
+              <p className="text-sm">Weight: {Number(packageDetails.formData?.weight).toFixed(2)} kg</p>
+              <p className="text-sm">Volume: {Number(packageDetails.formData?.volume).toFixed(2)} m<sup>3</sup></p>
+              <p className="text-sm">Fragility: {packageDetails.formData?.fragile ? "Fragile" : "Not Fragile"}</p>
+              <p className="text-sm">Priority: {packageDetails.formData?.priority}</p>
+            </div>
             <div className="flex flex-col gap-1 border-y py-2">
               <p className="text-sm font-semibold">Recipient</p>
               <p className="text-sm">Name: {packageDetails.formData?.recipient_name}</p>
@@ -188,13 +205,7 @@ export default function AddPackage() {
               <p className="text-sm">Phone: {packageDetails.formData?.sender_phone}</p>
             </div>
 
-            <div className="flex flex-col gap-1 border-b py-2">
-              <p className="text-sm font-semibold">Package</p>
-              <p className="text-sm">Weight: {Number(packageDetails.formData?.weight).toFixed(2)} kg</p>
-              <p className="text-sm">Volume: {Number(packageDetails.formData?.volume).toFixed(2)} m<sup>3</sup></p>
-              <p className="text-sm">Fragility: {packageDetails.formData?.fragile ? "Fragile" : "Not Fragile"}</p>
-              <p className="text-sm">Priority: {packageDetails.formData?.priority}</p>
-            </div>
+
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={e => setIsDialogOpen(false)}>

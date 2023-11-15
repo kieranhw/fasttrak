@@ -29,8 +29,16 @@ import Link from "next/link"
 import { useState } from "react"
 import { UUID } from "crypto"
 import { db } from "@/lib/db/db"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 
 export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
     {
@@ -111,6 +119,47 @@ export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button variant="ghost" className="relative h-8 font-normal text-black bg-card flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+                                        View Information
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Package Information</DialogTitle>
+                                        <DialogDescription>Tracking ID: {p.tracking_id}</DialogDescription>
+                                    </DialogHeader>
+                                    <div className="flex flex-col my-2">
+                                        <div className="flex flex-col gap-1 border-t py-2">
+                                            <p className="text-sm font-semibold">Package</p>
+                                            <p className="text-sm">Weight: {Number(p.weight).toFixed(2)} kg</p>
+                                            <p className="text-sm">Volume: {Number(p.volume).toFixed(2)} m<sup>3</sup></p>
+                                            <p className="text-sm">Fragility: {p.fragile ? "Fragile" : "Not Fragile"}</p>
+                                            <p className="text-sm">Priority: {p.priority}</p>
+                                        </div>
+                                        <div className="flex flex-col gap-1 border-y py-2">
+                                            <p className="text-sm font-semibold">Recipient</p>
+                                            <p className="text-sm">Name: {p.recipient_name}</p>
+                                            <p className="text-sm">Address: {p.recipient_address}</p>
+                                            <p className="text-sm">Phone: {p.recipient_phone}</p>
+                                        </div>
+                                        <div className="flex flex-col gap-1 border-b py-2">
+                                            <p className="text-sm font-semibold">Sender</p>
+                                            <p className="text-sm">Name: {p.sender_name}</p>
+                                            <p className="text-sm">Address: {p.sender_address}</p>
+                                            <p className="text-sm">Phone: {p.sender_phone}</p>
+                                        </div>
+                                    </div>
+                                    <DialogFooter>
+                                        <DialogClose asChild>
+                                            <Button type="button" variant="secondary">
+                                                Close
+                                            </Button>
+                                        </DialogClose>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
 
                             <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
                                 <AlertDialogTrigger asChild>
@@ -134,11 +183,8 @@ export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
                             </AlertDialog>
                         </DropdownMenuContent>
                     </DropdownMenu>
-
                     {/* Remove Package Alert */}
-
                 </>
-
             )
         },
     },
