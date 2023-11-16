@@ -71,6 +71,7 @@ export default function ScheduleDeliveries() {
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true); // Set loading to true when starting to fetch data
+      setIsDeletable(true); // Set default to true
 
       let schedules = await fetchSchedulesByDate(date);
 
@@ -83,8 +84,6 @@ export default function ScheduleDeliveries() {
         schedules.forEach(schedule => {
           if (schedule.status !== DeliveryStatus.Scheduled) {
             setIsDeletable(false);
-          } else {
-            setIsDeletable(true);
           }
         });
 
@@ -297,29 +296,30 @@ export default function ScheduleDeliveries() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline"
-                    disabled={isLoading == true || isScheduledToday == false || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isDeletable == false}
-                    onClick={e => handleDeleteSchedule()}
-                  >
-                    Delete
-                  </Button>
+                  <div>
+                    <Button variant="outline"
+                      disabled={isLoading == true || isScheduledToday == false || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isDeletable === false}
+                      onClick={e => handleDeleteSchedule()}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Delete all schedules</p>
+                  {isDeletable === false &&
+                    <p>Unable to delete schedule <br className="lg:hidden"/>with routes in progress</p>
+                  }
+                  {isDeletable === true &&
+                    <p>Delete schedule</p>
+                  }
+
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-
-
-
-            <Button className="" variant="outline">Info</Button>
             <div className="inline-flex">
-              <Button className="w-10 p-0 rounded-r-none border-r-0" variant="outline">
-                <HiOutlineCog size={16} />
-              </Button>
-
               {isScheduling == true &&
-                <Button disabled className="rounded-l-none border-l-none border-y border-r">
+                <Button disabled className="border">
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Scheduling
                 </Button>
@@ -329,15 +329,22 @@ export default function ScheduleDeliveries() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button className="rounded-l-none border-l-none border-y border-r"
-                        disabled={isLoading == true || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isScheduledToday != false}
-                        onClick={e => handleScheduleDelivery()}
-                      >
-                        Schedule
-                      </Button>
+                      <div>
+                        <Button className="border"
+                          disabled={isLoading == true || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isScheduledToday != false}
+                          onClick={e => handleScheduleDelivery()}
+                        >
+                          Schedule
+                        </Button>
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Schedule deliveries</p>
+                      {isScheduledToday != false &&
+                        <p>Schedule already generated</p>
+                      }
+                      {isScheduledToday == false &&
+                        <p>Schedule deliveries</p>
+                      }
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -363,7 +370,7 @@ export default function ScheduleDeliveries() {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Reset Graph</p>
+                      <p>Refresh</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
