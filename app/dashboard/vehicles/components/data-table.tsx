@@ -145,8 +145,10 @@ export function DataTable<TData, TValue>({
             </DropdownMenuContent>
           </DropdownMenu>
           <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger>
-              Add Vehicle
+            <DialogTrigger asChild>
+              <Button className="ml-2">
+                Add Vehicle
+              </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -207,7 +209,7 @@ export function DataTable<TData, TValue>({
         <div className="border-t flex items-center justify-between space-x-2 py-4 px-4">
           <div className="text-muted-foreground text-sm">
             {table.getFilteredRowModel().rows?.length || 0}
-            {table.getFilteredRowModel().rows?.length >= 1 ? ' Item' : ' Items'}
+            {table.getFilteredRowModel().rows?.length === 1 ? ' Vehicle' : ' Vehicles'}
           </div>
 
           <div className="inline-flex items-center space-x-2">

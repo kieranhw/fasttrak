@@ -119,12 +119,14 @@ export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuLabel>Vehicle</DropdownMenuLabel>
                         <DropdownMenuSeparator />
+                        <DropdownMenuItem>View Record</DropdownMenuItem>
+
                         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                             <DialogTrigger asChild>
                                 <Button variant="ghost" className="w-full justify-start relative h-8 font-normal text-black bg-card flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
-                                    Edit Vehicle
+                                    Edit Information
                                 </Button>
                             </DialogTrigger>
                             <DialogContent>
@@ -138,11 +140,10 @@ export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
 
                             </DialogContent>
                         </Dialog>
-                        <DropdownMenuItem>Vehicle Record</DropdownMenuItem>
                         <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
                             <AlertDialogTrigger asChild>
                                 <Button variant="ghost" className="relative w-full justify-start h-8 font-normal text-black bg-card flex cursor-default select-none items-center rounded-sm px-2 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
-                                    Remove Vehicle
+                                    Remove
                                 </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>

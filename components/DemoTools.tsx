@@ -45,10 +45,15 @@ export default function DemoTools() {
             <DropdownMenuContent className="mr-4">
                 <DropdownMenuLabel>Demo Tools</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={e => handleGeneratePackages(1)}>Generate Package</DropdownMenuItem>
-                <DropdownMenuItem onClick={e => handleGeneratePackages(5)}>Generate 5 Packages</DropdownMenuItem>
+                <DropdownMenuItem onClick={e => handleGeneratePackages(1)}>Create Sample Package</DropdownMenuItem>
+                <DropdownMenuItem onClick={e => handleGeneratePackages(5)}>Create 5 Sample Packages</DropdownMenuItem>
+                <DropdownMenuItem>Create Sample Vehicle</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Add Vehicle</DropdownMenuItem>
+                <DropdownMenuItem>Insert Test Data Set 1</DropdownMenuItem>
+                <DropdownMenuItem>Insert Test Data Set 2</DropdownMenuItem>
+                <DropdownMenuItem>Insert Test Data Set 3</DropdownMenuItem>
+                <DropdownMenuItem>Clear All Data</DropdownMenuItem>
+
             </DropdownMenuContent>
         </DropdownMenu>
 
