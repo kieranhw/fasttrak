@@ -11,10 +11,7 @@ interface Props {
 export const CytoscapeGraph: React.FC<Props> = ({ graph, solution }) => {
 
   useEffect(() => {
-
       displayGraph(graph, solution);
-    
-
   }, [graph, solution]);
 
   return (

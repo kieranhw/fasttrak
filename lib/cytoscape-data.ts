@@ -35,10 +35,8 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
     // Count packages being delivered to the same address
     const packageCounts = countPackagesByAddress(graph);
 
-
-    // Prepare nodes and edges data for cytoscape
+    // Prepare nodes and edges data 
     const cyNodes = graph.nodes.map((node, index) => {
-
         // positions with rotate -45 degrees to view map from north orientation
         const x = visCenterX + (node.coordinates.lat - midLat) * 25000 * Math.cos(-45) - (node.coordinates.lng - midLng) * 25000 * Math.sin(-45);
         const y = visCenterY + (node.coordinates.lat - midLat) * 25000 * Math.sin(-45) + (node.coordinates.lng - midLng) * 25000 * Math.cos(-45);
@@ -47,7 +45,9 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
         if (node.isDepot) {
             label = 'Depot';
         } else if (node.pkg) {
-            label = node.pkg.recipient_address;
+            label = node.pkg.recipient_address.split(',')[0];
+            label += `\n${node.pkg.recipient_address.split(',')[1].trim()}`;
+
             const count = packageCounts[node.pkg.recipient_address];
             if (count > 1) {
                 label += `\n${count} Packages`;
@@ -79,7 +79,7 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
                 data: {
                     source: graph.nodes.indexOf(node).toString(),
                     target: graph.nodes.indexOf(nextNode).toString(),
-                    color: ['red', 'green', 'blue'][index % 3],  // Different colors for different routes
+                    color: ['red', 'green', 'blue', 'yellow', 'purple', 'pink', 'orange', 'cyan'][index % 8],  // Different colors for first 8 routes
                     label: routeName,
                     routeName,  // Add route attribute
                     minutes: minutesToTraverse  // Add minutes to traverse edge
@@ -128,7 +128,7 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
                 }
             },
             {
-                selector: 'node:selected',
+                selector: 'node:selected', // Style for selected node
                 style: {
                     'label': 'data(label)',
                 }
@@ -149,7 +149,7 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
     // Handle mouseover for edge
     cy.on('mouseover', 'edge', function (evt) {
         const edge = evt.target;
-        
+
         edge.style({
             'label': edge.data('routeName'),
             'text-opacity': 1,
