@@ -9,10 +9,10 @@ module.exports = {
       '^.+\\.(js|jsx)$': ['babel-jest', { presets: ['next/babel'] }],
     },
     moduleNameMapper: {
-      // Handle module aliases and CSS imports
-      '^@/components/(.*)$': '<rootDir>/components/$1',
-      '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
-      // Add more mappings as needed
+      '^@/components/(.*)$': '<rootDir>/components/$1', // For components code
+      '^@/lib/(.*)$': '<rootDir>/lib/$1', // For lib code
+      '^@/app/(.*)$': '<rootDir>/app/$1', // For app code
+      '\\.(css|less|sass|scss)$': 'identity-obj-proxy', // For CSS modules
     },
   };
   

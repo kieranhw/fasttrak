@@ -3,7 +3,7 @@ import { Vehicle } from "@/types/vehicle"
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule"
 import { UUID } from "crypto"
 import { faker } from '@faker-js/faker';
-import { generateId } from "@/lib/generate-id";
+import { generateFT } from "@/lib/generate-ids";
 
 import { addressData } from "./liverpool-addresses";
 
@@ -24,7 +24,7 @@ export const generatePackages = async (numPackages: number): Promise<Package[]> 
 
         packages.push({
             package_id: faker.string.uuid() as UUID,
-            tracking_id: generateId("FT")!,
+            tracking_id: generateFT()!,
             store_id: undefined,
             recipient_name: faker.person.fullName(),
             recipient_address: recipientAddress.address,

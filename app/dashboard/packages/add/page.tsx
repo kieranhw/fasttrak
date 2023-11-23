@@ -8,7 +8,7 @@ import { supabase } from "@/pages/api/supabase-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { generateId } from "@/lib/generate-id";
+import { generateFT } from "@/lib/generate-ids";
 import { Button } from "@/components/ui/button";
 import { Loader } from '@googlemaps/js-api-loader';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -111,7 +111,7 @@ export default function AddPackage() {
     const { error } = await supabase
       .from('packages')
       .insert({
-        tracking_id: generateId("FT"),
+        tracking_id: generateFT(),
         recipient_name: values.recipient_name,
         recipient_phone: values.recipient_phone,
         recipient_address: resultRecipient[0].formatted_address,
