@@ -7,6 +7,7 @@ interface Location {
     lng: number;
 }
 
+// Model of the vehicle routing network
 export class Graph {
     public nodes: Node[] = [];
     public edges: Edge[] = [];
@@ -31,7 +32,7 @@ export class Node {
         public isDepot: boolean = false  // Identifier to check if the node is a depot
     ) { }
 
-    // Method to find the nearest neighbor by cost
+    // Find the nearest neighbor by cost
     findNearestNeighbor(graph: Graph): Node | null {
         // Initially, set nearestNode and minCost to null and Infinity, respectively
         let nearestNode: Node | null = null;
@@ -63,7 +64,7 @@ export class Edge {
     ) { }
 }
 
-// Helper function to calculate distance between two nodes
+// Calculate distance between nodes
 export function calculateDistance(node1: Node, node2: Node): number {
     const dx = node1.coordinates.lat - node2.coordinates.lat;
     const dy = node1.coordinates.lng - node2.coordinates.lng

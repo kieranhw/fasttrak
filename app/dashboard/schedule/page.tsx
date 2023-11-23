@@ -28,7 +28,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-import { createGraphAndSolutionFromScheduleArray, createSchedules } from "@/lib/routing/create-schedules";
+import { createSchedules } from "@/lib/routing/create-schedules";
+import { createGraphAndSolutionFromScheduleArray } from "@/lib/routing/schedules-to-graph";
+
 import { db } from "@/lib/db/db";
 import { displayGraph } from "@/lib/cytoscape-data";
 import { CytoscapeGraph } from "@/components/CytoscapeGraph";
@@ -128,7 +130,6 @@ export default function ScheduleDeliveries() {
     const [graph, solution] = await createGraphAndSolutionFromScheduleArray(schedules as DeliverySchedule[]);
     setGraph(graph);
     setSolution(solution);
-
   }
 
   // Schedule

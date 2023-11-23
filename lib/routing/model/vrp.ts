@@ -4,9 +4,10 @@ import { Package } from "@/types/package";
 import { Node } from "./graph";
 import { estimateDuration } from "../create-schedules";
 
+// Model of one individual vehicle route
 export class VehicleRoute {
     public nodes: Node[] = [];
-    public totalCost: number = 0; // distance
+    public totalCost: number = 0; // distance in miles
     public currentWeight: number = 0;
     public currentVolume: number = 0;
     public totalTime: number = 0;  // in minutes

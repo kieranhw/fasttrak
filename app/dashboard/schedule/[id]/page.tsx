@@ -1,7 +1,7 @@
 'use client'
 
 import { fetchSchedulesByDate } from "@/lib/db/delivery-schedules";
-import { createGraphAndSolutionFromSchedule } from "@/lib/routing/create-schedules";
+import { createGraphAndSolutionFromSchedule } from "@/lib/routing/schedules-to-graph";
 import { DeliverySchedule } from "@/types/delivery-schedule";
 import { useState, useEffect } from "react";
 import { date } from "zod";
@@ -15,7 +15,14 @@ import { VRPSolution } from "@/lib/routing/model/vrp";
 import { displayGraph } from "../../../../lib/cytoscape-data";
 import { CytoscapeGraph } from "../../../../components/CytoscapeGraph";
 import { BreadcrumbLink } from "@/components/ui/breadcrumb-link";
-
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { MdRefresh } from "react-icons/md";
+import { Button } from "@/components/ui/button";
 
 export default function ScheduleDetails() {
 
@@ -38,9 +45,7 @@ export default function ScheduleDetails() {
                 if (packages) {
                     setPackages(packages);
                 }
-                const [graph, solution] = await createGraphAndSolutionFromSchedule(schedule);
-                setGraph(graph);
-                setSolution(solution);
+                buildGraph(schedule);
             }
             setIsLoading(false);
         }
@@ -66,65 +71,95 @@ export default function ScheduleDetails() {
         }
     }
 
+    async function buildGraph(schedule: DeliverySchedule | undefined) {
+
+        if (!schedule) {
+            return;
+        }
+
+        const [graph, solution] = await createGraphAndSolutionFromSchedule(schedule);
+        setGraph(graph);
+        setSolution(solution);
+    }
+
 
 
     return (
-        <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1500px]">
-            <div>
-                <BreadcrumbLink href="/dashboard/schedule" text="Schedule" />
-                <BreadcrumbLink text={formatDate(deliverySchedule?.delivery_date!)} />
-                <BreadcrumbLink href="/dashboard/schedule" text={`Route ${deliverySchedule?.route_number}`} lastItem />
-            </div>
-            <div className="inline-flex justify-between">
-                <h1 className="text-foreground font-bold text-2xl my-2">Route</h1>
-            </div>
+        <TooltipProvider delayDuration={100}>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="">
-                    <DataTable columns={columns(refreshData)} data={packages!} />
+            <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1500px]">
+                <div>
+                    <BreadcrumbLink href="/dashboard/schedule" text="Schedule" />
+                    <BreadcrumbLink text={formatDate(deliverySchedule?.delivery_date!)} />
+                    <BreadcrumbLink href="/dashboard/schedule" text={`Route ${deliverySchedule?.route_number}`} lastItem />
                 </div>
-                <div className="border rounded-md border-divider min-h-[300px]">
-                    {graph && solution &&
-                        <CytoscapeGraph graph={graph} solution={solution} />
-                    }
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
-                <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
-                    <h1 className="font-bold text-xl">Vehicle</h1>
-                    <p>Registration</p>
-                    <p className="text-sm text-muted-foreground">Manufacturer Model Year</p>
-                    <br />
-                    <p className="text-sm">250 / 300 kg utilised</p>
-                    <p className="text-sm">12 / 15 m<sup>3</sup> utilised</p>
-                </div>
-                <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
-                    <h1 className="font-bold text-xl">Packages</h1>
-                    <p className="text-md">X Packages</p>
-                    <br />
-                    <p className="text-sm">Average Weight / Package: Xkg</p>
-                    <p className="text-sm">Average Volume / Package: Xkg</p>
-                </div>
-                <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
-                    <h1 className="font-bold text-xl">Route</h1>
-                    <p className="text-md">X Stops (Distinct Locations)</p>
-                    <br/>
-                    <p className="text-sm">Driving Time: Xh Xm</p>
-                    <p className="text-sm">Driving Distance: X miles</p>
-                </div>
-                <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
-                    <h1 className="font-bold text-xl">Optimisation</h1>
-                    <p className="text-md">Lowest Distance</p>
-                    <br />
-                    <p className="text-sm">This route has been optimised to reduce the amount of
-                    total distance travelled.</p>
+                <div className="inline-flex justify-between">
+                    <h1 className="text-foreground font-bold text-2xl my-2">Route Details</h1>
                 </div>
 
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div className="">
+                        <DataTable columns={columns(refreshData)} data={packages!} />
+                    </div>
+                    <div>
+                        <div className="border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1 h-12">
+                            <p className="text-muted-foreground font-medium text-sm m-2">Delivery Network</p>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button variant="ghost" size="icon" onClick={e => buildGraph(deliverySchedule)}>
+                                        <MdRefresh className="text-muted-foreground" size={18} />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Refresh</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
+                        <div className="border rounded-t-none rounded-md border-divider h-[450px]">
+                            {graph && solution &&
+                                <CytoscapeGraph graph={graph} solution={solution} />
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
+                    <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
+                        <h1 className="font-bold text-xl">Vehicle</h1>
+                        <p>Registration</p>
+                        <p className="text-sm text-muted-foreground">Manufacturer Model Year</p>
+                        <br />
+                        <p className="text-sm">250 / 300 kg utilised</p>
+                        <p className="text-sm">12 / 15 m<sup>3</sup> utilised</p>
+                    </div>
+                    <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
+                        <h1 className="font-bold text-xl">Packages</h1>
+                        <p className="text-md">X Packages</p>
+                        <br />
+                        <p className="text-sm">Average Weight / Package: Xkg</p>
+                        <p className="text-sm">Average Volume / Package: Xkg</p>
+                    </div>
+                    <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
+                        <h1 className="font-bold text-xl">Route</h1>
+                        <p className="text-md">X Stops (Distinct Locations)</p>
+                        <br />
+                        <p className="text-sm">Driving Time: Xh Xm</p>
+                        <p className="text-sm">Driving Distance: X miles</p>
+                    </div>
+                    <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
+                        <h1 className="font-bold text-xl">Optimisation</h1>
+                        <p className="text-md">Lowest Distance</p>
+                        <br />
+                        <p className="text-sm">This route has been optimised to reduce the amount of
+                            total distance travelled.</p>
+                    </div>
 
 
 
-            </div>
-        </div >
+
+                </div>
+            </div >
+        </TooltipProvider>
+
     )
 }
