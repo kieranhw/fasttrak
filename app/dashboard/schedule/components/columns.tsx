@@ -186,7 +186,7 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuLabel>Route {schedule.route_number}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
 
                             <AlertDialog open={inProgressAlertOpen} onOpenChange={setInProgressAlertOpen}>
@@ -196,7 +196,7 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                                         variant="ghost"
                                         className="relative w-full justify-start h-8 font-normal flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
                                     >
-                                        Set In-Progress
+                                        Delivery In-Progress
                                     </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
@@ -225,7 +225,7 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                                         variant="ghost"
                                         className="relative w-full justify-start h-8 font-normal flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
                                     >
-                                        Mark Complete
+                                        Delivery Complete
                                     </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>

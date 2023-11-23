@@ -66,12 +66,16 @@ export default function ScheduleDeliveries() {
   const [isScheduling, setIsScheduling] = useState(false);
   const [graph, setGraph] = useState<any>(null);
   const [solution, setSolution] = useState<any>(null);
-  const [isDeletable, setIsDeletable] = useState(false);
+
+  // Schedule progress states
+  const [inProgress, setInProgress] = useState(false);
+  const [scheduleComplete, setScheduleComplete] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true); // Set loading to true when starting to fetch data
-      setIsDeletable(true); // Set default to true
+      setInProgress(false); // Set default to true
+      setScheduleComplete(true); // Set default to true
 
       let schedules = await fetchSchedulesByDate(date);
 
@@ -81,11 +85,20 @@ export default function ScheduleDeliveries() {
         schedules.sort((a, b) => a.route_number - b.route_number);
         setIsScheduledToday(true);
 
+        // Check schedule status
         schedules.forEach(schedule => {
+          // Check if any schedule is in progress
           if (schedule.status !== DeliveryStatus.Scheduled) {
-            setIsDeletable(false);
+            setInProgress(true);
+          }
+
+          // Check all schedules for completion
+          // Default is set to true, if any schedule is not completed, set to false
+          if (schedule.status !== DeliveryStatus.Completed) {
+            setScheduleComplete(false);
           }
         });
+
 
         buildGraph(schedules)
 
@@ -216,117 +229,145 @@ export default function ScheduleDeliveries() {
     refreshData();
   }
 
+  // TODO: Export schedule analysis
+  function handleScheduleAnalysis() {
+    console.log("Schedule Analysis")
+  }
 
   return (
-    <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1500px]">
-      <div className="inline-flex justify-between">
-        <h1 className="text-foreground font-bold text-3xl my-auto">Delivery Schedule</h1>
-      </div>
+    <TooltipProvider delayDuration={100}>
+      <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1500px]">
+        <div className="inline-flex justify-between">
+          <h1 className="text-foreground font-bold text-3xl my-auto">Delivery Schedule</h1>
+        </div>
 
-      <div className="flex items-center justify-between py-4">
-        <div className="inline-flex justify-between w-full">
-          <div className="inline-flex justify-between gap-1">
-            <Popover>
-              <PopoverTrigger asChild>
+        <div className="flex items-center justify-between py-4">
+          <div className="inline-flex justify-between w-full">
+            <div className="inline-flex justify-between gap-1">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "min-w-[210px] justify-start text-left font-normal",
+                      !date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={(selectedDate) => {
+                      if (selectedDate instanceof Date) {
+                        setDate(selectedDate);
+                      }
+                    }}
+                    disabled={(date) =>
+                      // Disable dates in the past and more than 1 day in the future
+                      date > new Date((new Date()).valueOf() + 1000 * 3600 * 24) || date < new Date("1900-01-01")
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <div className="inline-flex justify-between gap-1">
                 <Button
-                  variant={"outline"}
-                  className={cn(
-                    "min-w-[210px] justify-start text-left font-normal",
-                    !date && "text-muted-foreground"
-                  )}
+                  className="w-10 h-10 p-0"
+                  variant="outline"
+                  onClick={e => {
+                    const newDate = new Date(date || new Date());
+                    newDate.setDate(newDate.getDate() - 1);
+                    setDate(newDate);
+                  }}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  <ChevronLeft size={16} />
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={(selectedDate) => {
-                    if (selectedDate instanceof Date) {
-                      setDate(selectedDate);
+                <Button variant="outline" onClick={e => setDate(new Date())}>
+                  Today
+                </Button>
+                <Button
+                  className="w-10 h-10 p-0"
+                  variant="outline"
+                  disabled={!isNextDateValid()}
+                  onClick={e => {
+                    if (date) {
+                      const newDate = new Date(date);
+                      newDate.setDate(date.getDate() + 1);
+                      if (isDateWithinLimit(newDate)) {
+                        setDate(newDate);
+                      }
                     }
                   }}
-                  disabled={(date) =>
-                    // Disable dates in the past and more than 1 day in the future
-                    date > new Date((new Date()).valueOf() + 1000 * 3600 * 24) || date < new Date("1900-01-01")
-                  }
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+                >
+                  <ChevronRight size={16} />
+                </Button>
+              </div>
+            </div>
 
             <div className="inline-flex justify-between gap-1">
-              <Button
-                className="w-10 h-10 p-0"
-                variant="outline"
-                onClick={e => {
-                  const newDate = new Date(date || new Date());
-                  newDate.setDate(newDate.getDate() - 1);
-                  setDate(newDate);
-                }}
-              >
-                <ChevronLeft size={16} />
-              </Button>
-              <Button variant="outline" onClick={e => setDate(new Date())}>
-                Today
-              </Button>
-              <Button
-                className="w-10 h-10 p-0"
-                variant="outline"
-                disabled={!isNextDateValid()}
-                onClick={e => {
-                  if (date) {
-                    const newDate = new Date(date);
-                    newDate.setDate(date.getDate() + 1);
-                    if (isDateWithinLimit(newDate)) {
-                      setDate(newDate);
-                    }
-                  }
-                }}
-              >
-                <ChevronRight size={16} />
-              </Button>
-
-            </div>
-          </div>
-
-          <div className="inline-flex justify-between gap-1">
-            <TooltipProvider delayDuration={100}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div>
                     <Button variant="outline"
-                      disabled={isLoading == true || isScheduledToday == false || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isDeletable === false}
-                      onClick={e => handleDeleteSchedule()}
+                      disabled={!(scheduleComplete == true && isScheduledToday == true) || isLoading == true}
+                      onClick={e => handleScheduleAnalysis()}
                     >
-                      Delete
+                      Analysis
                     </Button>
                   </div>
 
                 </TooltipTrigger>
                 <TooltipContent>
-                  {isDeletable === false &&
-                    <p>Unable to delete schedule <br className="lg:hidden" />with routes in progress</p>
+                  {scheduleComplete == true && isScheduledToday == true &&
+                    <p>Export schedule analysis</p>
                   }
-                  {isDeletable === true &&
-                    <p>Delete schedule</p>
+                  {scheduleComplete == false &&
+                    <p>Deliveries must be completed first</p>
                   }
-
+                  {isScheduledToday == false &&
+                    <p>No schedule to analyse</p>
+                  }
                 </TooltipContent>
               </Tooltip>
-            </TooltipProvider>
-            <div className="inline-flex">
-              {isScheduling == true &&
-                <Button disabled className="border">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Scheduling
-                </Button>
-              }
 
-              {isScheduling == false &&
-                <TooltipProvider delayDuration={100}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div>
+                    <Button variant="outline"
+                      disabled={isLoading == true || isScheduledToday == false || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || inProgress === true}
+                      onClick={e => handleDeleteSchedule()}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {inProgress == true &&
+                    <p>Unable to delete schedule <br className="lg:hidden" />with routes in progress</p>
+                  }
+                  {inProgress == false && isScheduledToday == false &&
+                    <p>No schedule to delete</p>
+                  }
+                  {inProgress == false && isScheduledToday == true &&
+                    <p>Delete schedule</p>
+                  }
+                </TooltipContent>
+              </Tooltip>
+
+              <div className="inline-flex">
+                {isScheduling == true &&
+                  <Button disabled className="border">
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Scheduling
+                  </Button>
+                }
+
+                {isScheduling == false &&
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div>
@@ -347,22 +388,20 @@ export default function ScheduleDeliveries() {
                       }
                     </TooltipContent>
                   </Tooltip>
-                </TooltipProvider>
-              }
+                }
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <DataTable columns={columns(refreshData)} data={deliverySchedules} />
+        <DataTable columns={columns(refreshData)} data={deliverySchedules} />
 
-      {deliverySchedules.length > 0 &&
-        <div className="flex flex-col justify-between mt-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2">
-            <div>
-              <div className=" border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1">
-                <p className="text-muted-foreground text-sm m-2">Network Analysis</p>
-                <TooltipProvider delayDuration={100}>
+        {deliverySchedules.length > 0 &&
+          <div className="flex flex-col justify-between mt-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2">
+              <div>
+                <div className=" border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1">
+                  <p className="text-muted-foreground text-sm m-2">Network Analysis</p>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button variant="ghost" size="icon" onClick={e => buildGraph(deliverySchedules)}>
@@ -373,21 +412,19 @@ export default function ScheduleDeliveries() {
                       <p>Refresh</p>
                     </TooltipContent>
                   </Tooltip>
-                </TooltipProvider>
+                </div>
 
-              </div>
-              <div className="border rounded-t-none rounded-md border-divider h-[500px]">
-                {graph && solution &&
-                  <CytoscapeGraph graph={graph} solution={solution} />
-                }
+                <div className="border rounded-t-none rounded-md border-divider h-[500px]">
+                  {graph && solution &&
+                    <CytoscapeGraph graph={graph} solution={solution} />
+                  }
+                </div>
+
               </div>
             </div>
-
           </div>
-
-        </div>
-      }
-
-    </div>
+        }
+      </div>
+    </TooltipProvider>
   )
 }
