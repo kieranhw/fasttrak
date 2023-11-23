@@ -80,10 +80,10 @@ export default function ScheduleDetails() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div>
+                <div className="">
                     <DataTable columns={columns(refreshData)} data={packages!} />
                 </div>
-                <div className="border rounded-md border-divider min-h-[500px]">
+                <div className="border rounded-md border-divider min-h-[300px]">
                     {graph && solution &&
                         <CytoscapeGraph graph={graph} solution={solution} />
                     }

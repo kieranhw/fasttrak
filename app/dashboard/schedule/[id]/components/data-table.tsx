@@ -56,10 +56,11 @@ export function DataTable<TData, TValue>({
     },
   })
 
+   // Calculate the number of empty rows to fill the table
+   const emptyRows = Math.max(0, table.initialState.pagination.pageSize - table.getRowModel().rows.length);
+
   return (
     <>
-
-
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -107,7 +108,7 @@ export function DataTable<TData, TValue>({
 
           <div className="text-muted-foreground text-sm">
             {table.getFilteredRowModel().rows?.length || 0}
-            {table.getFilteredRowModel().rows?.length >= 1 ? ' Deliveries' : ' Delivery'}
+            {table.getFilteredRowModel().rows?.length === 1 ? ' Delivery' : ' Deliveries'}
           </div>
 
           <div className="inline-flex items-center space-x-2">

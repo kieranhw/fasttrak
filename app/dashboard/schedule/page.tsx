@@ -231,7 +231,7 @@ export default function ScheduleDeliveries() {
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "w-[200px] justify-start text-left font-normal",
+                    "min-w-[210px] justify-start text-left font-normal",
                     !date && "text-muted-foreground"
                   )}
                 >
@@ -293,7 +293,7 @@ export default function ScheduleDeliveries() {
           </div>
 
           <div className="inline-flex justify-between gap-1">
-            <TooltipProvider>
+            <TooltipProvider delayDuration={100}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div>
@@ -308,7 +308,7 @@ export default function ScheduleDeliveries() {
                 </TooltipTrigger>
                 <TooltipContent>
                   {isDeletable === false &&
-                    <p>Unable to delete schedule <br className="lg:hidden"/>with routes in progress</p>
+                    <p>Unable to delete schedule <br className="lg:hidden" />with routes in progress</p>
                   }
                   {isDeletable === true &&
                     <p>Delete schedule</p>
@@ -326,7 +326,7 @@ export default function ScheduleDeliveries() {
               }
 
               {isScheduling == false &&
-                <TooltipProvider>
+                <TooltipProvider delayDuration={100}>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div>
@@ -362,7 +362,7 @@ export default function ScheduleDeliveries() {
             <div>
               <div className=" border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1">
                 <p className="text-muted-foreground text-sm m-2">Network Analysis</p>
-                <TooltipProvider>
+                <TooltipProvider delayDuration={100}>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button variant="ghost" size="icon" onClick={e => buildGraph(deliverySchedules)}>
