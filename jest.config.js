@@ -12,6 +12,7 @@ module.exports = {
       '^@/components/(.*)$': '<rootDir>/components/$1', // For components code
       '^@/lib/(.*)$': '<rootDir>/lib/$1', // For lib code
       '^@/app/(.*)$': '<rootDir>/app/$1', // For app code
+      '^@/types/(.*)$': '<rootDir>/types/$1', // For types
       '\\.(css|less|sass|scss)$': 'identity-obj-proxy', // For CSS modules
     },
   };

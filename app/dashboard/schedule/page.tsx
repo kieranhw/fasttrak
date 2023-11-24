@@ -455,10 +455,13 @@ export default function ScheduleDeliveries() {
                     </div>
 
                     <div>
-                      <p className="text-muted-foreground text-sm mx-2"></p>
+                      <p className="text-muted-foreground text-sm mx-2">Packages / Vehicle</p>
                       <p className="text-2xl font-semibold mx-2 my-1">
-                        
-
+                        {
+                          Math.round(deliverySchedules.reduce((acc, schedule) => {
+                            return acc + schedule.num_packages
+                          }, 0) / deliverySchedules.length * 100) / 100
+                        }
                       </p>
                     </div>
 

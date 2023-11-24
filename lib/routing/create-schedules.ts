@@ -43,6 +43,8 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
             load_volume: route.currentVolume,
             created_at: new Date()
         };
+
+        schedules.push(schedule);
     }
 
     console.log("Schedules: ", schedules);
