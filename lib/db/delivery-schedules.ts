@@ -9,11 +9,19 @@ import { Vehicle } from "@/types/vehicle";
 export const fetchSchedulesByDate = async (date: Date) => {
     const formattedDate = date.toISOString().slice(0, 10);
 
+    // Fetch store for user
+    const store = await db.stores.fetch.store.forUser();
+
+    if (!store) {
+        console.error("User not atatched to store");
+        return;
+    }
+
     let { data: schedules, error } = await supabase
         .from('delivery_schedules')
         .select('*')
         .eq('delivery_date', formattedDate)
-    // TODO: add store id
+        .eq('store_id', store.store_id);
     if (error) {
         console.error("Error fetching schedules: ", error);
         return;
@@ -41,6 +49,14 @@ export const fetchSchedulesByDate = async (date: Date) => {
 
 // Fetch schedule by ID
 export const fetchScheduleById = async (scheduleId: UUID): Promise<DeliverySchedule | null> => {
+    // Fetch store for user
+    const store = await db.stores.fetch.store.forUser();
+
+    if (!store) {
+        console.error("User not atatched to store");
+        return null;
+    }
+
     try {
         const { data, error } = await supabase
             .from('delivery_schedules')
@@ -58,7 +74,7 @@ export const fetchScheduleById = async (scheduleId: UUID): Promise<DeliverySched
 
         // Set schedule as data
         const schedule = data as DeliverySchedule;
-        
+
         // Save the order of the packages as retrieved from the database
         const packageIdOrder: UUID[] = data.package_order;
 
@@ -89,11 +105,19 @@ export const fetchScheduleById = async (scheduleId: UUID): Promise<DeliverySched
 
 // Update schedule status by ID
 const updateScheduleStatus = async (scheduleId: UUID, status: string) => {
+    // Fetch store for user
+    const store = await db.stores.fetch.store.forUser();
+
+    if (!store) {
+        console.error("User not atatched to store");
+        return;
+    }
+
     let { data: packages, error } = await supabase
         .from('delivery_schedules')
         .update({ status: status })
-        .eq('schedule_id', scheduleId);
-
+        .eq('schedule_id', scheduleId)
+        .eq('store_id', store.store_id);
     if (error) {
         console.error("Error updating package status: ", error);
         return ("Error updating package status");

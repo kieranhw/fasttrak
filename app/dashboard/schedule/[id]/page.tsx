@@ -101,7 +101,7 @@ export default function ScheduleDetails() {
                     <div className="">
                         <DataTable columns={columns(refreshData)} data={packages!} />
                     </div>
-                    <div>
+                    <div className="">
                         <div className="border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1 h-12">
                             <p className="text-muted-foreground font-medium text-sm m-2">Delivery Network</p>
                             <Tooltip>
@@ -115,7 +115,7 @@ export default function ScheduleDetails() {
                                 </TooltipContent>
                             </Tooltip>
                         </div>
-                        <div className="border rounded-t-none rounded-md border-divider h-[450px]">
+                        <div className="border rounded-t-none rounded-md border-divider h-[436px]">
                             {graph && solution &&
                                 <CytoscapeGraph graph={graph} solution={solution} />
                             }

@@ -5,7 +5,7 @@ export type PriorityType = "Redelivery" | "Express" | "Standard" | "Return";
 
 export type Package = {
     package_id: UUID
-    store_id?: UUID
+    store_id: UUID
     tracking_id: string;
     recipient_name: string
     recipient_address: string

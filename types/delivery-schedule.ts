@@ -13,7 +13,7 @@ export type DeliverySchedule = {
     schedule_id?: UUID;
     vehicle_id: UUID;
     vehicle: Vehicle; // Convert UUID to store Vehicle object
-    store_id?: UUID;
+    store_id: UUID;
     package_order: Package[];  // Convert array of UUIDs to array of Package objects
     delivery_date: Date;
     route_number: number;

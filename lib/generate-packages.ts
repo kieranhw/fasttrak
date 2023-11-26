@@ -4,7 +4,7 @@ import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule"
 import { UUID } from "crypto"
 import { faker } from '@faker-js/faker';
 import { generateFT } from "@/lib/generate-ids";
-
+import { db } from "@/lib/db/db";
 import { addressData } from "./liverpool-addresses";
 
 
@@ -22,10 +22,16 @@ export const generatePackages = async (numPackages: number): Promise<Package[]> 
         // Ensure recipient and sender addresses are different
         const [recipientAddress, senderAddress] = faker.helpers.shuffle(addresses).slice(0, 2);
 
+        const store = await db.stores.fetch.store.forUser();
+        if (!store) {
+            console.error("User not atatched to store");
+            return [] as Package[];
+        }
+
         packages.push({
             package_id: faker.string.uuid() as UUID,
             tracking_id: generateFT()!,
-            store_id: undefined,
+            store_id: store.store_id,
             recipient_name: faker.person.fullName(),
             recipient_address: recipientAddress.address,
             recipient_address_lat: recipientAddress.lat,

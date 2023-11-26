@@ -168,6 +168,7 @@ export default function ScheduleDeliveries() {
           .from('delivery_schedules')
           .insert({
             vehicle_id: deliverySchedule[schedule].vehicle_id,
+            store_id: deliverySchedule[schedule].store_id,
             package_order: packageOrderIds,
             delivery_date: deliverySchedule[schedule].delivery_date,
             route_number: deliverySchedule[schedule].route_number,
@@ -400,7 +401,6 @@ export default function ScheduleDeliveries() {
         {deliverySchedules.length > 0 &&
           <div className="flex flex-col justify-between mt-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
               <div>
                 <div className="border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1 h-12">
                   <p className="text-muted-foreground font-medium text-sm m-2">Delivery Network</p>
