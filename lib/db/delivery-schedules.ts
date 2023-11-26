@@ -49,13 +49,6 @@ export const fetchSchedulesByDate = async (date: Date) => {
 
 // Fetch schedule by ID
 export const fetchScheduleById = async (scheduleId: UUID): Promise<DeliverySchedule | null> => {
-    // Fetch store for user
-    const store = await db.stores.fetch.store.forUser();
-
-    if (!store) {
-        console.error("User not atatched to store");
-        return null;
-    }
 
     try {
         const { data, error } = await supabase
@@ -105,23 +98,20 @@ export const fetchScheduleById = async (scheduleId: UUID): Promise<DeliverySched
 
 // Update schedule status by ID
 const updateScheduleStatus = async (scheduleId: UUID, status: string) => {
-    // Fetch store for user
-    const store = await db.stores.fetch.store.forUser();
-
-    if (!store) {
-        console.error("User not atatched to store");
-        return;
-    }
-
     let { data: packages, error } = await supabase
         .from('delivery_schedules')
         .update({ status: status })
         .eq('schedule_id', scheduleId)
-        .eq('store_id', store.store_id);
     if (error) {
         console.error("Error updating package status: ", error);
         return ("Error updating package status");
     } else {
+        // Update status of all packages in schedule
+        const schedule = await fetchScheduleById(scheduleId);
+        if (schedule) {
+            const packageIds = schedule.package_order.map(pkg => pkg.package_id);
+            await db.packages.update.status.byIds(packageIds, status);
+        }
         return true;
     }
 }
@@ -131,6 +121,7 @@ const updateScheduleStatus = async (scheduleId: UUID, status: string) => {
 export const schedules = {
     fetch: {
         byId: fetchScheduleById,
+        byDate: fetchSchedulesByDate,
     },
     remove: {
     },

@@ -6,7 +6,6 @@ import { DataTable } from "./components/data-table"
 import { Package } from "@/types/package";
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { supabase } from "@/pages/api/supabase-client";
-import { fetchSchedulesByDate } from "@/lib/db/delivery-schedules";
 
 import { format } from "date-fns"
 import { Calendar as CalendarIcon, Loader2 } from "lucide-react"
@@ -78,8 +77,8 @@ export default function ScheduleDeliveries() {
       setIsLoading(true); // Set loading to true when starting to fetch data
       setInProgress(false); // Set default to true
       setScheduleComplete(true); // Set default to true
-
-      let schedules = await fetchSchedulesByDate(date);
+      
+      let schedules = await db.schedules.fetch.byDate(date);
 
       if (schedules && schedules.length > 0) {
         setDeliverySchedules(schedules as DeliverySchedule[]);
@@ -163,12 +162,18 @@ export default function ScheduleDeliveries() {
           }
         }
 
+        const store = await db.stores.fetch.store.forUser();
+        if (!store) {
+          console.error("User not atatched to store");
+          return [] as DeliverySchedule[];
+        }
+
         // Try upload schedules to database
         const { error } = await supabase
           .from('delivery_schedules')
           .insert({
             vehicle_id: deliverySchedule[schedule].vehicle_id,
-            store_id: deliverySchedule[schedule].store_id,
+            store_id: store.store_id,
             package_order: packageOrderIds,
             delivery_date: deliverySchedule[schedule].delivery_date,
             route_number: deliverySchedule[schedule].route_number,

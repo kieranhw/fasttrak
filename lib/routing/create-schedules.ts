@@ -4,7 +4,7 @@ import { Vehicle } from "@/types/vehicle";
 import { roundRobinAllocation } from "./algorithms/algorithm-2";
 import { Edge, Graph, Node, calculateDistance, createGraph } from "./model/graph";
 import { VRPSolution, VehicleRoute } from "./model/vrp";
-import { db } from "../db/db";
+import { UUID } from "crypto";
 
 
 export async function createSchedules(vehiclesData: Vehicle[], packagesData: Package[], date: Date) {
@@ -27,16 +27,10 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
 
     const vrpSolution = await roundRobinAllocation(graph, vehiclesData, 8);
 
-    const store = await db.stores.fetch.store.forUser();
-    if (!store) {
-        console.error("User not atatched to store");
-        return [] as DeliverySchedule[];
-    }
-
     for (const route of vrpSolution.routes) {
         let schedule: DeliverySchedule = {
             vehicle_id: route.vehicle.vehicle_id,
-            store_id: store.store_id,
+            store_id: undefined as unknown as UUID,
             vehicle: route.vehicle,
             package_order: route.nodes.map(node => node.pkg as Package),
             delivery_date: date,

@@ -57,19 +57,10 @@ const fetchPackagesByIds = async (ids: UUID[]) => {
         return ([] as Package[]);
     }
 
-    // Fetch store for user
-    const store = await db.stores.fetch.store.forUser();
-
-    if (!store) {
-        console.error("User not atatched to store");
-        return;
-    }
-
     let { data: packages, error } = await supabase
         .from('packages')
         .select('*')
         .in('package_id', ids)
-        .eq('store_id', store.store_id);
     if (error) {
         console.error("Error fetching packages: ", error);
         return;
@@ -105,21 +96,12 @@ const removePackageById = async (id: UUID) => {
     }
 }
 
-// Update package status by IDs
+// Update package statuses by IDs
 const updatePackageStatusByIds = async (ids: UUID[], status: string) => {
-    // Fetch store for user
-    const store = await db.stores.fetch.store.forUser();
-
-    if (!store) {
-        console.error("User not atatched to store");
-        return;
-    }
-
     const { error } = await supabase
         .from('packages')
         .update({ status: status })
-        .eq('package_id', ids)
-        .eq('store_id', store.store_id);
+        .in('package_id', ids)
     if (error) {
         console.error("Error updating package status: ", error);
         return
@@ -136,7 +118,9 @@ export const packages = {
         byIds: fetchPackagesByIds,
     },
     update: {
-        status: updatePackageStatusByIds,
+        status: {
+            byIds: updatePackageStatusByIds,
+        },
     },
     remove: {
         byId: removePackageById,
