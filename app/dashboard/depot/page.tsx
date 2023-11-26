@@ -3,13 +3,15 @@
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import './mapbox-overrides.css';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!;
 
 export default function Depot() {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const depotCoordinates: mapboxgl.LngLatLike | undefined = [-2.966384, 53.406605];
-  const centerCoordinates: mapboxgl.LngLatLike | undefined = [-2.968084, 53.406605];
+  const centerCoordinates: mapboxgl.LngLatLike | undefined = [-2.966384, 53.406605];
 
   useEffect(() => {
     if (mapContainer.current) {
@@ -85,13 +87,49 @@ export default function Depot() {
         <h1 className="text-foreground font-bold text-3xl my-auto pb-4">Depot</h1>
       </div>
 
-      <div className="relative flex-grow">
-        {/* Overlay div */}
-        <div className="flex md:absolute md:drop-shadow-xl left-5 top-5 z-40 w-full md:w-[400px] h-[400px] space-y-4 border rounded-md p-4 bg-card">
-        </div>
+      {/* Add depot form if depot does not exist */}
 
-        {/* Map container */}
-        <div ref={mapContainer} className="invisible md:visible md:absolute top-0 left-0 w-full h-full" />
+      {/* conditionally render if depot exists */}
+      <div className="flex flex-col justify-between">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div>
+            <div className="border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1 h-12">
+              <p className="text-muted-foreground font-medium text-sm m-2">Information</p>
+            </div>
+            <div className="border rounded-t-none rounded-md border-divider h-[450px] flex gap-2 flex-col">
+              <div className="flex flex-col items-start gap-2 py-2 px-5">
+                <h3 className="text-muted-foreground text-sm font-medium mt-4">Depot Name</h3>
+                <div>
+                  Depot 1
+                </div>
+              </div>
+
+              <div className="flex flex-col items-start gap-2 py-2 px-5">
+                <h3 className="text-muted-foreground text-sm font-medium">Store</h3>
+                <div>
+                  Store LTD
+                </div>
+              </div>
+              <div className="flex flex-col items-start gap-2 py-2 px-5">
+                <h3 className="text-muted-foreground text-sm font-medium">Location</h3>
+                <div>
+                  Depot Location, 15 Location, L1 2AB
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div>
+            <div className="border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1 h-12">
+              <p className="text-muted-foreground text-sm font-medium m-2">Location</p>
+            </div>
+            <div className="border rounded-t-none rounded-md border-divider h-[450px]">
+              <div ref={mapContainer} className="w-full h-full" />
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );
