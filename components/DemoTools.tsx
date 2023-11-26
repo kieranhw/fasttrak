@@ -14,10 +14,8 @@ import {
 
 import { AiFillTool } from "react-icons/ai"
 import { useState } from "react";
-import { generatePackages } from "@/lib/generate-packages";
+import { generatePackages } from "@/lib/create-packages";
 import { supabase } from "@/pages/api/supabase-client";
-
-
 
 
 export default function DemoTools() {

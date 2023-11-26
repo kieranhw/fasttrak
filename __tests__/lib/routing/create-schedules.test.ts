@@ -1,7 +1,7 @@
 import { createSchedules } from '@/lib/routing/create-schedules';
 import { Vehicle } from '@/types/vehicle';
 import { Package, PriorityType } from "@/types/package"
-import { addressData } from "@/lib/liverpool-addresses";
+import { addressData } from "@/lib/data/liverpool-addresses";
 
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule"
 import { UUID } from "crypto"
