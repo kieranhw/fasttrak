@@ -41,6 +41,14 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
     {
         accessorKey: "route_number",
         header: "Route",
+        cell: ({ row }) => {
+            const routeNumber = row.getValue("route_number")?.toString()
+
+            return (
+                    <p className="text-muted-foreground">{routeNumber}</p>
+            )
+        }
+
     },
     {
         accessorKey: "vehicle",
@@ -94,36 +102,63 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
         accessorKey: "distance_miles",
         header: () => (
             <div className="text-left">
-                Distance
+                Travel
             </div>
         ),
         cell: ({ row }) => {
             const distance = row.getValue("distance_miles")?.toString()
+            const time = row.original.estimated_duration_mins?.toString()
 
+            // convert minutes to hours and minutes (e.g. 90 minutes = 1h 30)
+            const hours = Math.floor(parseInt(time!) / 60);
+            const minutes = parseInt(time!) % 60;
             return (
                 <div className="flex flex-col w-fit">
                     <p>{distance} mi</p>
+                    <p>{hours}h {minutes}m</p>
                 </div>
             )
         }
     },
     {
-        accessorKey: "estimated_duration_mins",
+        accessorKey: "load_weight",
         header: () => (
             <div className="text-left">
-                Driving Time
+                Load
             </div>
         ),
         cell: ({ row }) => {
-            const time = row.getValue("estimated_duration_mins")?.toString()
+            // Get current load and weight
+            const vehicle: Vehicle = row.getValue("vehicle")
 
-            // convert minutes to hours and minutes (e.g. 90 minutes = 1h 30)
-            const hours = Math.floor(parseInt(time!) / 60);
-            const minutes = parseInt(time!) % 60;
+            let load = row.getValue("load_weight")?.toString()
+            let volume = row.original.load_volume?.toString()
+
+            // Reduce to 2 decimal places if there is a decimal point
+            if (load?.includes(".")) {
+                load = Number(load).toFixed(2)
+            }
+            if (volume?.includes(".")) {
+                volume = Number(volume).toFixed(2)
+            }
+
+
+            // Get max load and volume
+            const maxLoad = vehicle.max_load
+            const maxVolume = vehicle.max_volume
+
+
 
             return (
                 <div className="flex flex-col w-fit">
-                    <p>{hours}h {minutes}m</p>
+                    <div className="inline-flex gap-1">
+                        <p className="text-foreground">{load}kg </p>
+                        <p className="text-muted-foreground">/ {maxLoad} kg</p>
+                    </div>
+                    <div className="inline-flex gap-1">
+                        <p className="text-foreground">{volume}m<sup>3</sup> </p>
+                        <p className="text-muted-foreground">/ {maxVolume} m<sup>3</sup></p>
+                    </div>
                 </div>
             )
         }
@@ -150,23 +185,6 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
 
                 if (res) {
                     console.log("Delivery status updated successfully.")
-
-                    let packageIds: UUID[] = []
-                    let packageStatus = ""
-
-                    schedule.package_order.forEach(e => {
-                        // Add package IDs to array
-                        packageIds.push(e.package_id)
-                    });
-
-                    if (status == DeliveryStatus.InProgress) {
-                        packageStatus = "In Transit"
-                    } else if (status == DeliveryStatus.Completed) {
-                        packageStatus = "Delivered"
-                    }
-
-                    // Update packages from schedule to updated status
-                    const packages = await db.packages.update.status(packageIds, packageStatus)
 
                 } else {
                     console.warn("Failed to update delivery status.");
