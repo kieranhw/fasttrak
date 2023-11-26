@@ -113,7 +113,7 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
             const hours = Math.floor(parseInt(time!) / 60);
             const minutes = parseInt(time!) % 60;
             return (
-                <div className="flex flex-col w-fit">
+                <div className="flex flex-col w-fit whitespace-nowrap">
                     <p>{distance} mi</p>
                     <p>{hours}h {minutes}m</p>
                 </div>
@@ -151,11 +151,11 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
 
             return (
                 <div className="flex flex-col w-fit">
-                    <div className="inline-flex gap-1">
+                    <div className="inline-flex gap-1 whitespace-nowrap">
                         <p className="text-foreground">{load}kg </p>
                         <p className="text-muted-foreground">/ {maxLoad} kg</p>
                     </div>
-                    <div className="inline-flex gap-1">
+                    <div className="inline-flex gap-1 whitespace-nowrap">
                         <p className="text-foreground">{volume}m<sup>3</sup> </p>
                         <p className="text-muted-foreground">/ {maxVolume} m<sup>3</sup></p>
                     </div>
