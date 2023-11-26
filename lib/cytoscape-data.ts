@@ -38,15 +38,30 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
     // Prepare nodes and edges data 
     const cyNodes = graph.nodes.map((node, index) => {
         // positions with rotate -45 degrees to view map from north orientation
-        const x = visCenterX + (node.coordinates.lat - midLat) * 25000 * Math.cos(-45) - (node.coordinates.lng - midLng) * 25000 * Math.sin(-45);
-        const y = visCenterY + (node.coordinates.lat - midLat) * 25000 * Math.sin(-45) + (node.coordinates.lng - midLng) * 25000 * Math.cos(-45);
+        const x = visCenterX + (node.coordinates.lat - midLat) * 15000 * Math.cos(-45) - (node.coordinates.lng - midLng) * 15000 * Math.sin(-45);
+        const y = visCenterY + (node.coordinates.lat - midLat) * 15000 * Math.sin(-45) + (node.coordinates.lng - midLng) * 15000 * Math.cos(-45);
 
         let label: string;
         if (node.isDepot) {
             label = 'Depot';
         } else if (node.pkg) {
+            // Show the first line of the address
             label = node.pkg.recipient_address.split(',')[0];
-            label += `\n${node.pkg.recipient_address.split(',')[1].trim()}`;
+
+            // Regular expression to match UK postcodes
+            const postcodeRegex = /[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}/i;
+            const match = node.pkg.recipient_address.match(postcodeRegex);
+
+            if (match) {
+                // Add the postcode to the label
+                label += `\n${match[0]}`;
+            } else {
+                // If no postcode is found, add the second line of the address
+                const secondLine = node.pkg.recipient_address.split(',')[1]?.trim();
+                if (secondLine) {
+                    label += `\n${secondLine}`;
+                }
+            }
 
             const count = packageCounts[node.pkg.recipient_address];
             if (count > 1) {
@@ -91,8 +106,8 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
     // Create a cytoscape instance
     const cy = cytoscape({
         container: document.getElementById('cy'),
-        maxZoom: 1,
-        minZoom: 0.4,
+        maxZoom: 1.5,
+        minZoom: 0.25,
         elements: {
             nodes: cyNodes,
             edges: cyEdges,
