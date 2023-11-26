@@ -2,8 +2,8 @@ import { createSchedules } from '@/lib/routing/create-schedules';
 import { Vehicle } from '@/types/vehicle';
 import { Package, PriorityType } from "@/types/package"
 import { addressData } from "@/lib/data/liverpool-addresses";
+import { supabase } from "@/pages/api/supabase-client";
 
-import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule"
 import { UUID } from "crypto"
 import { faker } from '@faker-js/faker';
 import { generateFT } from "@/lib/generate-ids";
@@ -27,7 +27,7 @@ function generateMockPackages(numPackages: number, weight?: number, volume?: num
         mockPackages.push({
             package_id: faker.string.uuid() as UUID,
             tracking_id: generateFT()!,
-            store_id: undefined,
+            store_id: faker.string.uuid() as UUID,
             recipient_name: faker.person.fullName(),
             recipient_address: recipientAddress.address,
             recipient_address_lat: recipientAddress.lat,
