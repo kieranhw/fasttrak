@@ -71,6 +71,15 @@ export default function ScheduleDetails() {
         }
     }
 
+    const formatDateUrl = (date: Date | undefined) => {
+        // Format date url as DDMMYYY
+        if (!date) {
+            return "No date";
+        } else {
+            return new Date(date).toLocaleDateString().replaceAll("/", "");
+        }
+    }
+
     async function buildGraph(schedule: DeliverySchedule | undefined) {
 
         if (!schedule) {
@@ -89,8 +98,8 @@ export default function ScheduleDetails() {
 
             <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1500px]">
                 <div>
-                    <BreadcrumbLink href="/dashboard/schedule" text="Schedule" />
-                    <BreadcrumbLink text={formatDate(deliverySchedule?.delivery_date!)} />
+                    <BreadcrumbLink text="Schedule" />
+                    <BreadcrumbLink href={`/dashboard/schedule?date=${formatDateUrl(deliverySchedule?.delivery_date!)}`} text={formatDate(deliverySchedule?.delivery_date!)} />
                     <BreadcrumbLink href="/dashboard/schedule" text={`Route ${deliverySchedule?.route_number}`} lastItem />
                 </div>
                 <div className="inline-flex justify-between">

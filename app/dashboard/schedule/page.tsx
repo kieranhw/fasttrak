@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { columns } from "./components/columns"
 import { DataTable } from "./components/data-table"
 import { Package } from "@/types/package";
@@ -34,11 +34,60 @@ import { db } from "@/lib/db/db";
 import { displayGraph } from "@/lib/cytoscape-data";
 import { CytoscapeGraph } from "@/components/CytoscapeGraph";
 import { MdRefresh } from "react-icons/md"
+import { useRouter, useSearchParams } from "next/navigation";
 
 
 export default function ScheduleDeliveries() {
-  // Date Picker
-  const [date, setDate] = useState<Date>(new Date());
+  // Date Handling
+  const [date, setDate] = useState<Date | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    // Check if a valid date is in the URL
+    const dateString = searchParams?.get('date');
+    
+    // Check if dateString is a valid date
+    if (dateString && dateString.length === 8) {
+      const day = dateString.slice(0, 2);
+      const month = dateString.slice(2, 4);
+      const year = dateString.slice(4, 8);
+
+      // Construct date object 
+      const newDate = new Date(`${year}-${month}-${day}`)
+      
+      // Check newDate is a valid date
+      if (isNaN(newDate.valueOf())) {
+        handleDateChange(new Date()); 
+        return;
+      }
+      handleDateChange(newDate);
+    } else {
+      handleDateChange(new Date()); 
+    }
+  }, [searchParams]);
+
+  const handleDateChange = (selectedDate: number | SetStateAction<Date>) => {
+    if (selectedDate instanceof Date) {
+      setDate(selectedDate);
+      console.log("date set:", selectedDate)
+
+      // Format the date to 'ddMMyyyy'
+      const formattedDate = format(selectedDate, 'ddMMyyyy');
+      // Update the URL
+      router.push(`schedule/?date=${formattedDate}`);
+    } else {
+      // Set date to today
+      const today = new Date();
+      setDate(today);
+
+      // Format date to 'ddMMyyyy'
+      const formattedDate = format(today, 'ddMMyyyy');
+      // Update the URL
+      router.push(`schedule/?date=${formattedDate}`);
+    }
+  };
+
 
   const isDateWithinLimit = (newDate: Date) => {
     const tomorrow = new Date();
@@ -55,9 +104,7 @@ export default function ScheduleDeliveries() {
     return true;
   };
 
-  useEffect(() => {
-    setDate(new Date())
-  }, [])
+
 
   // Data
   const [deliverySchedules, setDeliverySchedules] = useState<DeliverySchedule[]>([]);
@@ -74,10 +121,12 @@ export default function ScheduleDeliveries() {
 
   useEffect(() => {
     async function fetchData() {
+      if (!date) return; // Return early if date is null
+
       setIsLoading(true); // Set loading to true when starting to fetch data
       setInProgress(false); // Set default to true
       setScheduleComplete(true); // Set default to true
-      
+
       let schedules = await db.schedules.fetch.byDate(date);
 
       if (schedules && schedules.length > 0) {
@@ -99,16 +148,13 @@ export default function ScheduleDeliveries() {
             setScheduleComplete(false);
           }
         });
-
-
+        
         buildGraph(schedules)
 
       } else {
         setDeliverySchedules([]);
         setIsScheduledToday(false);
       }
-
-
       setIsLoading(false); // Set loading to false after fetching data
     }
 
@@ -133,6 +179,7 @@ export default function ScheduleDeliveries() {
 
   // Schedule
   async function handleScheduleDelivery() {
+    if (!date) return; // Return early if date is null
     setIsLoading(true);
     setIsScheduling(true);
 
@@ -267,10 +314,12 @@ export default function ScheduleDeliveries() {
                 <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
-                    selected={date}
+                    selected={date || new Date()}
                     onSelect={(selectedDate) => {
                       if (selectedDate instanceof Date) {
-                        setDate(selectedDate);
+                        //setDate(selectedDate);
+                        handleDateChange(selectedDate);
+
                       }
                     }}
                     disabled={(date) =>
@@ -289,12 +338,12 @@ export default function ScheduleDeliveries() {
                   onClick={e => {
                     const newDate = new Date(date || new Date());
                     newDate.setDate(newDate.getDate() - 1);
-                    setDate(newDate);
+                    handleDateChange(newDate);
                   }}
                 >
                   <ChevronLeft size={16} />
                 </Button>
-                <Button variant="outline" onClick={e => setDate(new Date())}>
+                <Button variant="outline" onClick={e => handleDateChange(new Date())}>
                   Today
                 </Button>
                 <Button
@@ -306,7 +355,7 @@ export default function ScheduleDeliveries() {
                       const newDate = new Date(date);
                       newDate.setDate(date.getDate() + 1);
                       if (isDateWithinLimit(newDate)) {
-                        setDate(newDate);
+                        handleDateChange(newDate);
                       }
                     }
                   }}
@@ -346,7 +395,7 @@ export default function ScheduleDeliveries() {
                 <TooltipTrigger asChild>
                   <div>
                     <Button variant="outline"
-                      disabled={isLoading == true || isScheduledToday == false || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || inProgress === true}
+                      disabled={isLoading == true || isScheduledToday == false || date! < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date! < new Date("1900-01-01") || inProgress === true}
                       onClick={e => handleDeleteSchedule()}
                     >
                       Delete
@@ -379,7 +428,7 @@ export default function ScheduleDeliveries() {
                     <TooltipTrigger asChild>
                       <div>
                         <Button className="border"
-                          disabled={isLoading == true || date < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date < new Date("1900-01-01") || isScheduledToday != false}
+                          disabled={isLoading == true || date! < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date! < new Date("1900-01-01") || isScheduledToday != false}
                           onClick={e => handleScheduleDelivery()}
                         >
                           Schedule
@@ -390,8 +439,11 @@ export default function ScheduleDeliveries() {
                       {isScheduledToday != false &&
                         <p>Schedule already generated</p>
                       }
-                      {isScheduledToday == false &&
+                      {isScheduledToday == false && date! >= new Date((new Date()).valueOf() - 1000 * 3600 * 24) &&
                         <p>Schedule deliveries</p>
+                      }
+                      {isScheduledToday == false && date! < new Date((new Date()).valueOf() - 1000 * 3600 * 24) &&
+                        <p>Unable to schedule delivery for past date</p>
                       }
                     </TooltipContent>
                   </Tooltip>
