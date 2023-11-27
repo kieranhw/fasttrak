@@ -36,18 +36,19 @@ export default function Sidebar() {
         });
     }, []);
 
-    const buttonStyle = "sidebar-item inline-flex items-center gap-2 font-medium hover:bg-primary/50 p-2 px-2 rounded-md transition-colors w-full my-1"
-    const activeButton = "sidebar-item inline-flex items-center gap-2 font-medium bg-accent hover:bg-primary/50 p-2 px-2 full transition-colors";
+    const buttonStyle = "sidebar-item inline-flex items-center gap-2 font-medium hover:bg-primary/50 p-2 px-3 rounded-md transition-colors w-full"
+    const activeButton = "sidebar-item inline-flex items-center gap-2 font-medium bg-accent hover:bg-primary/50 p-2 px-3 full transition-colors";
 
     const linkStyle = "sidebar-item inline-flex font-medium text-foreground hover:text-primary p-2 w-full justify-start ml-4 transition-none"
     const activeLink = "sidebar-item inline-flex font-medium text-primary p-2 w-full justify-start ml-4 transition-none";
 
     return (
-        <aside className="min-w-[220px] max-w-[220px] border-r">
-            <div className="flex justify-between items-center px-4 py-8 h-12">
+        <aside className="min-w-[220px] max-w-[220px] border-r px-4">
+            <div className="flex justify-between items-center min-h-[60px] max-h-[60px]">
                 <p className="text-primary text-2xl font-bold">FastTrak</p>
             </div>
-            <div className="h-screen text-foreground flex flex-col px-4 py-2 ">
+
+            <div className="text-foreground flex flex-col gap-2 pt-6">
                 <Link draggable="false" href="/dashboard">
                     <div className={`${buttonStyle} ${isActive("/dashboard") ? activeButton : ''}`}>
                         <BiSolidDashboard />

@@ -291,9 +291,7 @@ export default function ScheduleDeliveries() {
   return (
     <TooltipProvider delayDuration={100}>
       <div className="flex flex-col w-full justify-start gap-4 mx-auto p-4 max-w-[1600px]">
-        <div className="inline-flex justify-between">
-          <h1 className="text-foreground font-bold text-3xl">Delivery Schedule</h1>
-        </div>
+        <h1 className="text-foreground font-bold text-3xl">Delivery Schedule</h1>
 
         <div className="flex items-center justify-between">
           <div className="inline-flex justify-between w-full">
@@ -457,7 +455,6 @@ export default function ScheduleDeliveries() {
 
         {deliverySchedules.length > 0 &&
           <div className="flex flex-col justify-between">
-            <h1 className="text-foreground font-semibold text-xl my-4">Analysis</h1>
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
               <div>
                 <div className="border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1 h-12">
@@ -485,11 +482,11 @@ export default function ScheduleDeliveries() {
                   <p className="text-muted-foreground text-sm font-medium m-2">Schedule Statistics</p>
                 </div>
                 <div className="border rounded-t-none rounded-md border-divider h-[450px]">
-                  <div className="grid grid-cols-2 p-6 gap-8 h-[450px]">
+                  <div className="grid grid-cols-2 p-8 gap-8 h-[450px]">
                     <div>
                       <p className="text-muted-foreground text-sm mx-2">Total Packages</p>
                       <div className="flex items-end gap-1 mx-2 my-1">
-                        <p className="text-4xl font-semibold">
+                        <p className="text-3xl font-semibold">
                           {
                             deliverySchedules.reduce((acc, schedule) => {
                               return acc + schedule.num_packages
@@ -501,8 +498,8 @@ export default function ScheduleDeliveries() {
 
                     <div>
                       <p className="text-muted-foreground text-sm mx-2">Total Distance</p>
-                      <div className="flex items-end gap-2 mx-2 my-1">
-                        <p className="text-4xl font-semibold">
+                      <div className="flex items-end gap-1 mx-2 my-1">
+                        <p className="text-3xl font-semibold">
                           {
                             Math.round(deliverySchedules.reduce((acc, schedule) => {
                               return acc + schedule.distance_miles
@@ -515,8 +512,8 @@ export default function ScheduleDeliveries() {
 
                     <div>
                       <p className="text-muted-foreground text-sm mx-2">Packages / Vehicle</p>
-                      <div className="flex items-end gap-2 mx-2 my-1">
-                        <p className="text-4xl font-semibold">
+                      <div className="flex items-end gap-1 mx-2 my-1">
+                        <p className="text-3xl font-semibold">
                           {
                             Math.round(deliverySchedules.reduce((acc, schedule) => {
                               return acc + schedule.num_packages
@@ -529,8 +526,8 @@ export default function ScheduleDeliveries() {
 
                     <div>
                       <p className="text-muted-foreground text-sm mx-2 whitespace-nowrap">Packages / Hour</p>
-                      <div className="flex items-end gap-2 mx-2 my-1">
-                        <p className="text-4xl font-semibold">
+                      <div className="flex items-end gap-1 mx-2 my-1">
+                        <p className="text-3xl font-semibold">
                           {
                             Math.round(deliverySchedules.reduce((acc, schedule) => {
                               return acc + schedule.num_packages
@@ -547,8 +544,8 @@ export default function ScheduleDeliveries() {
 
                     <div>
                       <p className="text-muted-foreground text-sm mx-2 whitespace-nowrap">Driving Time / Vehicle</p>
-                      <div className="flex items-end gap-2 mx-2 my-1">
-                        <p className="text-4xl font-semibold">
+                      <div className="flex items-end gap-1 mx-2 my-1">
+                        <p className="text-3xl font-semibold">
                           {
                             Math.floor(deliverySchedules.reduce((acc, schedule) => {
                               return acc + schedule.estimated_duration_mins
@@ -567,7 +564,7 @@ export default function ScheduleDeliveries() {
                     <div>
                       <p className="text-muted-foreground text-sm mx-2 whitespace-nowrap">Driving Time / Package</p>
                       <div className="flex items-end gap-2 mx-2 my-1">
-                        <p className="text-4xl font-semibold">
+                        <p className="text-3xl font-semibold">
                           {
                             Math.floor(deliverySchedules.reduce((acc, schedule) => {
                               return acc + schedule.estimated_duration_mins
@@ -587,13 +584,13 @@ export default function ScheduleDeliveries() {
 
                     <div>
                       <p className="text-muted-foreground text-sm mx-2 whitespace-nowrap">Distance / Vehicle</p>
-                      <div className="flex items-end gap-2 mx-2 my-1">
-                        <p className="text-4xl font-semibold">
-                        {
-                          Math.round(deliverySchedules.reduce((acc, schedule) => {
-                            return acc + schedule.distance_miles
-                          }, 0) / deliverySchedules.length * 100) / 100
-                        } 
+                      <div className="flex items-end gap-1 mx-2 my-1">
+                        <p className="text-3xl font-semibold">
+                          {
+                            Math.round(deliverySchedules.reduce((acc, schedule) => {
+                              return acc + schedule.distance_miles
+                            }, 0) / deliverySchedules.length * 100) / 100
+                          }
                         </p>
                         <p className="text-lg font-semibold">miles</p>
                       </div>
@@ -603,15 +600,15 @@ export default function ScheduleDeliveries() {
 
                     <div>
                       <p className="text-muted-foreground text-sm mx-2 whitespace-nowrap">Distance / Package</p>
-                      <div className="flex items-end gap-2 mx-2 my-1">
-                        <p className="text-4xl font-semibold">
-                        {
-                          Math.round(deliverySchedules.reduce((acc, schedule) => {
-                            return acc + schedule.distance_miles
-                          }, 0) / deliverySchedules.reduce((acc, schedule) => {
-                            return acc + schedule.num_packages
-                          }, 0) * 100) / 100
-                        } 
+                      <div className="flex items-end gap-1 mx-2 my-1">
+                        <p className="text-3xl font-semibold">
+                          {
+                            Math.round(deliverySchedules.reduce((acc, schedule) => {
+                              return acc + schedule.distance_miles
+                            }, 0) / deliverySchedules.reduce((acc, schedule) => {
+                              return acc + schedule.num_packages
+                            }, 0) * 100) / 100
+                          }
                         </p>
                         <p className="text-lg font-semibold">miles</p>
                       </div>
