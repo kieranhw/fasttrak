@@ -46,7 +46,7 @@ export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
 
             return (
                 <div className="flex flex-col w-5">
-                    <p>{deliveryNumber}</p>
+                    <p className="text-muted-foreground">{deliveryNumber}</p>
                 </div>
             )
         }
@@ -86,10 +86,9 @@ export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
         accessorKey: "recipient_address",
         header: "Postcode",
         cell: ({ row }) => {
-            // Extract postcode from address in printed format
+            // Extract postcode from address using regex for uk postcode [A-Za-z]{1,2}[0-9Rr][0-9A-Za-z]? [0-9][ABD-HJLNP-UW-Zabd-hjlnp-uw-z]{2}
             const address = row.getValue("recipient_address")?.toString()
-            const postcode = address?.substring(address.length - 7)
-
+            const postcode = address?.match(/[A-Za-z]{1,2}[0-9Rr][0-9A-Za-z]? [0-9][ABD-HJLNP-UW-Zabd-hjlnp-uw-z]{2}/)?.toString()
 
             return postcode;
         }
