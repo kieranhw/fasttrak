@@ -2,6 +2,7 @@ import { supabase } from "@/pages/api/supabase-client";
 import { Package } from "@/types/package";
 import { UUID } from "crypto";
 import { db } from "./db";
+import { DeliveryStatus } from "@/types/delivery-schedule";
 
 // Fetch all packages for a user
 const fetchPackages = async () => {
@@ -97,16 +98,38 @@ const removePackageById = async (id: UUID) => {
 }
 
 // Update package statuses by IDs
-const updatePackageStatusByIds = async (ids: UUID[], status: string) => {
-    const { error } = await supabase
-        .from('packages')
-        .update({ status: status })
-        .in('package_id', ids)
-    if (error) {
-        console.error("Error updating package status: ", error);
-        return
+const updatePackageStatusByIds = async (ids: UUID[], status: DeliveryStatus) => {
+    if (!ids) {
+        return;
+    }
+
+    if (status === DeliveryStatus.Completed) {
+        // Remove personal information from packages and set status to delivered
+        const { error } = await supabase
+            .from('packages')
+            .update({
+                status: "Delivered",
+                recipient_name: null,
+                recipient_phone: null,
+                sender_name: null,
+                sender_phone: null,
+            })
+            .in('package_id', ids)
+        if (error) {
+            console.error("Error updating package status: ", error);
+            return
+        }
     } else {
-        return
+        const { error } = await supabase
+            .from('packages')
+            .update({ status: status })
+            .in('package_id', ids)
+        if (error) {
+            console.error("Error updating package status: ", error);
+            return
+        } else {
+            return
+        }
     }
 }
 
