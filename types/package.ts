@@ -2,7 +2,6 @@ import { UUID } from "crypto"
 
 export type PriorityType = "Redelivery" | "Express" | "Standard" | "Return";
 
-
 export type Package = {
     package_id: UUID
     store_id: UUID

@@ -1,6 +1,6 @@
 import { supabase } from "@/pages/api/supabase-client";
 import { Package } from "@/types/package";
-import { DeliverySchedule } from "@/types/delivery-schedule";
+import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { UUID } from "crypto";
 import { db } from "./db";
 import { Vehicle } from "@/types/vehicle";
@@ -97,7 +97,7 @@ export const fetchScheduleById = async (scheduleId: UUID): Promise<DeliverySched
 };
 
 // Update schedule status by ID
-const updateScheduleStatus = async (scheduleId: UUID, status: string) => {
+const updateScheduleStatus = async (scheduleId: UUID, status: DeliveryStatus) => {
     let { data: packages, error } = await supabase
         .from('delivery_schedules')
         .update({ status: status })

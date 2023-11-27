@@ -56,8 +56,8 @@ export default function ScheduleDeliveries() {
       // Construct date object 
       const newDate = new Date(`${year}-${month}-${day}`)
       
-      // Check newDate is a valid date
-      if (isNaN(newDate.valueOf())) {
+      // Check newDate is a valid date and within limit
+      if (isNaN(newDate.valueOf()) || !isDateWithinLimit(newDate)) {
         handleDateChange(new Date()); 
         return;
       }

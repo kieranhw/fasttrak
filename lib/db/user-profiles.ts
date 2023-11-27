@@ -4,13 +4,11 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 // Fetch user profile from user
 const fetchUserProfile = async () => {
-
     // Create a Supabase client configured to use cookies
     const supabase = createClientComponentClient()
 
     // Get user id from session
     const user = await supabase.auth.getUser();
-
 
     if (!user) {
         console.error("User not found");
