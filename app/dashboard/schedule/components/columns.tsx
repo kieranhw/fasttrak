@@ -152,11 +152,11 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
             return (
                 <div className="flex flex-col w-fit">
                     <div className="inline-flex gap-1 whitespace-nowrap">
-                        <p className="text-foreground">{load}kg </p>
+                        <p className="text-foreground">{load} kg </p>
                         <p className="text-muted-foreground">/ {maxLoad} kg</p>
                     </div>
                     <div className="inline-flex gap-1 whitespace-nowrap">
-                        <p className="text-foreground">{volume}m<sup>3</sup> </p>
+                        <p className="text-foreground">{volume} m<sup>3</sup> </p>
                         <p className="text-muted-foreground">/ {maxVolume} m<sup>3</sup></p>
                     </div>
                 </div>
