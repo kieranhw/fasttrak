@@ -69,7 +69,7 @@ export default function Sidebar() {
                                 Packages
                             </div>
                         </AccordionTrigger>
-                        <AccordionContent>
+                        <AccordionContent className="mt-2 h-[120px]">
                             <Link draggable="false" href="/dashboard/packages/add">
                                 <Button className={`${linkStyle} ${isActive("/dashboard/packages/add") ? activeLink : ''}`} variant="link">Add Package</Button>
                             </Link>
