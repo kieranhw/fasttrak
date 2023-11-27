@@ -15,7 +15,6 @@ import { PiPackageBold } from 'react-icons/pi'
 import { RiRouteFill } from 'react-icons/ri'
 import { FaWarehouse } from 'react-icons/fa'
 import { useEffect } from 'react'
-import { Separator } from '@radix-ui/react-select'
 
 export default function Sidebar() {
     const router = usePathname();
@@ -37,70 +36,74 @@ export default function Sidebar() {
         });
     }, []);
 
-    const buttonStyle = "sidebar-item inline-flex items-center gap-2 font-medium hover:bg-primary/50 p-2 px-4 rounded-full transition-colors w-full my-1"
-    const activeButton = "sidebar-item inline-flex items-center gap-2 font-medium bg-foreground/10 hover:bg-primary/50 p-2 px-4 full transition-colors";
+    const buttonStyle = "sidebar-item inline-flex items-center gap-2 font-medium hover:bg-primary/50 p-2 px-2 rounded-md transition-colors w-full my-1"
+    const activeButton = "sidebar-item inline-flex items-center gap-2 font-medium bg-accent hover:bg-primary/50 p-2 px-2 full transition-colors";
 
     const linkStyle = "sidebar-item inline-flex font-medium text-foreground hover:text-primary p-2 w-full justify-start ml-4 transition-none"
     const activeLink = "sidebar-item inline-flex font-medium text-primary p-2 w-full justify-start ml-4 transition-none";
 
     return (
-        <aside className="h-screen w-[250px] text-foreground flex flex-col p-4 border-r">
-            <p className="text-primary text-2xl font-bold mx-4 mb-8">FastTrak</p>
-            <Link draggable="false" href="/dashboard">
-                <div className={`${buttonStyle} ${isActive("/dashboard") ? activeButton : ''}`}>
-                    <BiSolidDashboard />
-                    <p>Dashboard</p>
-                </div>
-            </Link>
-            <Link draggable="false" href="/dashboard/schedule">
-                <div className={`${buttonStyle} ${isActive("/dashboard/schedule") ? activeButton : ''}`}>
-                    <RiRouteFill />
-                    <p>Schedule</p>
-                </div>
-            </Link>
-            <Accordion type="single" collapsible>
-                <AccordionItem value="item-1">
-                    <AccordionTrigger className={`${buttonStyle} ${isActive("/dashboard/packages") ? activeButton : ''}`}>
-                        <div className="inline-flex justify-start items-center gap-2">
-                            <PiPackageBold />
-                            Packages
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                        <Link draggable="false" href="/dashboard/packages/add">
-                            <Button className={`${linkStyle} ${isActive("/dashboard/packages/add") ? activeLink : ''}`} variant="link">Add Package</Button>
-                        </Link>
-                        <Link draggable="false" href="/dashboard/packages/inventory">
-                            <Button className={`${linkStyle} ${isActive("/dashboard/packages/inventory") ? activeLink : ''}`} variant="link">Inventory</Button>
-                        </Link>
-                        <Link draggable="false" href="/dashboard/packages/history">
-                            <Button className={`${linkStyle} ${isActive("/dashboard/packages/history") ? activeLink : ''}`} variant="link">History</Button>
-                        </Link>
-                    </AccordionContent>
-                </AccordionItem>
-            </Accordion>
+        <aside className="w-[250px] border-r">
+            <div className="flex justify-between items-center px-4 py-8 h-12">
+                <p className="text-primary text-2xl font-bold">FastTrak</p>
+            </div>
+            <div className="h-screen  text-foreground flex flex-col px-4 py-2 ">
+                <Link draggable="false" href="/dashboard">
+                    <div className={`${buttonStyle} ${isActive("/dashboard") ? activeButton : ''}`}>
+                        <BiSolidDashboard />
+                        <p>Dashboard</p>
+                    </div>
+                </Link>
+                <Link draggable="false" href="/dashboard/schedule">
+                    <div className={`${buttonStyle} ${isActive("/dashboard/schedule") ? activeButton : ''}`}>
+                        <RiRouteFill />
+                        <p>Schedule</p>
+                    </div>
+                </Link>
+                <Accordion type="single" collapsible>
+                    <AccordionItem value="item-1">
+                        <AccordionTrigger className={`${buttonStyle} ${isActive("/dashboard/packages") ? activeButton : ''}`}>
+                            <div className="inline-flex justify-start items-center gap-2">
+                                <PiPackageBold />
+                                Packages
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                            <Link draggable="false" href="/dashboard/packages/add">
+                                <Button className={`${linkStyle} ${isActive("/dashboard/packages/add") ? activeLink : ''}`} variant="link">Add Package</Button>
+                            </Link>
+                            <Link draggable="false" href="/dashboard/packages/inventory">
+                                <Button className={`${linkStyle} ${isActive("/dashboard/packages/inventory") ? activeLink : ''}`} variant="link">Inventory</Button>
+                            </Link>
+                            <Link draggable="false" href="/dashboard/packages/history">
+                                <Button className={`${linkStyle} ${isActive("/dashboard/packages/history") ? activeLink : ''}`} variant="link">History</Button>
+                            </Link>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
 
-            <Link draggable="false" href="/dashboard/vehicles">
-                <div className={`${buttonStyle} ${isActive("/dashboard/vehicles") ? activeButton : ''}`}>
-                    <BiSolidTruck />
-                    <p>Vehicles</p>
-                </div>
-            </Link>
-            <Link draggable="false" href="/dashboard/depot">
-                <div className={`${buttonStyle} ${isActive("/dashboard/depot") ? activeButton : ''}`}>
-                    <FaWarehouse />
-                    <p>Depot</p>
-                </div>
-            </Link>
-            <Link draggable="false" href="/dashboard/reports">
-                <div className={`${buttonStyle} ${isActive("/dashboard/reports") ? activeButton : ''}`}>
-                    <BiSolidReport />
-                    <p>Reports</p>
-                </div>
-            </Link>
+                <Link draggable="false" href="/dashboard/vehicles">
+                    <div className={`${buttonStyle} ${isActive("/dashboard/vehicles") ? activeButton : ''}`}>
+                        <BiSolidTruck />
+                        <p>Vehicles</p>
+                    </div>
+                </Link>
+                <Link draggable="false" href="/dashboard/depot">
+                    <div className={`${buttonStyle} ${isActive("/dashboard/depot") ? activeButton : ''}`}>
+                        <FaWarehouse />
+                        <p>Depot</p>
+                    </div>
+                </Link>
+                <Link draggable="false" href="/dashboard/reports">
+                    <div className={`${buttonStyle} ${isActive("/dashboard/reports") ? activeButton : ''}`}>
+                        <BiSolidReport />
+                        <p>Reports</p>
+                    </div>
+                </Link>
 
 
 
+            </div>
         </aside>
     )
 }
