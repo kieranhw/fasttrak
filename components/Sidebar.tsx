@@ -43,11 +43,11 @@ export default function Sidebar() {
     const activeLink = "sidebar-item inline-flex font-medium text-primary p-2 w-full justify-start ml-4 transition-none";
 
     return (
-        <aside className="w-[250px] border-r">
+        <aside className="min-w-[220px] max-w-[220px] border-r">
             <div className="flex justify-between items-center px-4 py-8 h-12">
                 <p className="text-primary text-2xl font-bold">FastTrak</p>
             </div>
-            <div className="h-screen  text-foreground flex flex-col px-4 py-2 ">
+            <div className="h-screen text-foreground flex flex-col px-4 py-2 ">
                 <Link draggable="false" href="/dashboard">
                     <div className={`${buttonStyle} ${isActive("/dashboard") ? activeButton : ''}`}>
                         <BiSolidDashboard />

@@ -274,7 +274,7 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
                             {/* If delivery already in progress, show dialog to select any items that have already been delivered */}
                             {/* else, show alert dialog to confirm that the delivery will be cancelled */}
 
-                            <DropdownMenuItem>Cancel Deliveries</DropdownMenuItem>
+                            <DropdownMenuItem >Cancel Deliveries</DropdownMenuItem>
 
                         </DropdownMenuContent>
                     </DropdownMenu>

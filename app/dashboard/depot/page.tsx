@@ -82,9 +82,9 @@ export default function Depot() {
   }, []);
 
   return (
-    <div className="flex flex-col w-full h-full justify-start gap-2 mx-auto p-4 max-w-[1600px]">
+    <div className="flex flex-col w-full h-full justify-start gap-4 mx-auto p-4 max-w-[1600px]">
       <div className="inline-flex justify-between">
-        <h1 className="text-foreground font-bold text-3xl my-auto pb-4">Depot</h1>
+        <h1 className="text-foreground font-bold text-3xl my-auto">Depot</h1>
       </div>
 
       {/* Add depot form if depot does not exist */}

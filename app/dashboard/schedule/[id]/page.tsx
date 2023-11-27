@@ -95,15 +95,14 @@ export default function ScheduleDetails() {
 
     return (
         <TooltipProvider delayDuration={100}>
-
-            <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1500px]">
-                <div>
+            <div className="flex flex-col w-full justify-start gap-4 mx-auto p-4 max-w-[1600px]">
+                <div className="justify-start inline-flex">
                     <BreadcrumbLink text="Schedule" />
                     <BreadcrumbLink href={`/dashboard/schedule?date=${formatDateUrl(deliverySchedule?.delivery_date!)}`} text={formatDate(deliverySchedule?.delivery_date!)} />
                     <BreadcrumbLink href="/dashboard/schedule" text={`Route ${deliverySchedule?.route_number}`} lastItem />
                 </div>
                 <div className="inline-flex justify-between">
-                    <h1 className="text-foreground font-bold text-2xl my-2">Route Details</h1>
+                    <h1 className="text-foreground font-bold text-3xl">Route Details</h1>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
