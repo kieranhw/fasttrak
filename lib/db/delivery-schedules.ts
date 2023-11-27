@@ -98,7 +98,7 @@ export const fetchScheduleById = async (scheduleId: UUID): Promise<DeliverySched
 
 // Update schedule status by ID
 const updateScheduleStatus = async (scheduleId: UUID, status: DeliveryStatus) => {
-    let { data: packages, error } = await supabase
+    let { error } = await supabase
         .from('delivery_schedules')
         .update({ status: status })
         .eq('schedule_id', scheduleId)
@@ -110,7 +110,7 @@ const updateScheduleStatus = async (scheduleId: UUID, status: DeliveryStatus) =>
         const schedule = await fetchScheduleById(scheduleId);
         if (schedule) {
             const packageIds = schedule.package_order.map(pkg => pkg.package_id);
-            await db.packages.update.status.byIds(packageIds, status);
+            await db.packages.update.status.byIds(packageIds, status as DeliveryStatus);
         }
         return true;
     }
