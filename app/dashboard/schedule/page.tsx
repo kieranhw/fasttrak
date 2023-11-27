@@ -295,6 +295,7 @@ export default function ScheduleDeliveries() {
           <h1 className="text-foreground font-bold text-3xl my-auto">Delivery Schedule</h1>
         </div>
 
+        
         <div className="flex items-center justify-between py-4">
           <div className="inline-flex justify-between w-full">
             <div className="inline-flex justify-between gap-1">
@@ -486,12 +487,6 @@ export default function ScheduleDeliveries() {
                 <div className="border rounded-t-none rounded-md border-divider h-[450px]">
                   <div className="grid grid-cols-2 p-8 gap-8 h-[450px]">
                     <div>
-                      <p className="text-muted-foreground text-sm mx-2">Total Routes</p>
-                      <p className="text-2xl font-semibold mx-2 my-1">
-                        {deliverySchedules.length}
-                      </p>
-                    </div>
-                    <div>
                       <p className="text-muted-foreground text-sm mx-2">Total Packages</p>
                       <p className="text-2xl font-semibold mx-2 my-1">
                         {
@@ -523,6 +518,21 @@ export default function ScheduleDeliveries() {
                     </div>
 
                     <div>
+                      <p className="text-muted-foreground text-sm mx-2">Packages / Hour</p>
+                      <p className="text-2xl font-semibold mx-2 my-1">
+                        {
+                          Math.round(deliverySchedules.reduce((acc, schedule) => {
+                            return acc + schedule.num_packages
+                          }, 0) / deliverySchedules.reduce((acc, schedule) => {
+                            return acc + schedule.estimated_duration_mins
+                          }, 0) * 60 * 100) / 100
+                        }
+                      </p>
+                    </div>
+
+
+
+                    <div>
                       <p className="text-muted-foreground text-sm mx-2">Driving Time / Vehicle</p>
                       <p className="text-2xl font-semibold mx-2 my-1">
                         {
@@ -536,18 +546,6 @@ export default function ScheduleDeliveries() {
                         }m
                       </p>
                     </div>
-
-                    <div>
-                      <p className="text-muted-foreground text-sm mx-2">Distance / Vehicle</p>
-                      <p className="text-2xl font-semibold mx-2 my-1">
-                        {
-                          Math.round(deliverySchedules.reduce((acc, schedule) => {
-                            return acc + schedule.distance_miles
-                          }, 0) / deliverySchedules.length * 100) / 100
-                        } miles
-                      </p>
-                    </div>
-
                     <div>
                       <p className="text-muted-foreground text-sm mx-2">Driving Time / Package</p>
                       <p className="text-2xl font-semibold mx-2 my-1">
@@ -567,6 +565,16 @@ export default function ScheduleDeliveries() {
                       </p>
                     </div>
 
+                    <div>
+                      <p className="text-muted-foreground text-sm mx-2">Distance / Vehicle</p>
+                      <p className="text-2xl font-semibold mx-2 my-1">
+                        {
+                          Math.round(deliverySchedules.reduce((acc, schedule) => {
+                            return acc + schedule.distance_miles
+                          }, 0) / deliverySchedules.length * 100) / 100
+                        } miles
+                      </p>
+                    </div>
                     <div>
                       <p className="text-muted-foreground text-sm mx-2">Distance / Package</p>
                       <p className="text-2xl font-semibold mx-2 my-1">
