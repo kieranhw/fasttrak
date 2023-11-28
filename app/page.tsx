@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { BiPackage } from 'react-icons/bi';
 import { TbRoute } from 'react-icons/tb'
 import { FaTruck } from 'react-icons/fa';
+import bg from '@/lib/bgimg.jpg'
+import hero from '@/lib/hero.jpg'
 
 export const dynamic = 'force-dynamic';
 
@@ -35,9 +37,9 @@ export default async function Index() {
   } = await supabase.auth.getUser();
 
   return (
-    <div className="w-full flex flex-col items-center px-2">
-      <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="w-full max-w-7xl flex justify-between items-center p-3 text-sm text-foreground">
+    <div className="w-full flex flex-col items-center h-screen bg-black overflow-hidden">
+      <nav className="w-full flex justify-center h-16">
+        <div className="w-full px-8 lg:px-36 flex justify-between items-center p-3 text-sm text-white">
           <Link href="/">
             <p className="text-primary text-xl font-bold">FastTrak</p>
           </Link>
@@ -55,68 +57,92 @@ export default async function Index() {
         </div>
       </nav>
 
-      <div className="flex flex-col gap-16 max-w-4xl px-3 py-16 lg:py-24 text-foreground">
-        <div className="flex flex-col items-center gap-8">
-          <h1 className="text-6xl lg:text-7xl mx-auto max-w-4xl text-center font-extrabold">
-            <p className="text-primary">FastTrak</p>{' '}
-            <p className="p-2 bg-gradient-to-t from-gray-800 to-gray-600 bg-clip-text text-transparent">
-              Vehicle Routing
-            </p>
-          </h1>
-          <p className="text-lg lg:text-xl mx-auto max-w-xl text-center opacity-50 animate-fadeIn50 animation-duration[200ms]">
-            Parcel logistics and tracking made simple.
-          </p>
-          <div className="flex gap-2 mx-auto justify-center items-center w-full">
-            {user ? (
-              <Link href="/dashboard">
-                <Button>Dashboard</Button>
-              </Link>
-            ) : (
-              <Link href="/login">
-                <Button>Get Started</Button>
-              </Link>
-            )}
+      <div className="flex flex-col w-full h-full relative"
+        style={{
+          backgroundImage: `url(${bg.src})`,
+          width: '100%',
+          height: '100%',
+        }}>
 
-            <Link href="/demo">
-              <Button variant="secondary">View Demo</Button>
-            </Link>
-          </div>
-        </div>
+        <div className="hidden xl:flex  flex-col items-start px-36">
+          <div className="w-full flex ">
+            <div className="w-2/5 z-50 pt-[100px]">
+              <h1 className="scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-7xl text-primary">
+                FastTrak
+              </h1>
+              <h1 className="scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-7xl text-gray-100">
+                Vehicle Routing
+              </h1>
+              <p className="text-gray-200 mt-2 text-md tracking-tight lg:text-xl max-w-xl animate-fadeIn50 animation-duration[200ms]">
+                Delivery optimisation made simple.
+              </p>
 
-        <div className="w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
+              <div className="flex gap-2 mx-auto my-4 justify-start items-center w-full">
+                {user ? (
+                  <Link href="/dashboard">
+                    <Button>Dashboard</Button>
+                  </Link>
+                ) : (
+                  <Link href="/login">
+                    <Button>Get Started</Button>
+                  </Link>
+                )}
 
-        <div className="flex flex-col gap-8 text-foreground">
-          <h2 className="text-lg font-bold text-center text-foreground">
-            Key Features
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {resources.map(({ title, subtitle, icon }) => (
-              <div
-                key={title}
-                className="relative flex flex-col group rounded-lg border p-6 hover:border-foreground"
-                rel="noreferrer"
-              >
-                <h3 className="font-bold min-h-[20px] lg:min-h-[40px]">
-                  {title}
-                </h3>
-                <p className="my-4 text-sm opacity-70">{subtitle}</p>
-                <div className="mt-4">
-                  {icon}
+                <Link href="/demo">
+                  <Button variant="secondary">View Demo</Button>
+                </Link>
+              </div>
+            </div>
+
+
+
+            <div className="flex justify-end w-full pr-36 pt-16 h-full absolute right-0 overflow-y-scroll">
+
+              <div className="grid gap-4 grid-cols-2 w-1/2 max-w-[700px]">
+                <div className="col-span-2 rounded-lg drop-shadow-lg">
+                  <img src={hero.src} className="w-full h-full rounded-lg" />
+
+                </div>
+                <div className="h-[600px]">
+                </div>
+                <div className="h-[600px]">
                 </div>
               </div>
-            ))}
+            </div>
+
           </div>
         </div>
 
-        <div className="flex justify-center items-center text-center mt-10 text-xs">
-          <p>
-            Created by{' '}
-            <Link href="https://kieranhardwick.com/" target="_blank" className="font-bold">
-              <Button className="p-0 m-0 text-sm" variant="link">
-                Kieran Hardwick
-              </Button>
-            </Link>
-          </p>
+
+        {/* Mobile */}
+        <div className="flex xl:hidden flex-col items-center px-8">
+          <div className="my-16 text-center">
+            <h1 className="scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-7xl text-primary">
+              FastTrak
+            </h1>
+            <h1 className="scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-7xl text-gray-100">
+              Vehicle Routing
+            </h1>
+            <p className="text-gray-200 mt-2 text-md tracking-tight lg:text-xl max-w-xl animate-fadeIn50 animation-duration[200ms]">
+              Delivery optimisation made simple.
+            </p>
+
+            <div className="flex gap-2 mx-auto my-4 justify-center items-center w-full">
+              {user ? (
+                <Link href="/dashboard">
+                  <Button>Dashboard</Button>
+                </Link>
+              ) : (
+                <Link href="/login">
+                  <Button>Get Started</Button>
+                </Link>
+              )}
+
+              <Link href="/demo">
+                <Button variant="secondary">View Demo</Button>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>
