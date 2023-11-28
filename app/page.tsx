@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { BiPackage } from 'react-icons/bi';
 import { TbRoute } from 'react-icons/tb'
 import { FaTruck } from 'react-icons/fa';
+import './globals.css'
+
 import bg from '@/lib/bgimg.jpg'
 import hero from '@/lib/hero.jpg'
 
@@ -37,8 +39,9 @@ export default async function Index() {
   } = await supabase.auth.getUser();
 
   return (
-    <div className="w-full flex flex-col items-center h-screen bg-black overflow-hidden">
-      <nav className="w-full flex justify-center h-16">
+    <div className="w-full flex flex-col items-center h-screen overflow-hidden">
+
+      <nav className="w-full flex justify-center h-16 border-b border-white/25 absolute top-0 z-50 bg-transparent backdrop-blur-lg">
         <div className="w-full px-8 lg:px-36 flex justify-between items-center p-3 text-sm text-white">
           <Link href="/">
             <p className="text-primary text-xl font-bold">FastTrak</p>
@@ -50,30 +53,34 @@ export default async function Index() {
               </div>
             ) : (
               <Link href="/login">
-                <Button variant="secondary">Login</Button>
+                <Button variant="secondary" className="drop-shadow-md">Login</Button>
               </Link>
             )}
           </div>
         </div>
       </nav>
 
-      <div className="flex flex-col w-full h-full relative"
+      <div className="flex flex-col w-full h-full"
         style={{
           backgroundImage: `url(${bg.src})`,
           width: '100%',
           height: '100%',
+          backgroundPosition: 'left bottom',
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat',
+          position: 'absolute',         
         }}>
 
         <div className="hidden xl:flex  flex-col items-start px-36">
           <div className="w-full flex ">
-            <div className="w-2/5 z-50 pt-[100px]">
-              <h1 className="scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-7xl text-primary">
+            <div className="w-2/5 z-50 pt-36">
+              <h1 className="scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-7xl text-primary drop-shadow-xl">
                 FastTrak
               </h1>
-              <h1 className="scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-7xl text-gray-100">
+              <h1 className="scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-7xl text-gray-100 drop-shadow-xl">
                 Vehicle Routing
               </h1>
-              <p className="text-gray-200 mt-2 text-md tracking-tight lg:text-xl max-w-xl animate-fadeIn50 animation-duration[200ms]">
+              <p className="text-gray-200 mt-2 text-md tracking-tight lg:text-xl max-w-xl drop-shadow-xl" >
                 Delivery optimisation made simple.
               </p>
 
@@ -96,7 +103,7 @@ export default async function Index() {
 
 
 
-            <div className="flex justify-end w-full pr-36 pt-16 h-full absolute right-0 overflow-y-scroll">
+            <div className="flex justify-end w-full pr-36 pt-36 h-full absolute right-0 overflow-y-scroll">
 
               <div className="grid gap-4 grid-cols-2 w-1/2 max-w-[700px]">
                 <div className="col-span-2 rounded-lg drop-shadow-lg">
@@ -116,14 +123,14 @@ export default async function Index() {
 
         {/* Mobile */}
         <div className="flex xl:hidden flex-col items-center px-8">
-          <div className="my-16 text-center">
+          <div className="my-32 text-center">
             <h1 className="scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-7xl text-primary">
               FastTrak
             </h1>
             <h1 className="scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-7xl text-gray-100">
               Vehicle Routing
             </h1>
-            <p className="text-gray-200 mt-2 text-md tracking-tight lg:text-xl max-w-xl animate-fadeIn50 animation-duration[200ms]">
+            <p className="text-gray-200 mt-2 text-md tracking-tight lg:text-xl max-w-xl">
               Delivery optimisation made simple.
             </p>
 
