@@ -520,7 +520,6 @@ export default function ScheduleDeliveries() {
                             }, 0) / deliverySchedules.length * 100) / 100
                           }
                         </p>
-                        <p className="text-lg font-semibold whitespace-nowrap">per vehicle</p>
                       </div>
                     </div>
 

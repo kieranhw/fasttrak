@@ -98,7 +98,7 @@ export default async function Index() {
 
 
 
-            <div className="flex justify-center xl:justify-end w-full xl:pr-36 pt-64 md:pt-32 h-full xl:absolute right-0 overflow-y-scroll no-scrollbar">
+            <div className="flex justify-center xl:justify-end w-full pt-40 md:pt-32 xl:pr-36 h-full xl:absolute right-0 overflow-y-scroll no-scrollbar">
 
 
               <div className="grid gap-6 grid-cols-2 w-full xl:w-1/2 max-w-[700px] z-40">
