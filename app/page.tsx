@@ -55,7 +55,7 @@ export default async function Index() {
         }}>
 
         <div className="flex-col items-start px-8 lg:px-36">
-          <div className="w-full flex flex-col xl:flex-row">
+          <div className="w-full flex flex-col xl:flex-row  ">
             <div className="w-full xl:w-2/5 z-40 pt-32 flex flex-col items-center xl:items-start">
               <h1 className="scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-7xl text-primary drop-shadow-xl">
                 FastTrak
@@ -134,7 +134,7 @@ export default async function Index() {
                 </div>
 
                 <div className="col-span-2 rounded-lg drop-shadow-lg">
-                  <Image priority src="/images/ss2.jpg" width={1920} height={1440} alt="Image demonstrating the FastTrak dashboard" className="w-full h-full rounded-lg" />
+                  <Image src="/images/ss2.jpg" width={1920} height={1440} alt="Image demonstrating the FastTrak dashboard" className="w-full h-full rounded-lg" />
                 </div>
 
                 <div className="rounded-lg dropshadow-lg bg-gray-100/5 border-gray-100/25 border backdrop-blur-lg col-span-2 md:col-span-1">
