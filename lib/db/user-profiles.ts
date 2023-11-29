@@ -10,10 +10,12 @@ const fetchUserProfile = async () => {
     // Get user id from session
     const user = await supabase.auth.getUser();
 
-    if (!user) {
+    if (!user.data.user?.id) {
         console.error("User not found");
         return;
     } 
+
+    
 
     const userId = user.data.user?.id;
     console.log(userId)
