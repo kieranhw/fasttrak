@@ -28,7 +28,6 @@ export default async function Index() {
           <Link href="/">
             <p className="text-primary text-xl font-bold">FastTrak</p>
           </Link>
-
           {user ? (
             <div className="flex gap-2 items-center">
               <Link href="/dashboard">
@@ -55,7 +54,7 @@ export default async function Index() {
           backgroundPositionY: '10%',
         }}>
 
-        <div className="xl:flex flex-col items-start px-8 lg:px-36">
+        <div className="flex-col items-start px-8 lg:px-36">
           <div className="w-full flex flex-col xl:flex-row">
             <div className="w-full xl:w-2/5 z-40 pt-32 flex flex-col items-center xl:items-start">
               <h1 className="scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-7xl text-primary drop-shadow-xl">
@@ -67,7 +66,6 @@ export default async function Index() {
               <p className="text-white mt-2 text-md tracking-tight lg:text-xl max-w-xl drop-shadow-md text-center xl:text-start" >
                 Network optimisation for 'last mile' delivery services.
               </p>
-
               <div className="flex gap-2 my-4">
                 <Link href="/demo">
                   <Button>View Demo</Button>
@@ -86,11 +84,23 @@ export default async function Index() {
 
 
               </div>
+
+              <div className="relative xl:absolute xl:bottom-10 inline-flex items-center gap-2 mt-1">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                </span>
+                <p className="text-gray-300 text-sm">Software project created by
+                  <Link href="https://github.com/Kieran260/fasttrak" className="pl-1 text-primary hover:underline" target="_blank" rel="noopener noreferrer">Kieran Hardwick</Link>
+                </p>
+              </div>
             </div>
 
 
 
             <div className="flex justify-center xl:justify-end w-full xl:pr-36 pt-64 md:pt-32 h-full xl:absolute right-0 overflow-y-scroll no-scrollbar">
+
+
               <div className="grid gap-6 grid-cols-2 w-full xl:w-1/2 max-w-[700px] z-40">
                 <div className="col-span-2 rounded-lg drop-shadow-lg">
                   <Image priority src="/images/ss1.jpg" width={1920} height={1440} alt="Image demonstrating the FastTrak dashboard" className="w-full h-full rounded-lg" />
