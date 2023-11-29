@@ -78,7 +78,7 @@ export default async function Index() {
                   </div>
                 ) : (
                   <Link href="/login">
-                    <Button className="drop-shadow-lg">Get Started</Button>
+                    <Button variant="secondary" className="drop-shadow-lg">Get Started</Button>
                   </Link>
                 )}
 
