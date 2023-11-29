@@ -40,7 +40,7 @@ export default async function Index() {
 
   return (
     <div className="w-full flex flex-col items-center h-screen overflow-hidden">
-
+      <div className="w-full flex justify-center h-16 absolute top-0 z-30 bg-black"/>
       <nav className="w-full flex justify-center h-16 border-b border-white/25 absolute top-0 z-50 bg-transparent backdrop-blur-lg">
         <div className="w-full px-8 lg:px-36 flex justify-between items-center p-3 text-sm text-white">
           <Link href="/">
@@ -68,10 +68,11 @@ export default async function Index() {
           backgroundPosition: 'left bottom',
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',
-          position: 'absolute',         
+          position: 'absolute',     
+          backgroundPositionY: '10%',    
         }}>
 
-        <div className="hidden xl:flex  flex-col items-start px-36">
+        <div className="hidden xl:flex  flex-col items-start px-36 ">
           <div className="w-full flex ">
             <div className="w-2/5 z-50 pt-36">
               <h1 className="scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-7xl text-primary drop-shadow-xl">
@@ -81,7 +82,7 @@ export default async function Index() {
                 Vehicle Routing
               </h1>
               <p className="text-gray-200 mt-2 text-md tracking-tight lg:text-xl max-w-xl drop-shadow-xl" >
-                Delivery optimisation made simple.
+                Last mile delivery optimisation
               </p>
 
               <div className="flex gap-2 mx-auto my-4 justify-start items-center w-full">
@@ -105,7 +106,7 @@ export default async function Index() {
 
             <div className="flex justify-end w-full pr-36 pt-36 h-full absolute right-0 overflow-y-scroll">
 
-              <div className="grid gap-4 grid-cols-2 w-1/2 max-w-[700px]">
+              <div className="grid gap-4 grid-cols-2 w-1/2 max-w-[700px] z-40">
                 <div className="col-span-2 rounded-lg drop-shadow-lg">
                   <img src={hero.src} className="w-full h-full rounded-lg" />
 
