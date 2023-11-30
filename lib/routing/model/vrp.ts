@@ -19,6 +19,7 @@ export class VehicleRoute {
         this.nodes.push(depotNode);
     }
 
+    // Check if the vehicle can add a package to the route
     canAddPackage(pkg: Package, pkgNode: Node, timeRequired: number, timeWindow: number): boolean {
         console.log({
             vehicle: this.vehicle,
@@ -42,6 +43,7 @@ export class VehicleRoute {
         );
     }
 
+    // Check if the vehicle can add a group of packages to the route
     canAddGroup(pkgGroup: Node[], timeRequired: number, timeWindow: number): boolean {
         let groupWeight = 0;
         let groupVolume = 0;
@@ -79,6 +81,7 @@ export class VehicleRoute {
         }
     }
 
+    // Close the route by adding the depot node
     closeRoute(depot: Node): void {
         const lastNode = this.nodes[this.nodes.length - 1];
         const cost = calculateDistance(lastNode, depot);
