@@ -22,10 +22,10 @@ export default async function Index() {
 
 
   return (
-    <div className="w-full flex flex-col items-center overflow-hidden h-full ">
+    <div className="w-full flex flex-col items-center overflow-hidden h-full overscroll-none	">
 
-      <nav className="w-full flex justify-center h-16 border-b border-white/25 fixed top-0 z-50 bg-transparent backdrop-blur-lg overflow-y-hidden">
-        <div className="w-full px-8 lg:px-36 flex justify-between items-center p-3 text-sm text-white overflow-y-hidden">
+      <nav className="w-full flex justify-center h-16 border-b border-white/25 fixed top-0 z-50 bg-transparent backdrop-blur-lg overflow-y-hidden overscroll-none	">
+        <div className="w-full px-8 lg:px-36 flex justify-between items-center p-3 text-sm text-white overflow-y-hidden overscroll-none	">
           <Link href="/">
             <p className="text-primary text-xl font-bold">FastTrak</p>
           </Link>
@@ -43,7 +43,7 @@ export default async function Index() {
         </div>
       </nav>
 
-      <div className="flex flex-col w-full overflow-y-hidden no-scrollbar h-full fixed"
+      <div className="flex flex-col w-full overflow-y-hidden no-scrollbar h-full fixed overscroll-none	"
         style={{
           backgroundImage: `url(${bgFull.src})`,
           backgroundPosition: 'left bottom',
