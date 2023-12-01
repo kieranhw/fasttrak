@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import json
-import re
 
 def visualize_coordinates(coordinates):
     latitudes = [coord[0] for coord in coordinates]
@@ -9,7 +8,6 @@ def visualize_coordinates(coordinates):
 
     plt.figure(figsize=(10, 6))
     plt.scatter(longitudes, latitudes, color='blue', marker='o')
-    plt.title('Grid Coordinates Visualization')
     plt.xlabel('Longitude')
     plt.ylabel('Latitude')
     plt.grid(True)
@@ -17,7 +15,7 @@ def visualize_coordinates(coordinates):
     
 def main():
     # Read the JavaScript file
-    with open('lib/data/liverpool-addresses-even.js', 'r') as file:
+    with open('lib/data/liverpool-addresses-random.js', 'r') as file:
         js_content = file.read()
 
     # Find the start and end of the JSON array
@@ -28,6 +26,7 @@ def main():
     if start != -1 and end != -1:
         json_str = js_content[start:end]
         address_data = json.loads(json_str)
+        print(len(address_data))
         visualize_coordinates([(data['lat'], data['lng']) for data in address_data])
 
     else:
