@@ -24,7 +24,7 @@ export default async function Index() {
   return (
     <div className="w-full flex flex-col items-center overflow-hidden h-[100vh] ">
 
-      <nav className="w-full flex justify-center h-16 border-b border-white/25 absolute top-0 z-50 bg-transparent backdrop-blur-lg">
+      <nav className="w-full flex justify-center h-16 border-b border-white/25 absolute top-0 z-50 bg-transparent backdrop-blur-lg overflow-y-hidden">
         <div className="w-full px-8 lg:px-36 flex justify-between items-center p-3 text-sm text-white">
           <Link href="/">
             <p className="text-primary text-xl font-bold">FastTrak</p>
