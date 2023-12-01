@@ -47,18 +47,6 @@ def reverse_geocode(coordinate, attempt=0, max_attempts=3):
 
     return None, None
 
-def visualize_coordinates(coordinates):
-    latitudes = [coord[0] for coord in coordinates]
-    longitudes = [coord[1] for coord in coordinates]
-
-    plt.figure(figsize=(10, 6))
-    plt.scatter(longitudes, latitudes, color='blue', marker='o')
-    plt.title('Grid Coordinates Visualization')
-    plt.xlabel('Longitude')
-    plt.ylabel('Latitude')
-    plt.grid(True)
-    plt.show()
-    
 def save_to_js(addresses, filename):
     with open(filename, 'w') as file:
         file.write("export const addressData = ")
@@ -95,10 +83,7 @@ def main():
                     "lat": address_coord[0],
                     "lng": address_coord[1]
                 })
-
-        # Correct the list comprehension for visualizing coordinates
-        visualize_coordinates([(data['lat'], data['lng']) for data in address_data])
-
+                
         # Save to JS file
         save_to_js(address_data, f"lib/data/liverpool-addresses-{dataset_name}.js")
 
