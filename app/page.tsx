@@ -22,7 +22,8 @@ export default async function Index() {
 
 
   return (
-    <div className="w-full flex flex-col items-center overflow-hidden h-[100vh]">
+    <div className="w-full flex flex-col items-center overflow-hidden h-[100vh] ">
+
       <nav className="w-full flex justify-center h-16 border-b border-white/25 absolute top-0 z-50 bg-transparent backdrop-blur-lg">
         <div className="w-full px-8 lg:px-36 flex justify-between items-center p-3 text-sm text-white">
           <Link href="/">
@@ -42,16 +43,12 @@ export default async function Index() {
         </div>
       </nav>
 
-      <div className="flex flex-col w-full h-full overflow-y-scroll no-scrollbar"
+      <div className="flex flex-col w-full overflow-y-scroll no-scrollbar h-full absolute"
         style={{
           backgroundImage: `url(${bgFull.src})`,
-          width: '100%',
-          height: '100%',
           backgroundPosition: 'left bottom',
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',
-          position: 'absolute',
-          backgroundPositionY: '10%',
         }}>
 
         <div className="flex-col items-start px-8 lg:px-36">
