@@ -22,10 +22,8 @@ export default async function Index() {
 
 
   return (
-    <div className="w-full flex flex-col items-center overflow-hidden h-full overscroll-none	">
-
-      <nav className="w-full flex justify-center h-16 border-b border-white/25 fixed top-0 z-50 bg-transparent backdrop-blur-lg overflow-y-hidden overscroll-none	">
-        <div className="w-full px-8 lg:px-36 flex justify-between items-center p-3 text-sm text-white overflow-y-hidden overscroll-none	">
+    <div className="w-full flex flex-col items-center overflow-hidden h-full fixed">
+      <nav className="w-full flex justify-center h-16 border-b border-white/25 fixed top-0 z-50 bg-transparent backdrop-blur-lg w-full px-8 lg:px-36 flex justify-between items-center p-3 text-sm text-white">
           <Link href="/">
             <p className="text-primary text-xl font-bold">FastTrak</p>
           </Link>
@@ -40,18 +38,11 @@ export default async function Index() {
               <Button variant="secondary" className="drop-shadow-md">Login</Button>
             </Link>
           )}
-        </div>
       </nav>
 
-      <div className="flex flex-col w-full overflow-y-hidden no-scrollbar h-full fixed overscroll-none	"
-        style={{
-          backgroundImage: `url(${bgFull.src})`,
-          backgroundPosition: 'left bottom',
-          backgroundSize: 'cover',
-          backgroundRepeat: 'no-repeat',
-        }}>
-
-        <div className="flex-col items-start px-8 lg:px-36 overflow-y-scroll xl:overflow-y-hidden no-scrollbar">
+      <div className="flex flex-col w-full no-scrollbar h-full fixed overscroll-none" style={{backgroundImage: `url(${bgFull.src})`, backgroundPosition: 'left bottom', backgroundSize: 'cover', backgroundRepeat: 'no-repeat'}}>
+        
+        <div className="flex flex-col items-start px-8 lg:px-36 overflow-y-scroll xl:overflow-y-hidden no-scrollbar">
           <div className="w-full flex flex-col xl:flex-row  ">
             <div className="w-full xl:w-2/5 z-40 pt-32 flex flex-col items-center xl:items-start">
               <h1 className="scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-7xl text-primary drop-shadow-xl">
@@ -93,7 +84,7 @@ export default async function Index() {
 
 
 
-            <div className="flex justify-center xl:justify-end w-full pt-40 md:pt-32 xl:pr-36 h-full xl:absolute right-0 xl:overflow-y-auto no-scrollbar">
+            <div className="flex justify-center xl:justify-end w-full pt-40 md:pt-32 xl:pr-36 h-full xl:absolute right-0 overflow-y-hidden xl:overflow-y-scroll no-scrollbar">
               <div className="grid gap-6 grid-cols-2 w-full xl:w-1/2 max-w-[700px] z-40">
                 <div className="col-span-2 rounded-lg drop-shadow-lg">
                   <Image priority src="/images/ss1.jpg" width={1920} height={1440} alt="Image demonstrating the FastTrak dashboard" className="w-full h-full rounded-lg" />
