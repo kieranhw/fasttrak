@@ -18,15 +18,18 @@ import { displayGraph } from "../../cytoscape-data";
  * @returns VRPSolution, results in the minimum required number of vehicles to service all packages
  */
 export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], timeWindow: number): Promise<VRPSolution> {
+
     const solution = new VRPSolution();
     const availableVehicles = [...vehicles];
 
+    // Sort packages by date added (FIFO) and filter out depot node
     const sortedPackages = graph.nodes
         .filter(node => !node.isDepot)
         .sort((a, b) =>
             (new Date(a.pkg?.date_added || 0).getTime()) - (new Date(b.pkg?.date_added || 0).getTime())
         );
 
+    // Round robin allocation
     let vehicleIndex = 0;
 
     for (const pkgNode of sortedPackages) {

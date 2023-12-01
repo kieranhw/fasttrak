@@ -18,9 +18,11 @@ import { estimateDuration } from "../create-schedules";
  * @returns VRPSolution, results in the minimum required number of vehicles to service all packages
  */
 export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], timeWindow: number): Promise<VRPSolution> {
+    
     const solution = new VRPSolution();
     const availableVehicles = [...vehicles];
 
+    // Sort packages by date added (FIFO) and filter out depot node
     const sortedPackages = graph.nodes
         .filter(node => !node.isDepot)
         .sort((a, b) =>
@@ -41,6 +43,10 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], ti
 
     let vehicleIndex = 0;
 
+    // Round robin allocation
+    // For each group of packages, find a vehicle that can fit the group
+    // If no vehicle, split group into two and try again
+    // If no vehicle can fit package, package is not allocated
     for (const pkgGroup of groupedPackages) {
         let vehiclesChecked = 0;
         while (vehiclesChecked < availableVehicles.length) {
@@ -65,17 +71,16 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], ti
         }
         // If all vehicles checked and no fit
         if (vehiclesChecked === availableVehicles.length) {
-            
-            // If group size more than 1, split group into two and try again
+    
             if (pkgGroup.length > 1) {
+                // Split group into two and try again
                 const halfIndex = Math.ceil(pkgGroup.length / 2);
                 const firstHalf = pkgGroup.slice(0, halfIndex);
                 const secondHalf = pkgGroup.slice(halfIndex);
                 groupedPackages.push(firstHalf);
                 groupedPackages.push(secondHalf);
-                console.warn(`No space for package group of size ${pkgGroup.length} . Splitting in two`)
             } else {
-                console.error('No available vehicle for package:', pkgGroup.map(pkg => pkg.pkg));
+                // Package not allocated
             }
         }
     }

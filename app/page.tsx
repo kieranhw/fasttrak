@@ -43,7 +43,7 @@ export default async function Index() {
         </div>
       </nav>
 
-      <div className="flex flex-col w-full overflow-y-scroll no-scrollbar h-full absolute"
+      <div className="flex flex-col w-full overflow-y-scroll no-scrollbar h-[100vh] absolute"
         style={{
           backgroundImage: `url(${bgFull.src})`,
           backgroundPosition: 'left bottom',
