@@ -2,6 +2,7 @@ import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
 import { roundRobinAllocation } from "./algorithms/algorithm-2";
+import { geospatialClustering } from "./algorithms/algorithm-3";
 import { Edge, Graph, Node, calculateDistance, createGraph } from "./model/graph";
 import { VRPSolution, VehicleRoute } from "./model/vrp";
 import { UUID } from "crypto";
@@ -25,7 +26,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
     // Initialize an empty array to hold delivery schedules for each vehicle
     let schedules: DeliverySchedule[] = [];
 
-    const vrpSolution = await roundRobinAllocation(graph, vehiclesData, 8);
+    const vrpSolution = await geospatialClustering(graph, vehiclesData, 8);
 
     for (const route of vrpSolution.routes) {
         let schedule: DeliverySchedule = {

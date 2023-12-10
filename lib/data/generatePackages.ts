@@ -5,7 +5,7 @@ import { UUID } from "crypto"
 import { faker } from '@faker-js/faker';
 import { generateFT } from "@/lib/generate-ids";
 import { db } from "@/lib/db/db";
-import { addressData } from "./liverpool-addresses";
+import { addressData } from "./liverpool-addresses-even";
 
 
 export const generatePackages = async (numPackages: number): Promise<Package[]> => {
