@@ -11,7 +11,7 @@ import { format } from "date-fns"
 import { Calendar as CalendarIcon, Loader2 } from "lucide-react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -27,11 +27,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-import { createSchedules } from "@/lib/routing/create-schedules";
-import { createGraphAndSolutionFromScheduleArray } from "@/lib/routing/schedules-to-graph";
+import { createSchedules } from "@/lib/scheduling/create-schedules";
+import { createGraphAndSolutionFromScheduleArray } from "@/lib/scheduling/schedules-to-graph";
 
 import { db } from "@/lib/db/db";
-import { displayGraph } from "@/lib/cytoscape-data";
+import { displayGraph } from "@/lib/utils/cytoscape-data";
 import { CytoscapeGraph } from "@/components/CytoscapeGraph";
 import { MdRefresh } from "react-icons/md"
 import { useRouter, useSearchParams } from "next/navigation";

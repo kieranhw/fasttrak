@@ -1,6 +1,6 @@
 import { DeliverySchedule } from "@/types/delivery-schedule";
-import { Edge, Graph, Node, calculateDistance, createGraph } from "./model/graph";
-import { VRPSolution, VehicleRoute } from "./model/vrp";
+import { Edge, Graph, Node, calculateDistance, createGraph } from "../routing/model/graph";
+import { VRPSolution, VehicleRoute } from "../routing/model/vrp";
 
 export async function createGraphAndSolutionFromScheduleArray(schedules: DeliverySchedule[]): Promise<[Graph, VRPSolution]> {
     const graph = new Graph();

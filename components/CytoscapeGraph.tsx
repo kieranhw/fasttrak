@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { displayGraph } from '../lib/cytoscape-data'
+import { displayGraph } from '../lib/utils/cytoscape-data'
 import { Graph } from '@/lib/routing/model/graph';
 import { VRPSolution } from '@/lib/routing/model/vrp';
 

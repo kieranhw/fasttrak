@@ -1,4 +1,4 @@
-import { createSchedules } from '@/lib/routing/create-schedules';
+import { createSchedules } from '@/lib/scheduling/create-schedules';
 import { Vehicle } from '@/types/vehicle';
 import { Package, PriorityType } from "@/types/package"
 import { addressData } from "@/lib/data/liverpool-addresses";
@@ -6,7 +6,7 @@ import { supabase } from "@/pages/api/supabase-client";
 
 import { UUID } from "crypto"
 import { faker } from '@faker-js/faker';
-import { generateFT } from "@/lib/generate-ids";
+import { generateFT } from "@/lib/utils/generate-ids";
 
 function generateMockPackages(numPackages: number, weight?: number, volume?: number): Package[] {
 

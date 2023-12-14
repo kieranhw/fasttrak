@@ -2,7 +2,7 @@ import { Vehicle } from "@/types/vehicle";
 import { calculateDistance } from "./graph";
 import { Package } from "@/types/package";
 import { Node } from "./graph";
-import { estimateDuration } from "../create-schedules";
+import { estimateDuration } from "../../scheduling/create-schedules";
 
 // Model of one individual vehicle route
 export class VehicleRoute {
@@ -21,15 +21,6 @@ export class VehicleRoute {
 
     // Check if the vehicle can add a package to the route
     canAddPackage(pkg: Package, pkgNode: Node, timeRequired: number, timeWindow: number): boolean {
-        console.log({
-            vehicle: this.vehicle,
-            pkg,
-            currentWeight: this.currentWeight,
-            currentVolume: this.currentVolume,
-            maxLoad: this.vehicle.max_load,
-            maxVolume: this.vehicle.max_volume
-        });
-
         // calculate distance to travel from last node to depot
         const travelCost = calculateDistance(pkgNode, this.depotNode);
 

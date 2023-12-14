@@ -8,8 +8,8 @@ export type Package = {
     tracking_id: string;
     recipient_name: string
     recipient_address: string
-    recipient_address_lat?: number
-    recipient_address_lng?: number
+    recipient_address_lat: number
+    recipient_address_lng: number
     recipient_phone: string
     sender_name: string
     sender_address: string
@@ -21,6 +21,7 @@ export type Package = {
     volume: number
     fragile?: boolean
     priority: PriorityType
+    effective_priority?: number
     delivery_notes: string
     date_added: Date
     //date_modified?: Date

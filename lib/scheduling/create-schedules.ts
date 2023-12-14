@@ -1,15 +1,24 @@
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
-import { roundRobinAllocation } from "./algorithms/algorithm-2";
-import { geospatialClustering } from "./algorithms/algorithm-3";
-import { Edge, Graph, Node, calculateDistance, createGraph } from "./model/graph";
-import { VRPSolution, VehicleRoute } from "./model/vrp";
+import { roundRobinAllocation } from "../routing/algorithms/algorithm-2";
+import { geospatialClustering } from "../routing/algorithms/algorithm-3";
+import { Edge, Graph, Node, calculateDistance, createGraph } from "../routing/model/graph";
+import { VRPSolution, VehicleRoute } from "../routing/model/vrp";
 import { UUID } from "crypto";
 
 
 export async function createSchedules(vehiclesData: Vehicle[], packagesData: Package[], date: Date) {
     console.log("Scheduling packages...");
+    if (packagesData.length === 0) {
+        console.log("No packages to schedule.");
+        return;
+    }
+
+    if (vehiclesData.length === 0) {
+        console.log("No vehicles to schedule.");
+        return;
+    }
 
     // TODO: Get depot here, set to variable to be used in createGraph
 
@@ -23,10 +32,14 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
         console.error("Error creating graph!");
     }
 
+    // number of packages:
+    console.log("Number of packages: " + graph.nodes.length);
+
+    // Run the VRP algorithm to generate a solution
+    const vrpSolution = await geospatialClustering(graph, vehiclesData, 8);
+
     // Initialize an empty array to hold delivery schedules for each vehicle
     let schedules: DeliverySchedule[] = [];
-
-    const vrpSolution = await geospatialClustering(graph, vehiclesData, 8);
 
     for (const route of vrpSolution.routes) {
         let schedule: DeliverySchedule = {
@@ -56,6 +69,6 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
 
 // Function to estimate duration to travel from miles, average speed
 export function estimateDuration(distance: number): number {
-    const averageSpeed = 10; // mph
+    const averageSpeed = 8; // mph
     return (distance / averageSpeed) * 60; // minutes
 }

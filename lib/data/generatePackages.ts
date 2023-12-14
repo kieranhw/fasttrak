@@ -3,7 +3,7 @@ import { Vehicle } from "@/types/vehicle"
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule"
 import { UUID } from "crypto"
 import { faker } from '@faker-js/faker';
-import { generateFT } from "@/lib/generate-ids";
+import { generateFT } from "@/lib/utils/generate-ids";
 import { db } from "@/lib/db/db";
 import { addressData } from "./liverpool-addresses-even";
 
@@ -44,7 +44,7 @@ export const generatePackages = async (numPackages: number): Promise<Package[]> 
             sender_phone: "07" + faker.number.int({ min: 0o0, max: 999999999 }),
             status: "Pending",
             weight: faker.number.int({ min: 5, max: 20 }),
-            volume: parseFloat(faker.number.float({ min: 0.5, max: 2 }).toPrecision(2)),
+            volume: parseFloat(faker.number.float({ min: 0.1, max: 1 }).toPrecision(2)),
             fragile: false,
             priority: priorities[randomNumber],
             delivery_notes: faker.lorem.words(10),

@@ -2,8 +2,8 @@ import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
 import { Graph, Node, Edge, createGraph, calculateDistance } from '../model/graph';
 import { VehicleRoute, VRPSolution } from '../model/vrp';
-import { estimateDuration } from "../create-schedules";
-import { displayGraph } from "../../cytoscape-data";
+import { estimateDuration } from "../../scheduling/create-schedules";
+import { displayGraph } from "../../utils/cytoscape-data";
 
 /***
  * Round Robin Allocation 1

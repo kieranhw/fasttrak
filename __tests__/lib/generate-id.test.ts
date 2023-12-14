@@ -1,4 +1,4 @@
-import { generateFT } from '@/lib/generate-ids';
+import { generateFT } from '@/lib/utils/generate-ids';
 
 describe('generateFT', () => {
     it('generates a tracking ID starting with FT followed by 8 uppercase letters', () => {
