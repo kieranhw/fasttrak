@@ -13,5 +13,5 @@ A schedule can be generated at any point for each day from the /dashboard/schedu
 - /lib/db: re-usable functions for database operations
 - /lib/routing: files for the route optimisation
 - /lib/scheduling: files for delivery schedule generation
-- /lib/utils: standard re-usable utilities
+- /lib/utils: standard utilities
 - /lib/data: test data generation used during evaluation of the project
