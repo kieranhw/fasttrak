@@ -2,7 +2,7 @@
 
 ### About
 
-This software is designed and implemented as a project as part of my final year dissertation.
+This software is designed and implemented as a project for my final year dissertation.
 
 The aim of the project is to create a system to generate optimised routes for 'last mile' delivery schedules. Additionally, a modern user interface provides a platform to manage the network of delivery operations including creating and managing vehicles, packages and detailed analytical reports. Throughout the project, I have researched various academic papers on the Vehicle Routing Problem (VRP), using the insights to design a practical solution.The application is built with React and NextJS written in TypeScript, with the back end making AWS Lambda function calls to handle compute heavy data processing. Data is stored within a cloud hosted PostgreSQL database.
 
