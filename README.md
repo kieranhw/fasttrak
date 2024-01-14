@@ -8,7 +8,7 @@ The aim of the project was to create a system that generates optimised routes fo
 
 A schedule can be generated at any point for each day from the /dashboard/schedules page, which attempts to assign the maximum number of packages currently pending to vehicles available for the specified date. A hybrid genetic algorithm was designed to concurrently optimise the vehicle routes as well as the load utilisation for each vehicle. Regarding route optimisation, the network is modelled as a graph problem where customers are represented as nodes, connected by edges representing roads. This model allows the problem to be analysed as a typical graph problem. The Google Maps API is frequently used to calculate travel times to ensure the greatest accuracy. It is also used for geocoding tasks such as verifying customer addresses and converting street addresses into coordinates.
 
-### Project Structure
+### File Structure
 
 - /lib/db: re-usable functions for database operations
 - /lib/routing: files for the route optimisation
