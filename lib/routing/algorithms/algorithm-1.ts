@@ -42,7 +42,7 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
         while (vehiclesChecked < availableVehicles.length) {
             const route = solution.routes[vehicleIndex] || new VehicleRoute(availableVehicles[vehicleIndex], graph.depot as Node);
             const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode);
-            const timeRequired = calculateTraversalMins(travelCost, deliveryTime);
+            const timeRequired = calculateTraversalMins(travelCost) + deliveryTime;
             if (route.canAddPackage(pkgNode.pkg as Package, pkgNode, timeRequired, timeWindow, driverBreak)) {
                 route.addNode(pkgNode, travelCost, timeRequired);
                 if (!solution.routes[vehicleIndex]) {
