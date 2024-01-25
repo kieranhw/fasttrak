@@ -44,7 +44,7 @@ import * as z from "zod"
 
 import { VehicleForm } from "./add-vehicle-form/vehicle-form";
 import { VehicleSchema } from "./add-vehicle-form/vehicle-schema";
-import { supabase } from "@/pages/api/supabase-client";
+import { supabase } from "@/lib/supabase/client";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

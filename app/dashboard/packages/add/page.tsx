@@ -4,7 +4,7 @@ import * as z from "zod"
 
 import PackageSchema from "./add-package-form/package-schema";
 import { PackageForm } from "./add-package-form/package-form";
-import { supabase } from "@/pages/api/supabase-client";
+import { supabase } from "@/lib/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";

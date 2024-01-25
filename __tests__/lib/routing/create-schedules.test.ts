@@ -2,7 +2,7 @@ import { createSchedules } from '@/lib/scheduling/create-schedules';
 import { Vehicle } from '@/types/vehicle';
 import { Package, PriorityType } from "@/types/package"
 import { addressData } from "@/lib/data/liverpool-addresses";
-import { supabase } from "@/pages/api/supabase-client";
+import { supabase } from "@/lib/supabase/client";
 
 import { UUID } from "crypto"
 import { faker } from '@faker-js/faker';

@@ -7,7 +7,7 @@ import { Vehicle } from '@/types/vehicle'
 import { DataTable } from './components/data-table'
 import { columns } from './components/columns'
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/pages/api/supabase-client';
+import { supabase } from '@/lib/supabase/client';
 
 
 

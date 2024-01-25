@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useEffect, useState } from 'react';
 import { Package } from '@/types/package';
-import { supabase } from '@/pages/api/supabase-client';
+import { supabase } from '@/lib/supabase/client';
 import { DataTable } from './components/data-table';
 import { columns } from './components/columns';
 import { db } from '@/db/db';
