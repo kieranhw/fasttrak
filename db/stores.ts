@@ -1,12 +1,13 @@
-import { supabase } from "@/pages/api/supabase-client";
+import { supabase } from "@/lib/supabase/client";
 import { UserProfile } from "@/types/user-profile";
 import { UUID } from "crypto";
 import { db } from "./db";
 import { Store } from "@/types/store";
+import { cookies } from "next/headers";
 
 // Fetch store as type Store from store id saved in user profile
 const fetchStoreForUser = async () => {
-
+    
     const user = await db.profiles.fetch.profile();
     console.log("User in store " + user?.user_id)
     console.log("Store ID in store " + user?.store_id)

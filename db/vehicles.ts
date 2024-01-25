@@ -1,4 +1,4 @@
-import { supabase } from "@/pages/api/supabase-client";
+import { supabase } from "@/lib/supabase/client";
 import { Vehicle } from "@/types/vehicle";
 import { UUID } from "crypto";
 

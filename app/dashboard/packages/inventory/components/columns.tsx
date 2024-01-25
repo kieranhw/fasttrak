@@ -28,7 +28,7 @@ import {
 import Link from "next/link"
 import { useState } from "react"
 import { UUID } from "crypto"
-import { db } from "@/utils/db/db"
+import { db } from "@/db/db"
 import {
     Dialog,
     DialogClose,

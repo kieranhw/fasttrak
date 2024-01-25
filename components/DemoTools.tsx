@@ -14,11 +14,12 @@ import {
 
 import { AiFillTool } from "react-icons/ai"
 import { useState } from "react";
-import { generatePackages } from "@/utils/data/generatePackages";
-import { supabase } from "@/pages/api/supabase-client";
+import { generatePackages } from "@/lib/data/generatePackages";
+import { createClient } from "@/lib/supabase/client";
 
 
 export default function DemoTools() {
+    const supabase = createClient();
 
     // Generate Packages
     const [loadingPackages, setLoadingPackages] = useState<boolean>(false);

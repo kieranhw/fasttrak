@@ -3,7 +3,7 @@ import Sidebar from "@/components/Sidebar"
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { notFound, redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
-
+import { useEffect } from "react"
 
 export const metadata = {
     title: 'FastTrak | Dashboard',
@@ -15,6 +15,7 @@ export default function DashboardLayout({
 }: {
     children: React.ReactNode
 }) {
+
     return (
         <div className="h-screen w-full flex flex overflow-hidden">
             <Sidebar />

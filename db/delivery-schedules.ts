@@ -1,13 +1,16 @@
-import { supabase } from "@/pages/api/supabase-client";
+import { createClient } from "@/lib/supabase/client";
 import { Package } from "@/types/package";
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { UUID } from "crypto";
 import { db } from "./db";
 import { Vehicle } from "@/types/vehicle";
+import { cookies } from "next/headers";
 
 // Fetch all schedules for a date
 export const fetchSchedulesByDate = async (date: Date) => {
+    
     const formattedDate = date.toISOString().slice(0, 10);
+    const supabase = createClient();
 
     // Fetch store for user
     const store = await db.stores.fetch.store.forUser();
@@ -49,6 +52,7 @@ export const fetchSchedulesByDate = async (date: Date) => {
 
 // Fetch schedule by ID
 export const fetchScheduleById = async (scheduleId: UUID): Promise<DeliverySchedule | null> => {
+    const supabase = createClient();
 
     try {
         const { data, error } = await supabase
@@ -98,6 +102,8 @@ export const fetchScheduleById = async (scheduleId: UUID): Promise<DeliverySched
 
 // Update schedule status by ID
 const updateScheduleStatus = async (scheduleId: UUID, status: DeliveryStatus) => {
+    const supabase = createClient();
+
     let { error } = await supabase
         .from('delivery_schedules')
         .update({ status: status })

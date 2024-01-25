@@ -4,13 +4,13 @@ import { SetStateAction, useEffect, useState } from "react";
 import { columns } from "./components/columns"
 import { DataTable } from "./components/data-table"
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
-import { supabase } from "@/pages/api/supabase-client";
+import { createClient } from "@/lib/supabase/client";
 
 import { format } from "date-fns"
 import { Calendar as CalendarIcon, Loader, Loader2, SeparatorHorizontal } from "lucide-react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-import { cn } from "@/utils/utils/utils"
+import { cn } from "@/lib/utils/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -31,11 +31,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-import { createSchedules } from "@/utils/scheduling/create-schedules";
-import { createGraphAndSolutionFromScheduleArray } from "@/utils/scheduling/schedules-to-graph";
+import { createSchedules } from "@/lib/scheduling/create-schedules";
+import { createGraphAndSolutionFromScheduleArray } from "@/lib/scheduling/schedules-to-graph";
 
-import { db } from "@/utils/db/db";
-import { displayGraph } from "@/utils/utils/cytoscape-data";
+import { db } from "@/db/db";
+import { displayGraph } from "@/lib/utils/cytoscape-data";
 import { CytoscapeGraph } from "@/components/CytoscapeGraph";
 import { MdRefresh } from "react-icons/md"
 import { useRouter, useSearchParams } from "next/navigation";
@@ -45,6 +45,7 @@ import { ScheduleProfile } from "@/types/schedule-profile";
 export default function ScheduleDeliveries() {
   // Dialog
   const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
+  const supabase = createClient();
 
   // Date Handling
   const [date, setDate] = useState<Date | null>(null);

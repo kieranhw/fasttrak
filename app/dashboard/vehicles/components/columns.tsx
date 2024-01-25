@@ -32,7 +32,7 @@ import { VehicleSchema } from "./add-vehicle-form/vehicle-schema"
 import { supabase } from "@/pages/api/supabase-client"
 import { z } from "zod"
 import { UUID } from "crypto"
-import { db } from "@/utils/db/db"
+import { db } from "@/db/db"
 
 export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
     {

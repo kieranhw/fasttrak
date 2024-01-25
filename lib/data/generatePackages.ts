@@ -3,8 +3,8 @@ import { Vehicle } from "@/types/vehicle"
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule"
 import { UUID } from "crypto"
 import { faker } from '@faker-js/faker';
-import { generateFT } from "@/utils/utils/generate-ids";
-import { db } from "@/utils/db/db";
+import { generateFT } from "@/lib/utils/generate-ids";
+import { db } from "@/db/db";
 import { addressData } from "./liverpool-addresses-even";
 
 
