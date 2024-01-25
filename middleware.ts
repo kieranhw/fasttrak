@@ -2,37 +2,34 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/utils/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
-  try {
-    // This `try/catch` block is only here for the interactive tutorial.
-    // Feel free to remove once you have Supabase connected.
-    const { supabase, response } = createClient(request);
+    const { supabase } = createClient(request);
 
-    // Refresh session if expired - required for Server Components
-    // https://supabase.com/docs/guides/auth/auth-helpers/nextjs#managing-session-with-middleware
-    await supabase.auth.getSession();
+    try {
+        // Attempt to retrieve the current user's session
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        
+        if (!user) {
+            // No user session found, redirect to the login page
+            // Make sure to exclude the login and public routes to avoid infinite redirects
+            if (!request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/public')) {
+                return NextResponse.redirect(new URL('/login', request.url));
+            }
+        }
 
-    return response;
-  } catch (e) {
-    // If you are here, a Supabase client could not be created!
-    // This is likely because you have not set up environment variables.
-    // Check out http://localhost:3000 for Next Steps.
-    return NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    });
-  }
+        // User is authenticated, or the request is for a public route, so proceed with the request
+        return NextResponse.next();
+    } catch (error) {
+        console.error('Error checking user authentication:', error);
+        return NextResponse.redirect(new URL('/error', request.url));
+    }
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    // Apply middleware only to paths starting with "/dashboard/"
+    '/dashboard/:path*',
   ],
 };
+
