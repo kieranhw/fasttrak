@@ -1,7 +1,7 @@
 import cytoscape from "cytoscape";
-import { Graph, calculateDistance } from "@/lib/routing/model/graph";
-import { VRPSolution } from "@/lib/routing/model/vrp";
-import { calculateTraversalMins } from "@/lib/scheduling/create-schedules";
+import { Graph, calculateDistance } from "@/utils/routing/model/graph";
+import { VRPSolution } from "@/utils/routing/model/vrp";
+import { calculateTraversalMins } from "@/utils/scheduling/create-schedules";
 
 interface CyEdge {
     data: {

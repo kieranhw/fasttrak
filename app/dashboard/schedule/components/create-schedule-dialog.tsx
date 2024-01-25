@@ -23,7 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2 } from 'lucide-react';
 import { OptimisationProfile, ScheduleProfile } from '@/types/schedule-profile';
 import { MdError, MdInfoOutline } from 'react-icons/md';
-import { db } from '@/lib/db/db';
+import { db } from '@/utils/db/db';
 import { HiLightningBolt } from 'react-icons/hi';
 import { FaLeaf, FaTruck } from 'react-icons/fa';
 

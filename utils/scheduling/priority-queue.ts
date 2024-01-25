@@ -1,4 +1,4 @@
-import { Node } from "@/lib/routing/model/graph";
+import { Node } from "@/utils/routing/model/graph";
 
 // Priority queue for node objects
 export class PriorityQueue {

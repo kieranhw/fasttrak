@@ -8,7 +8,7 @@ import { supabase } from "@/pages/api/supabase-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { generateFT } from "@/lib/utils/generate-ids";
+import { generateFT } from "@/utils/utils/generate-ids";
 import { Button } from "@/components/ui/button";
 import { Loader } from '@googlemaps/js-api-loader';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";

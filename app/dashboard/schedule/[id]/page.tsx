@@ -1,18 +1,18 @@
 'use client'
 
-import { fetchSchedulesByDate } from "@/lib/db/delivery-schedules";
-import { createGraphAndSolutionFromSchedule } from "@/lib/scheduling/schedules-to-graph";
+import { fetchSchedulesByDate } from "@/utils/db/delivery-schedules";
+import { createGraphAndSolutionFromSchedule } from "@/utils/scheduling/schedules-to-graph";
 import { DeliverySchedule } from "@/types/delivery-schedule";
 import { useState, useEffect } from "react";
 import { date } from "zod";
 import { DataTable } from "./components/data-table"
 import { columns } from "./components/columns"
-import { db } from "@/lib/db/db";
+import { db } from "@/utils/db/db";
 import { UUID } from "crypto";
 import { Package } from "@/types/package";
-import { Graph } from "@/lib/routing/model/graph";
-import { VRPSolution } from "@/lib/routing/model/vrp";
-import { displayGraph } from "../../../../lib/utils/cytoscape-data";
+import { Graph } from "@/utils/routing/model/graph";
+import { VRPSolution } from "@/utils/routing/model/vrp";
+import { displayGraph } from "../../../../utils/utils/cytoscape-data";
 import { CytoscapeGraph } from "../../../../components/CytoscapeGraph";
 import { BreadcrumbLink } from "@/components/ui/breadcrumb-link";
 import {

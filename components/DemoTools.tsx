@@ -14,7 +14,7 @@ import {
 
 import { AiFillTool } from "react-icons/ai"
 import { useState } from "react";
-import { generatePackages } from "@/lib/data/generatePackages";
+import { generatePackages } from "@/utils/data/generatePackages";
 import { supabase } from "@/pages/api/supabase-client";
 
 

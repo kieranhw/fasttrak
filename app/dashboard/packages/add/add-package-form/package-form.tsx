@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 
 import PackageSchema from "./package-schema";
 import sanitizeHtml from "sanitize-html";
-import { sanitizeFloat } from "@/lib/utils/validation";
+import { sanitizeFloat } from "@/utils/utils/validation";
 import { Textarea } from "@/components/ui/textarea";
 
 interface PackageFormProps {
