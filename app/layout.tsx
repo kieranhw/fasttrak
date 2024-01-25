@@ -1,5 +1,7 @@
 import './globals.css'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: 'FastTrak | Vehicle Routing',
   description: 'Parcel logistics and tracking made simple.',

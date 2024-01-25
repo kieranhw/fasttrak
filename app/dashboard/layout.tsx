@@ -1,5 +1,9 @@
 import DemoTools from "@/components/DemoTools"
 import Sidebar from "@/components/Sidebar"
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { notFound, redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
+
 
 export const metadata = {
     title: 'FastTrak | Dashboard',
