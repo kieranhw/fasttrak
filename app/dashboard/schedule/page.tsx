@@ -10,7 +10,7 @@ import { format } from "date-fns"
 import { Calendar as CalendarIcon, Loader, Loader2, SeparatorHorizontal } from "lucide-react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-import { cn } from "@/lib/utils/utils"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
