@@ -213,7 +213,7 @@ export const PackageForm: React.FC<PackageFormProps> = ({ onSubmit, form }) => {
                     </div>
 
                     {/* Delivery Details */}
-                    <div className="space-y-4 border rounded-md p-4 order-3">
+                    <div className="space-y-4 border rounded-md bg-card p-4 order-3">
                         <FormField
                             control={form.control}
                             name="fragile"
@@ -365,7 +365,7 @@ export const PackageForm: React.FC<PackageFormProps> = ({ onSubmit, form }) => {
                     </div>
 
                     {/* Sender Details */}
-                    <div className="space-y-4 border rounded-md p-4 flex-grow order-4">
+                    <div className="space-y-4 border rounded-md p-4 bg-card flex-grow order-4">
                         <FormField
                             control={form.control}
                             name="sender_name"
