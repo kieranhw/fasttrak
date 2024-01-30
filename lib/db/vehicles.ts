@@ -70,6 +70,37 @@ const deleteVehicleById = async (id: UUID): Promise<boolean> => {
     }
 }
 
+export const createVehicle = async (vehicleData: Partial<Vehicle>): Promise<{ data: Vehicle | null, error: Error | null }> => {
+    try {
+        const { data: userProfile, error: userProfileError } = await db.profiles.fetch.profile();
+
+        if (userProfileError || !userProfile || !userProfile.store_id) {
+            throw new Error("User profile not found or store_id is missing");
+        }
+
+        // Validate vehicleData fields
+        if (!vehicleData.registration || !vehicleData.manufacturer || !vehicleData.model) {
+            throw new Error("Missing required vehicle fields");
+        }
+
+        // Add store_id to the vehicle data
+        const completeVehicleData = { ...vehicleData, store_id: userProfile.store_id };
+
+        const { data, error } = await supabase
+            .from('vehicles')
+            .insert([completeVehicleData])
+            .single();
+
+        if (error) throw new Error(`Error creating vehicle: ${error.message}`);
+
+        return { data, error: null };
+    } catch (error) {
+        console.error("Error in createVehicle:", error);
+        return { data: null, error: error as Error };
+    }
+};
+
+
 export const vehicles = {
     fetch: {
         all: fetchVehicles,
@@ -77,5 +108,6 @@ export const vehicles = {
     },
     delete: {
         byId: deleteVehicleById,
-    }
+    },
+    create: createVehicle,
 };

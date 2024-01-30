@@ -45,6 +45,7 @@ import * as z from "zod"
 import { VehicleForm } from "./add-vehicle-form/vehicle-form";
 import { VehicleSchema } from "./add-vehicle-form/vehicle-schema";
 import { supabase } from "@/lib/supabase/client";
+import { db } from "@/lib/db/db"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -57,7 +58,11 @@ export function DataTable<TData, TValue>({
   data,
   refreshData,
 }: DataTableProps<TData, TValue>) {
+  // Dialog
+  const [open, setOpen] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
+  // Data Table
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
@@ -81,26 +86,26 @@ export function DataTable<TData, TValue>({
   })
 
   async function onSubmit(values: z.infer<typeof VehicleSchema>) {
-    const { error } = await supabase
-      .from('vehicles')
-      .insert({
-        registration: values.registration,
-        manufacturer: values.manufacturer,
-        model: values.model,
-        manufacture_year: values.manufacture_year,
-        status: "Available",
-        max_load: values.max_load,
-        max_volume: values.max_volume,
-      })
+    setSubmitting(true)
+    const { data, error } = await db.vehicles.create({
+      registration: values.registration,
+      manufacturer: values.manufacturer,
+      model: values.model,
+      manufacture_year: values.manufacture_year,
+      status: "Available",
+      max_load: values.max_load,
+      max_volume: values.max_volume,
+    });
+
     if (error) {
-      alert(error.message)
+      alert(error.message);
     } else {
       refreshData();
       setOpen(false);
     }
+    setSubmitting(false)
   }
 
-  const [open, setOpen] = useState(false)
 
 
   return (
@@ -115,22 +120,22 @@ export function DataTable<TData, TValue>({
           className="max-w-sm"
         />
 
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button className="ml-2">
-                Add Vehicle
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>New Vehicle</DialogTitle>
-                <DialogDescription>
-                  Add a new vehicle to your fleet.
-                </DialogDescription>
-                <VehicleForm onSubmit={onSubmit} />
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button className="ml-2">
+              Add Vehicle
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>New Vehicle</DialogTitle>
+              <DialogDescription>
+                Add a new vehicle to your fleet.
+              </DialogDescription>
+              <VehicleForm onSubmit={onSubmit} submitting={submitting} />
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="rounded-md border bg-card">
@@ -183,7 +188,9 @@ export function DataTable<TData, TValue>({
           </div>
 
           <div className="inline-flex items-center space-x-2">
-            <div className="text-muted-foreground text-sm pr-2">Page {table.getState().pagination.pageIndex + 1} of{" "} {table.getPageCount()}</div>
+            {table.getPageCount() > 0 &&
+              <div className="text-muted-foreground text-sm pr-2">Page {table.getState().pagination.pageIndex + 1} of{" "} {table.getPageCount()}</div>
+            }
             <Button
               variant="outline"
               size="sm"

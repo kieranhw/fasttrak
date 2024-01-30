@@ -15,13 +15,15 @@ import { Button } from "@/components/ui/button";
 import { VehicleSchema } from "./vehicle-schema";
 import { Vehicle } from "@/types/vehicle";
 import { useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
 interface VehicleFormProps {
     onSubmit: (values: z.infer<typeof VehicleSchema>) => void;
+    submitting?: boolean;
     vehicle?: Vehicle;
 }
 
-export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit, vehicle }) => {
+export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit, vehicle, submitting }) => {
     const form = useForm<z.infer<typeof VehicleSchema>>({
         resolver: zodResolver(VehicleSchema),
         defaultValues: {
@@ -182,13 +184,13 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit, vehicle }) =
                             <FormItem>
                                 <FormLabel>Max Load (kg)</FormLabel>
                                 <FormControl>
-                                    <Input 
-                                    {...field} 
-                                    value={field.value?.toString() || ''} 
-                                    type="number" 
-                                    placeholder="Weight Limit"
-                                    onKeyDown={preventNonNumericInput} 
-                                    onChange={onInputChange} />
+                                    <Input
+                                        {...field}
+                                        value={field.value?.toString() || ''}
+                                        type="number"
+                                        placeholder="Weight Limit"
+                                        onKeyDown={preventNonNumericInput}
+                                        onChange={onInputChange} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -201,14 +203,14 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit, vehicle }) =
                             <FormItem>
                                 <FormLabel>Max Volume (m<sup>3</sup>)</FormLabel>
                                 <FormControl>
-                                    <Input 
-                                    {...field} 
-                                    value={field.value?.toString() || ''} 
-                                    type="number"
-                                    placeholder="Cargo Volume Capacity"
+                                    <Input
+                                        {...field}
+                                        value={field.value?.toString() || ''}
+                                        type="number"
+                                        placeholder="Cargo Volume Capacity"
 
-                                    onKeyDown={preventNonNumericInput} 
-                                    onChange={onInputChange} />
+                                        onKeyDown={preventNonNumericInput}
+                                        onChange={onInputChange} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -216,7 +218,14 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ onSubmit, vehicle }) =
                     />
                 </div>
                 <div className="flex justify-end pt-2">
-                    <Button type="submit">Submit</Button>
+                    {!submitting &&
+                        <Button type="submit" >Submit</Button>
+                    }
+                    {submitting &&
+                        <Button type="submit" disabled={true} className="flex gap-2">
+                            <Loader2 size={16} className="animate-spin" /> Submitting
+                        </Button>
+                    }
                 </div>
             </form>
         </Form>
