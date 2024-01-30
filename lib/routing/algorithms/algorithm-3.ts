@@ -214,6 +214,9 @@ type ClusterWithNodes = {
 };
 
 function kMeans(queue: PriorityQueue, k: number, maxIterations = 100): PriorityQueue[] {
+    // Create a backup of the original queue data
+    const originalNodes = queue.getData().slice();
+
     // Dequeue all packages into nodes array
     const nodes: Node[] = [];
     while (!queue.isEmpty()) {
@@ -272,6 +275,10 @@ function kMeans(queue: PriorityQueue, k: number, maxIterations = 100): PriorityQ
     const emptyClusterExists = clusters.some(cluster => cluster.nodes.length === 0);
     if (emptyClusterExists) {
         console.log("Empty cluster found, restarting...");
+
+        // Reinitialize the queue with the original nodes and restart clustering
+        queue = new PriorityQueue();
+        originalNodes.forEach(node => queue.enqueue(node));
         return kMeans(queue, k, maxIterations);
     }
 
