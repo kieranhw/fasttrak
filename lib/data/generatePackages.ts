@@ -31,7 +31,7 @@ export const generatePackages = async (numPackages: number): Promise<Package[]> 
         packages.push({
             package_id: faker.string.uuid() as UUID,
             tracking_id: generateFT()!,
-            store_id: store.store_id,
+            store_id: store.store_id!,
             recipient_name: faker.person.fullName(),
             recipient_address: recipientAddress.address,
             recipient_address_lat: recipientAddress.lat,
