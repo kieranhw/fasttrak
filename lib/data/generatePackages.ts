@@ -13,7 +13,7 @@ export const generatePackages = async (numPackages: number): Promise<Package[]> 
     const addresses: { address: string, lat: number, lng: number }[] = addressData;
 
     for (let i = 0; i < numPackages; i++) {
-        const priorities: PriorityType[] = ["Redelivery", "Express", "Standard", "Return"];
+        const priorities: PriorityType[] = ["Express", "Standard"];
         const randomNumber = faker.number.int({
             'min': 0,
             'max': priorities.length - 1

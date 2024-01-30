@@ -1,6 +1,8 @@
 import { UUID } from "crypto"
 
-export type PriorityType = "Redelivery" | "Express" | "Standard" | "Return";
+export type PriorityType = "Express" | "Standard";
+export type PackageStatus = "Pending" | "In Transit" | "Delivered";
+export type CurrentState = "Pending" | "Scheduled" | "In-Transit" | "Return" | "Delivered";
 
 export type Package = {
     package_id: UUID
@@ -16,7 +18,8 @@ export type Package = {
     sender_address_lat?: number
     sender_address_lng?: number
     sender_phone: string
-    status: "Pending" | "In Transit" | "Delivered"
+    status: PackageStatus
+    current_state?: CurrentState
     weight: number
     volume: number
     fragile?: boolean

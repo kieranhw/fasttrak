@@ -50,8 +50,10 @@ export default function DemoTools() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Insert Test Data Set 1</DropdownMenuItem>
                 <DropdownMenuItem>Insert Test Data Set 2</DropdownMenuItem>
-                <DropdownMenuItem>Insert Test Data Set 3</DropdownMenuItem>
-                <DropdownMenuItem>Clear All Data</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Clear Packages Data</DropdownMenuItem>
+                <DropdownMenuItem>Clear Vehicles Data</DropdownMenuItem>
+
 
             </DropdownMenuContent>
         </DropdownMenu>

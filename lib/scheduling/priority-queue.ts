@@ -18,16 +18,14 @@ export class PriorityQueue {
 
         const daysOld = (new Date().getTime() - dateAdded.getTime()) / (1000 * 3600 * 24);
         const priorityMap = {
-            MoreThan5Days: 6,
-            Express: 5,
+            MoreThan5Days: 4,
             MoreThan3Days: 4,
-            Redelivery: 3,
-            Return: 2,
+            Express: 2,
             Standard: 1
         };
-        const agePriority = daysOld > 5 ? 6 : daysOld > 3 ? 4 : 0;
+        const agePriority = daysOld > 5 ? priorityMap.MoreThan5Days : daysOld > 3 ? priorityMap.MoreThan3Days : 0;
         const pkgPriorityValue = priorityMap[node.pkg.priority];
-        return Math.max(agePriority, pkgPriorityValue);
+        return (agePriority + pkgPriorityValue);
     }
 
 
