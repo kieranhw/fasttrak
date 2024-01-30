@@ -1,13 +1,13 @@
 'use client'
 
-import { fetchSchedulesByDate } from "@/db/delivery-schedules";
+import { fetchSchedulesByDate } from "@/lib/db/delivery-schedules";
 import { createGraphAndSolutionFromSchedule } from "@/lib/scheduling/schedules-to-graph";
 import { DeliverySchedule } from "@/types/delivery-schedule";
 import { useState, useEffect } from "react";
 import { date } from "zod";
 import { DataTable } from "./components/data-table"
 import { columns } from "./components/columns"
-import { db } from "@/db/db";
+import { db } from "@/lib/db/db";
 import { UUID } from "crypto";
 import { Package } from "@/types/package";
 import { Graph } from "@/lib/routing/model/graph";

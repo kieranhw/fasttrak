@@ -28,77 +28,61 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 import { FaCopy } from "react-icons/fa"
 import { IoMdRefresh } from "react-icons/io";
-
-const storeFormSchema = z.object({
-    name: z
-        .string({
-            required_error: "Please enter a store name.",
-        })
-        .min(2, {
-            message: "Store name must be at least 2 characters.",
-        })
-        .max(30, {
-            message: "Store name must not be longer than 30 characters.",
-        }),
-    passcode: z
-        .string({
-            required_error: "Please enter a store name.",
-        })
-        .min(2, {
-            message: "Store name must be at least 2 characters.",
-        })
-        .max(30, {
-            message: "Store name must not be longer than 30 characters.",
-        }),
-    email: z
-        .string({
-            required_error: "Please select an email to display.",
-        })
-        .email(),
-    bio: z.string().max(160).min(4),
-    urls: z
-        .array(
-            z.object({
-                value: z.string().url({ message: "Please enter a valid URL." }),
-            })
-        )
-        .optional(),
-})
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { db } from "@/lib/db/db"
+import { Store } from "@/types/store"
+import { PostgrestError } from "@supabase/supabase-js"
+import { useEffect } from "react"
+import { generateIC } from "@/lib/utils/generate-ids"
+import { storeFormSchema } from "./store-form"
 
 type StoreFormValues = z.infer<typeof storeFormSchema>
 
 // This can come from your database or API.
 const defaultValues: Partial<StoreFormValues> = {
-    passcode: "IC1AAG3EYYOB",
-    bio: "I own a computer.",
-    urls: [
-        { value: "https://shadcn.com" },
-        { value: "http://twitter.com/shadcn" },
-    ],
+    name: "",
+    passcode: "",
 }
 
-export function StoreForm() {
+export function CreateStoreForm() {
     const form = useForm<StoreFormValues>({
         resolver: zodResolver(storeFormSchema),
         defaultValues,
         mode: "onChange",
     })
 
-    const { fields, append } = useFieldArray({
-        name: "urls",
-        control: form.control,
-    })
+    async function onSubmit(data: StoreFormValues) {
+        const store: Store = {
+            store_name: data.name,
+            invite_code: data.passcode,
+            // Include other fields as necessary
+        };
 
-    function onSubmit(data: StoreFormValues) {
-        toast({
-            title: "You submitted the following values:",
-            description: (
-                <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-                    <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-                </pre>
-            ),
-        })
+        try {
+            const { data: createdStore, error } = await db.stores.create(store);
+            console.log(createdStore)
+
+            if (error) {
+                console.log("Error occurred while creating store:", error);
+                // Handle the error case here
+            } else if (createdStore && createdStore.store_id) {
+                // Here you have the created store with the UUID
+                // You can now use createdStore.store_id to update the user's profile
+                const updateResult = await db.profiles.update.store(createdStore.store_id);
+            } else {
+                // Handle the case where the store was not returned
+                console.log("Store was not created.");
+            }
+        } catch (error) {
+            console.error("An unexpected error occurred:", error);
+        }
     }
+
+
+    useEffect(() => {
+        form.setValue("passcode", generateIC());
+    }, [])
+
 
     return (
         <Form {...form}>
@@ -114,7 +98,7 @@ export function StoreForm() {
                                     <Input placeholder="Store" {...field} />
                                 </FormControl>
                                 <FormDescription>
-                                    This is your store name which is used to identify your organisation.
+                                    This is the name of your organisation.
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
@@ -129,19 +113,25 @@ export function StoreForm() {
                                 <FormControl>
                                     <div className="flex gap-2">
                                         <div className="flex justify-start border items-center p-2 px-3 h-10 text-start text-sm text-muted-foreground rounded-lg flex-grow">{field.value}</div>
-                                        <Button type="button" variant="secondary" size="icon"><FaCopy size={16}/></Button>
-                                        <Button type="button" variant="secondary" size="icon"><IoMdRefresh size={16}/></Button>
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            size="icon"
+                                            onClick={e => form.setValue("passcode", generateIC())}>
+
+                                            <IoMdRefresh size={16} />
+                                        </Button>
                                     </div>
                                 </FormControl>
                                 <FormDescription>
-                                    This code is required for new users to join your store.
+                                    This code is required for new users to join your store. Click the refresh button to generate a new code.
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
                 </div>
-                <Button type="submit">Save Changes</Button>
+                <Button type="submit">Create Store</Button>
 
             </form>
         </Form >

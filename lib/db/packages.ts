@@ -10,7 +10,7 @@ const fetchPackages = async () => {
     const supabase = createClient();
 
     // Fetch store for user
-    const store = await db.stores.fetch.store.forUser();
+    const store = await db.stores.fetch.forUser();
 
     if (!store) {
         console.error("User not atatched to store");
@@ -33,7 +33,7 @@ const fetchPackages = async () => {
 // Fetch all packages for a user where "status" is "Pending" (i.e. not scheduled for delivery)
 const fetchPackagesByPending = async () => {
     // Fetch store for user
-    const store = await db.stores.fetch.store.forUser();
+    const store = await db.stores.fetch.forUser();
     const supabase = createClient();
 
     if (!store) {
@@ -82,7 +82,7 @@ const removePackageById = async (id: UUID) => {
     const supabase = createClient();
 
     // Fetch store for user
-    const store = await db.stores.fetch.store.forUser();
+    const store = await db.stores.fetch.forUser();
 
     if (!store) {
         console.error("User not atatched to store");

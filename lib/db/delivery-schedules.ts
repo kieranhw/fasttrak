@@ -13,7 +13,7 @@ export const fetchSchedulesByDate = async (date: Date) => {
     const supabase = createClient();
 
     // Fetch store for user
-    const store = await db.stores.fetch.store.forUser();
+    const store = await db.stores.fetch.forUser();
 
     if (!store) {
         console.error("User not atatched to store");

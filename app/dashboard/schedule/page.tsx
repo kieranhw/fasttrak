@@ -34,7 +34,7 @@ import {
 import { createSchedules } from "@/lib/scheduling/create-schedules";
 import { createGraphAndSolutionFromScheduleArray } from "@/lib/scheduling/schedules-to-graph";
 
-import { db } from "@/db/db";
+import { db } from "@/lib/db/db";
 import { displayGraph } from "@/lib/utils/cytoscape-data";
 import { CytoscapeGraph } from "@/components/CytoscapeGraph";
 import { MdRefresh } from "react-icons/md"
@@ -221,7 +221,7 @@ export default function ScheduleDeliveries() {
           }
         }
 
-        const store = await db.stores.fetch.store.forUser();
+        const store = await db.stores.fetch.forUser();
         if (!store) {
           console.error("User not atatched to store");
           return [] as DeliverySchedule[];

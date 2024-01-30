@@ -30,7 +30,7 @@ import { useState } from "react"
 import { UUID } from "crypto"
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule"
 import { Vehicle } from "@/types/vehicle"
-import { db } from "@/db/db"
+import { db } from "@/lib/db/db"
 import {
     HoverCard,
     HoverCardContent,

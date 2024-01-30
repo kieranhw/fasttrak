@@ -8,7 +8,7 @@ import { Package } from '@/types/package';
 import { supabase } from '@/lib/supabase/client';
 import { DataTable } from './components/data-table';
 import { columns } from './components/columns';
-import { db } from '@/db/db';
+import { db } from '@/lib/db/db';
 
 export default function ManagePackage() {
   const [data, setData] = useState<Package[]>([]);
