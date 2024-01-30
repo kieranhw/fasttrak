@@ -369,8 +369,7 @@ export default function ScheduleDeliveries() {
                         handleDateChange(newDate);
                       }
                     }
-                  }}
-                >
+                  }}>
                   <ChevronRight size={16} />
                 </Button>
               </div>
@@ -465,7 +464,7 @@ export default function ScheduleDeliveries() {
           <div className="flex flex-col justify-between">
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
               <div>
-                <div className="border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1 h-12">
+                <div className="border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1 h-12 bg-card">
                   <p className="text-muted-foreground font-medium text-sm m-2">Delivery Network</p>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -486,10 +485,10 @@ export default function ScheduleDeliveries() {
               </div>
 
               <div>
-                <div className="border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1 h-12">
+                <div className="border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1 h-12 bg-card">
                   <p className="text-muted-foreground text-sm font-medium m-2">Schedule Statistics</p>
                 </div>
-                <div className="border rounded-t-none rounded-md border-divider h-[450px]">
+                <div className="border rounded-t-none rounded-md border-divider h-[450px] bg-card">
                   <div className="grid grid-cols-2 p-8 gap-8 h-[450px]">
                     <div>
                       <p className="text-muted-foreground text-sm mx-2">Total Packages</p>

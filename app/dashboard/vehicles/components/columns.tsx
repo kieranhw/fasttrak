@@ -79,21 +79,19 @@ export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
                 //TODO : update vehicle instead of create new
                 const { data, error } = await db.vehicles.update.byId(
                     vehicle.vehicle_id,
-                {
-                    registration: values.registration,
-                    manufacturer: values.manufacturer,
-                    model: values.model,
-                    manufacture_year: values.manufacture_year,
-                    status: "Available",
-                    max_load: values.max_load,
-                    max_volume: values.max_volume,
-                });
-
+                    {
+                        registration: values.registration,
+                        manufacturer: values.manufacturer,
+                        model: values.model,
+                        manufacture_year: values.manufacture_year,
+                        status: "Available",
+                        max_load: values.max_load,
+                        max_volume: values.max_volume,
+                    });
                 if (error) {
                     alert(error.message);
                 } else {
                     refreshData();
-                    setEditDialogOpen(false);
                 }
                 setSubmitting(false)
             }
