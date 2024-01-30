@@ -116,7 +116,7 @@ export default function ScheduleDeliveries() {
   const [deliverySchedules, setDeliverySchedules] = useState<DeliverySchedule[]>([]);
   const [reload, setReload] = useState(false);
   const [isScheduledToday, setIsScheduledToday] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isScheduling, setIsScheduling] = useState(false);
   const [graph, setGraph] = useState<any>(null);
   const [solution, setSolution] = useState<any>(null);
@@ -458,7 +458,7 @@ export default function ScheduleDeliveries() {
           </div>
         </div>
 
-        <DataTable columns={columns(refreshData)} data={deliverySchedules} />
+        <DataTable columns={columns(refreshData)} data={deliverySchedules} isLoading={isLoading} />
 
         {deliverySchedules.length > 0 &&
           <div className="flex flex-col justify-between">

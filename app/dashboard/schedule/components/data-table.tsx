@@ -30,17 +30,20 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Loader2 } from "lucide-react"
 
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  isLoading: boolean;
 }
 
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isLoading,
 }: DataTableProps<TData, TValue>) {
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -103,8 +106,11 @@ export function DataTable<TData, TValue>({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No delivery scheduled for this date.
+                <TableCell colSpan={columns.length} className="h-36 text-center">
+                  {isLoading &&
+                    <div className="flex gap-2 font-normal justify-center items-center"><Loader2 size={18} className="animate-spin" /> Loading...</div>
+                  }
+                  {!isLoading && "No schedules for this date."}
                 </TableCell>
               </TableRow>
             )}
