@@ -1,60 +1,50 @@
-import { UserProfile } from "@/types/user-profile";
 import { supabase } from "@/lib/supabase/client";
-import { UUID } from "crypto";
+import { UserProfile } from "@/types/user-profile";
+import { PostgrestError } from "@supabase/supabase-js";
 
-// Fetch user profile from user
-const fetchUserProfile = async () => {
-    // Get user id from session
-    const user = await supabase.auth.getUser();
+const fetchUserProfile = async (): Promise<{ data: UserProfile | null, error: PostgrestError | null }> => {
+    try {
+        const user = await supabase.auth.getUser();
+        const userId = user.data.user?.id;
 
-    if (!user.data.user?.id) {
-        console.error("User not found");
-        return;
-    }     
+        if (!userId) {
+            console.error("User not found");
+            return { data: null, error: null };
+        }
 
-    const userId = user.data.user?.id;
-    console.log(userId)
+        const { data, error } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
 
-    // fetch user profile from user id
-    const { data, error } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('user_id', userId);
-
-    if (error) {
+        return { data: data ?? null, error };
+    } catch (error) {
         console.error("Error fetching user profile: ", error);
-        return;
-    } else if (data && data.length > 0) {
-        // Convert user profile to UserProfile type
-        const userProfile: UserProfile = data[0] as UserProfile;
-        return userProfile;
+        return { data: null, error: error as PostgrestError };
     }
 }
 
-const updateUserStore = async (storeId: UUID) => {
-    const user = await supabase.auth.getUser();
-    console.log("update user store called")
+const updateUserStore = async (storeId: string): Promise<{ data: UserProfile | null, error: PostgrestError | null }> => {
+    try {
+        const user = await supabase.auth.getUser();
+        const userId = user.data.user?.id;
 
-    if (!user.data.user?.id) {
-        console.error("User not found");
-        return;
-    }
+        if (!userId) {
+            console.error("User not found");
+            return { data: null, error: null };
+        }
 
-    const userProfile = fetchUserProfile();
-
-    if (!userProfile) {
-        console.error("User profile not found");
-        return;
-    } else {
-        // Update in supabase the "store_id" field of the user profile
         const { data, error } = await supabase
             .from('user_profiles')
             .update({ store_id: storeId })
-            .eq('user_id', user.data.user?.id);
-        if (error) {
-            console.error("Error updating user profile: ", error);
-            return;
-        }
+            .eq('user_id', userId)
+            .single();
+
+        return { data: data ?? null, error };
+    } catch (error) {
+        console.error("Error updating user profile: ", error);
+        return { data: null, error: error as PostgrestError };
     }
 }
 

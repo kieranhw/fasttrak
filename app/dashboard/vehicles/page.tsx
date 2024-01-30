@@ -6,11 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { Vehicle } from '@/types/vehicle'
 import { DataTable } from './components/data-table'
 import { columns } from './components/columns'
-import { Button } from '@/components/ui/button';
-import { supabase } from '@/lib/supabase/client';
-
-
-
+import { db } from '@/lib/db/db';
 
 export default function Vehicles() {
     const [data, setData] = useState<Vehicle[]>([]);
@@ -18,9 +14,9 @@ export default function Vehicles() {
 
     useEffect(() => {
         async function fetchData() {
-            const { data: vehicles } = await supabase.from("vehicles").select();
+            const vehicles = await db.vehicles.fetch.all();
             if (vehicles) {
-                setData(vehicles as Vehicle[]);
+                setData(vehicles);
             }
         }
         fetchData();

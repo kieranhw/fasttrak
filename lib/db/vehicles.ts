@@ -1,61 +1,73 @@
 import { supabase } from "@/lib/supabase/client";
 import { Vehicle } from "@/types/vehicle";
+import { db } from "./db";
+import { UserProfile } from "@/types/user-profile";
 import { UUID } from "crypto";
 
-// Fetch Vehicles
-const fetchVehicles = async () => {
+const fetchVehicles = async (): Promise<Vehicle[] | null> => {
+    try {
+        const { data: userProfile, error: userProfileError } = await db.profiles.fetch.profile();
 
-    const { data, error } = await supabase
-        .from('vehicles')
-        .select('*');
+        if (userProfileError || !userProfile || !userProfile.store_id) {
+            console.error("Error fetching user profile or store_id is missing:", userProfileError);
+            return null;
+        }
 
-    if (error) {
-        console.error("Error fetching vehicles: ", error);
+        // Fetch vehicles for store which user is attached to
+        const { data: vehicles, error: vehicleError } = await supabase
+            .from('vehicles')
+            .select('*')
+            .eq('store_id', userProfile.store_id);
+
+        if (vehicleError) {
+            throw new Error(`Error fetching vehicles: ${vehicleError.message}`);
+        }
+
+        return vehicles as Vehicle[] ?? null;
+    } catch (error) {
+        console.error("Error in fetchVehicles:", error);
         return null;
-    } else if (data && data.length > 0) {
-        // Convert vehicles to Vehicle type
-        const vehicles: Vehicle[] = data as Vehicle[];
-        return vehicles;
     }
+};
 
-    return null;
-}
 
 // Fetch vehicle by ID
-const fetchVehicleById = async (id: UUID) => {
+const fetchVehicleById = async (id: UUID): Promise<Vehicle | null> => {
+    try {
+        const { data, error } = await supabase
+            .from('vehicles')
+            .select('*')
+            .eq('vehicle_id', id)
+            .single();
 
-    const { data, error } = await supabase
-        .from('vehicles')
-        .select('*')
-        .eq('vehicle_id', id);
+        if (error) {
+            throw new Error(`Error fetching vehicle: ${error.message}`);
+        }
 
-    if (error) {
-        console.error("Error fetching vehicle: ", error);
+        return data ?? null;
+    } catch (error) {
+        console.error("Error in fetchVehicleById:", error);
         return null;
-    } else if (data && data.length > 0) {
-        // Convert vehicle to Vehicle type
-        const vehicle: Vehicle = data[0] as Vehicle;
-        return vehicle;
     }
-
-    return null;
 }
 
 // Delete vehicle by ID
-const deleteVehicleById = async (id: UUID) => {
+const deleteVehicleById = async (id: UUID): Promise<boolean> => {
+    try {
+        const { error } = await supabase
+            .from('vehicles')
+            .delete()
+            .eq('vehicle_id', id);
 
-    const { error } = await supabase
-        .from('vehicles')
-        .delete()
-        .eq('vehicle_id', id);
+        if (error) {
+            throw new Error(`Error deleting vehicle: ${error.message}`);
+        }
 
-    if (error) {
-        console.error();
-        return (false);
-    } else {
-        return (true);
+        return true;
+    } catch (error) {
+        console.error("Error in deleteVehicleById:", error);
+        return false;
     }
-
 }
 
 export const vehicles = {

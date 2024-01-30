@@ -221,9 +221,9 @@ export default function ScheduleDeliveries() {
           }
         }
 
-        const store = await db.stores.fetch.forUser();
-        if (!store) {
-          console.error("User not atatched to store");
+        const { data: store, error: storeError } = await db.stores.fetch.forUser();
+        if (!store || storeError) {
+          console.error("Unable to retrieve user store.");
           return [] as DeliverySchedule[];
         }
 

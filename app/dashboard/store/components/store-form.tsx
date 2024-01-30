@@ -246,7 +246,7 @@ export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate }) =>
                         }
                         {isSubmitting &&
                             <Button type="submit" disabled={true} className="flex gap-2">
-                                <Loader2 size={18} className="animate-spin" /> Submitting
+                                <Loader2 size={16} className="animate-spin" /> Submitting
                             </Button>
                         }
                     </div>

@@ -22,9 +22,12 @@ export const generatePackages = async (numPackages: number): Promise<Package[]> 
         // Ensure recipient and sender addresses are different
         const [recipientAddress, senderAddress] = faker.helpers.shuffle(addresses).slice(0, 2);
 
-        const store = await db.stores.fetch.forUser();
+        const { data: store, error} = await db.stores.fetch.forUser();
         if (!store) {
             console.error("User not atatched to store");
+            return [] as Package[];
+        } if (error) {
+            console.error("Error fetching store: ", error);
             return [] as Package[];
         }
 

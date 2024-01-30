@@ -27,9 +27,12 @@ export default function Depot() {
   // Fetch store upon page load, if store set store, else set store as null
   useEffect(() => {
     async function fetchData() {
-      const store = await db.stores.fetch.forUser();
+      const { data: store, error: storeError } = await db.stores.fetch.forUser();
       if (store) {
         setStore(store);
+      } else {
+        setStore(null);
+        console.error("Unable to retrieve user store. " + storeError)
       }
       setLoading(false);
     }

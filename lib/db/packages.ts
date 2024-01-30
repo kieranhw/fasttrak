@@ -10,48 +10,58 @@ const fetchPackages = async () => {
     const supabase = createClient();
 
     // Fetch store for user
-    const store = await db.stores.fetch.forUser();
+    const { data: store, error } = await db.stores.fetch.forUser();
 
     if (!store) {
         console.error("User not atatched to store");
         return;
-    }
-
-    let { data: packages, error } = await supabase
-        .from('packages')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .eq('store_id', store.store_id);
-    if (error) {
-        console.error("Error fetching packages: ", error);
+    } if (error) {
+        console.error("Error fetching store: ", error);
         return;
     } else {
-        return (packages as Package[]);
+
+        let { data: packages, error } = await supabase
+            .from('packages')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .eq('store_id', store.store_id);
+        if (error) {
+            console.error("Error fetching packages: ", error);
+            return;
+        } else {
+            return (packages as Package[]);
+        }
     }
 }
 
 // Fetch all packages for a user where "status" is "Pending" (i.e. not scheduled for delivery)
 const fetchPackagesByPending = async () => {
     // Fetch store for user
-    const store = await db.stores.fetch.forUser();
     const supabase = createClient();
+
+    // Fetch store for user
+    const { data: store, error } = await db.stores.fetch.forUser();
 
     if (!store) {
         console.error("User not atatched to store");
         return;
-    }
-
-    let { data: packages, error } = await supabase
-        .from('packages')
-        .select('*')
-        .eq('status', 'Pending')
-        .order('created_at', { ascending: false })
-        .eq('store_id', store.store_id);
-    if (error) {
-        console.error("Error fetching packages: ", error);
+    } if (error) {
+        console.error("Error fetching store: ", error);
         return;
     } else {
-        return (packages as Package[]);
+
+        let { data: packages, error } = await supabase
+            .from('packages')
+            .select('*')
+            .eq('status', 'Pending')
+            .order('created_at', { ascending: false })
+            .eq('store_id', store.store_id);
+        if (error) {
+            console.error("Error fetching packages: ", error);
+            return;
+        } else {
+            return (packages as Package[]);
+        }
     }
 }
 
@@ -82,23 +92,26 @@ const removePackageById = async (id: UUID) => {
     const supabase = createClient();
 
     // Fetch store for user
-    const store = await db.stores.fetch.forUser();
+    const { data: store, error } = await db.stores.fetch.forUser();
 
     if (!store) {
         console.error("User not atatched to store");
         return;
-    }
-
-    const { error } = await supabase
-        .from('packages')
-        .delete()
-        .eq('package_id', id)
-        .eq('store_id', store.store_id);
-    if (error) {
-        console.error("Error removing package: ", error);
-        return
+    } if (error) {
+        console.error("Error fetching store: ", error);
+        return;
     } else {
-        return
+        const { error } = await supabase
+            .from('packages')
+            .delete()
+            .eq('package_id', id)
+            .eq('store_id', store.store_id);
+        if (error) {
+            console.error("Error removing package: ", error);
+            return
+        } else {
+            return
+        }
     }
 }
 

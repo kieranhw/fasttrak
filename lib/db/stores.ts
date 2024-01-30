@@ -7,35 +7,32 @@ import { cookies } from "next/headers";
 import { PostgrestError } from "@supabase/supabase-js";
 
 // Fetch store as type Store from store id saved in user profile
-const fetchStoreForUser = async () => {
-    
-    const user = await db.profiles.fetch.profile();
-    console.log("User in store " + user?.user_id)
-    console.log("Store ID in store " + user?.store_id)
+const fetchStoreForUser = async (): Promise<{ data: Store | null, error: PostgrestError | null }> => {
+    const { data: userProfile, error: userError } = await db.profiles.fetch.profile();
 
-    if (!user) {
-        console.error("User not found");
-        return;
+    if (userError) {
+        console.error("Error fetching user profile: ", userError);
+        return { data: null, error: userError };
     }
 
-    // fetch store from userprofile store id
-    const { data, error } = await supabase
+    if (!userProfile) {
+        console.error("User profile not found");
+        return { data: null, error: null };
+    }
+
+    const { data: storeData, error: storeError } = await supabase
         .from('stores')
         .select('*')
-        .eq('store_id', user.store_id);
-    if (error) {
-        console.error("Error fetching store: ", error);
-        return;
+        .eq('store_id', userProfile.store_id)
+        .single();
+
+    if (storeError) {
+        console.error("Error fetching store: ", storeError);
+        return { data: null, error: storeError };
     }
 
-    if (!data) {
-        return null;
-    }
-
-    // Set store as data
-    const store = data[0] as Store;
-    return store;
-}
+    return { data: storeData ?? null, error: null };
+};
 
 const createStore = async (store: Store): Promise<{ data: Store | null, error: PostgrestError | null }> => {
     const { data, error } = await supabase
