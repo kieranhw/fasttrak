@@ -19,7 +19,7 @@ import { Loader2 } from "lucide-react";
 
 interface VehicleFormProps {
     onSubmit: (values: z.infer<typeof VehicleSchema>) => void;
-    submitting?: boolean;
+    submitting: boolean;
     vehicle?: Vehicle;
 }
 

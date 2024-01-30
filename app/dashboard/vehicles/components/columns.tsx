@@ -33,6 +33,7 @@ import { supabase } from "@/lib/supabase/client"
 import { z } from "zod"
 import { UUID } from "crypto"
 import { db } from "@/lib/db/db"
+import { VehicleDialogContent } from "./vehicle-dialog-content"
 
 export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
     {
@@ -71,27 +72,30 @@ export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
             const vehicle = row.original
             const [editDialogOpen, setEditDialogOpen] = useState(false)
             const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
+            const [submitting, setSubmitting] = useState(false)
 
-            async function onSubmit(values: z.infer<typeof VehicleSchema>) {
+            async function onEditSubmit(values: z.infer<typeof VehicleSchema>) {
+                setSubmitting(true)
+                //TODO : update vehicle instead of create new
+                const { data, error } = await db.vehicles.update.byId(
+                    vehicle.vehicle_id,
+                {
+                    registration: values.registration,
+                    manufacturer: values.manufacturer,
+                    model: values.model,
+                    manufacture_year: values.manufacture_year,
+                    status: "Available",
+                    max_load: values.max_load,
+                    max_volume: values.max_volume,
+                });
 
-                const { error } = await supabase
-                    .from('vehicles')
-                    .update({
-                        registration: values.registration,
-                        manufacturer: values.manufacturer,
-                        model: values.model,
-                        manufacture_year: values.manufacture_year,
-                        status: "Available",
-                        max_load: values.max_load,
-                        max_volume: values.max_volume,
-                    })
-                    .eq('vehicle_id', vehicle.vehicle_id)
                 if (error) {
-                    alert(error.message)
+                    alert(error.message);
                 } else {
                     refreshData();
                     setEditDialogOpen(false);
                 }
+                setSubmitting(false)
             }
 
             async function onRemoveVehicle(id: UUID) {
@@ -129,16 +133,15 @@ export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
                                     Edit Information
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Edit Vehicle Information</DialogTitle>
-                                    <DialogDescription>
-                                        Make your changes and click 'save' to update the details.
-                                    </DialogDescription>
-                                    <VehicleForm vehicle={vehicle} onSubmit={onSubmit} />
-                                </DialogHeader>
-
-                            </DialogContent>
+                            <VehicleDialogContent
+                                vehicle={vehicle}
+                                open={editDialogOpen}
+                                onOpenChange={setEditDialogOpen}
+                                onSubmit={onEditSubmit}
+                                dialogTitle="Edit Vehicle Information"
+                                dialogDescription="Make your changes and click 'save' to update the details."
+                                submitting={submitting}
+                            />
                         </Dialog>
                         <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
                             <AlertDialogTrigger asChild>

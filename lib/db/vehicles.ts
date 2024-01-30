@@ -100,14 +100,36 @@ export const createVehicle = async (vehicleData: Partial<Vehicle>): Promise<{ da
     }
 };
 
+const updateVehicleById = async (vehicleId: UUID, vehicleData: Partial<Vehicle>): Promise<{ data: Vehicle | null, error: Error | null }> => {
+    try {
+        const { data, error } = await supabase
+            .from('vehicles')
+            .update(vehicleData)
+            .eq('vehicle_id', vehicleId)
+            .single();
+
+        if (error) throw new Error(`Error updating vehicle: ${error.message}`);
+
+        return { data, error: null };
+    } catch (error) {
+        console.error("Error in updateVehicleById:", error);
+        return { data: null, error: error as Error };
+    }
+};
+
+
 
 export const vehicles = {
+    create: createVehicle,
     fetch: {
         all: fetchVehicles,
         byId: fetchVehicleById,
     },
+    update: {
+        byId: updateVehicleById,
+    },
     delete: {
         byId: deleteVehicleById,
     },
-    create: createVehicle,
+    
 };

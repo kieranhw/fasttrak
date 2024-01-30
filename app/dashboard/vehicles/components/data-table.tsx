@@ -46,6 +46,7 @@ import { VehicleForm } from "./add-vehicle-form/vehicle-form";
 import { VehicleSchema } from "./add-vehicle-form/vehicle-schema";
 import { supabase } from "@/lib/supabase/client";
 import { db } from "@/lib/db/db"
+import { VehicleDialogContent } from "./vehicle-dialog-content"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -126,15 +127,14 @@ export function DataTable<TData, TValue>({
               Add Vehicle
             </Button>
           </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>New Vehicle</DialogTitle>
-              <DialogDescription>
-                Add a new vehicle to your fleet.
-              </DialogDescription>
-              <VehicleForm onSubmit={onSubmit} submitting={submitting} />
-            </DialogHeader>
-          </DialogContent>
+          <VehicleDialogContent
+            open={open}
+            onOpenChange={setOpen}
+            onSubmit={onSubmit}
+            dialogTitle="New Vehicle"
+            dialogDescription="Enter your information and click 'save' to create a new vehicle."
+            submitting={submitting}
+          />
         </Dialog>
       </div>
 
