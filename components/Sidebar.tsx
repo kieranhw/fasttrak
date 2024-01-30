@@ -89,10 +89,10 @@ export default function Sidebar() {
                         <p>Vehicles</p>
                     </div>
                 </Link>
-                <Link draggable="false" href="/dashboard/depot">
-                    <div className={`${buttonStyle} ${isActive("/dashboard/depot") ? activeButton : ''}`}>
+                <Link draggable="false" href="/dashboard/store">
+                    <div className={`${buttonStyle} ${isActive("/dashboard/store") ? activeButton : ''}`}>
                         <FaWarehouse />
-                        <p>Depot</p>
+                        <p>Store</p>
                     </div>
                 </Link>
                 <Link draggable="false" href="/dashboard/reports">
