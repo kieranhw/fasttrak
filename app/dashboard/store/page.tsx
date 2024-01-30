@@ -54,11 +54,14 @@ export default function Depot() {
       </div>
 
 
-      {store &&
+      {store && !loading &&
         <StoreForm store={store} onStoreUpdate={handleStoreUpdate} />
       }
+      {loading &&
+        <StoreForm store={null} onStoreUpdate={handleStoreUpdate} />
+      }
 
-      {!store &&
+      {!store && !loading &&
         <div className="my-2 border p-8 rounded-lg gap-4 flex flex-col bg-background">
           <div>
             <h3 className="text-foreground font-bold text-2xl">Create Store</h3>

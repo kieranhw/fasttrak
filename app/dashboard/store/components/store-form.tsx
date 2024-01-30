@@ -94,16 +94,15 @@ export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate }) =>
     }, [watchedFormValues, store]);
 
 
-    // Fetch store and set fields
+    // Set form fields
     useEffect(() => {
-        async function setStore() {
-            const store = await db.stores.fetch.forUser();
+        async function setFields() {
             if (store?.store_id) {
                 form.setValue("name", store.store_name);
                 form.setValue("passcode", store.invite_code);
             }
         }
-        setStore();
+        setFields();
     }, [store])
 
     async function onSubmit(data: StoreFormValues) {
@@ -165,7 +164,16 @@ export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate }) =>
                                 <FormItem>
                                     <FormLabel>Store Name</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Store" {...field} />
+                                        <>
+                                            {store === null &&
+                                                <div className="flex justify-start border items-center p-2 px-3 h-10 text-start text-sm text-muted-foreground rounded-md flex-grow gap-2">
+                                                    <Loader2 size={16} className="animate-spin" /> Loading...
+                                                </div>
+                                            }
+                                            {store != null &&
+                                                <Input placeholder="Store" {...field} />
+                                            }
+                                        </>
                                     </FormControl>
                                     <FormDescription>
                                         This is the name of your organisation.
@@ -182,7 +190,14 @@ export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate }) =>
                                     <FormLabel>Invite Code</FormLabel>
                                     <FormControl>
                                         <div className="flex gap-2">
-                                            <div className="flex justify-start border items-center p-2 px-3 h-10 text-start text-sm text-muted-foreground rounded-lg flex-grow">{field.value}</div>
+                                            {store === null &&
+                                                <div className="flex justify-start border items-center p-2 px-3 h-10 text-start text-sm text-muted-foreground rounded-md flex-grow gap-2">
+                                                    <Loader2 size={16} className="animate-spin" /> Loading...
+                                                </div>
+                                            }
+                                            {store != null &&
+                                                <div className="flex justify-start border items-center p-2 px-3 h-10 text-start text-sm text-muted-foreground rounded-md flex-grow">{field.value}</div>
+                                            }
                                             <Button
                                                 type="button"
                                                 variant="secondary"
