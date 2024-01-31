@@ -53,30 +53,29 @@ export default function ScheduleDeliveries() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    // Check if a valid date is in the URL
     const dateString = searchParams?.get('date');
-
-    // Check if dateString is a valid date
     if (dateString && dateString.length === 8) {
       const day = dateString.slice(0, 2);
       const month = dateString.slice(2, 4);
       const year = dateString.slice(4, 8);
-
-      // Construct date object 
-      const newDate = new Date(`${year}-${month}-${day}`)
-
-      // Check newDate is a valid date and within limit
-      if (isNaN(newDate.valueOf()) || !isDateWithinLimit(newDate)) {
+      const newDate = new Date(`${year}-${month}-${day}`);
+  
+      if (!isNaN(newDate.valueOf()) && isDateWithinLimit(newDate)) {
+        // Only call handleDateChange if the new date is different from the current date
+        if (!date || newDate.toDateString() !== date.toDateString()) {
+          handleDateChange(newDate);
+        }
+      } else {
         handleDateChange(new Date());
-        return;
       }
-      handleDateChange(newDate);
     } else {
       handleDateChange(new Date());
     }
   }, [searchParams]);
+  
 
   const handleDateChange = (selectedDate: number | SetStateAction<Date>) => {
+    console.log("date called")
     if (selectedDate instanceof Date) {
       setDate(selectedDate);
       console.log("date set:", selectedDate)
