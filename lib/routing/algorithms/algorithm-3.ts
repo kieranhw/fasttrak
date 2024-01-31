@@ -61,6 +61,8 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
         // Get the cluster queue for the current vehicle
         const clusterQueue = clusterPriorityQueues[index];
 
+        // TODO: Order the cluster queues from largest size to smallest size, assign to vehicles in same order
+
         // Create a new route for the vehicle cluster
         const route = new VehicleRoute(vehicle, graph.depot as Node);
 
@@ -99,12 +101,6 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
             route.updateTotalTime(deliveryTime);
         }
 
-        // Find the shortest path through the route and addroute to solution
-        const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
-
-        // Overwrite the route nodes with the shortest path
-        route.nodes = shortestPath;
-        //route.updateTotalTime(profile);
 
         solution.addRoute(route);
     }
