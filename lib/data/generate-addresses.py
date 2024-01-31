@@ -54,13 +54,13 @@ def save_to_js(addresses, filename):
 
 def main():
     # Define the area boundaries as a polygon
-    bottom_left = (53.378064, -2.966178)
-    bottom_right = (53.382797, -2.908117)
-    top_right = (53.421585, -2.947838)
-    top_left = (53.412230, -2.996143)
+    bottom_left = (53.362982, -2.922504) # Aigburth
+    bottom_right = (53.388978, -2.854104) # Belle Vale
+    top_right = (53.447261, -2.920163) # Norris Green
+    top_left = (53.444805, -3.000404) # Bootle
 
     # Number of points to generate, corresponds to the density of the grid
-    num_points = 150
+    num_points = 300
 
     # Grid coordinates
     lat_min = min(bottom_left[0], bottom_right[0])
@@ -85,7 +85,7 @@ def main():
                 })
                 
         # Save to JS file
-        save_to_js(address_data, f"lib/data/liverpool-addresses-{dataset_name}.js")
+        save_to_js(address_data, f"lib/data/2liverpool-addresses-{dataset_name}.js")
 
 if __name__ == "__main__":
     main()

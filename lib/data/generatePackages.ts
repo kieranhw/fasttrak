@@ -5,12 +5,12 @@ import { UUID } from "crypto"
 import { faker } from '@faker-js/faker';
 import { generateFT } from "@/lib/utils/generate-ids";
 import { db } from "@/lib/db/db";
-import { addressData } from "./liverpool-addresses-even";
-
+import { addressData as evenAddresses } from "./liverpool-addresses-even";
+import { addressData as randomAddresses } from "./liverpool-addresses-random";
 
 export const generatePackages = async (numPackages: number): Promise<Package[]> => {
     const packages: Package[] = [];
-    const addresses: { address: string, lat: number, lng: number }[] = addressData;
+    const addresses: { address: string, lat: number, lng: number }[] = evenAddresses;
 
     for (let i = 0; i < numPackages; i++) {
         const priorities: PriorityType[] = ["Express", "Standard"];
