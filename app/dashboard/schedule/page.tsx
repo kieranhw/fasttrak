@@ -115,7 +115,7 @@ export default function ScheduleDeliveries() {
   const [deliverySchedules, setDeliverySchedules] = useState<DeliverySchedule[]>([]);
   const [reload, setReload] = useState(false);
   const [isScheduledToday, setIsScheduledToday] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isScheduleLoading, setIsScheduleLoading] = useState(true);
   const [isScheduling, setIsScheduling] = useState(false);
   const [graph, setGraph] = useState<any>(null);
   const [solution, setSolution] = useState<any>(null);
@@ -131,7 +131,7 @@ export default function ScheduleDeliveries() {
         return
       }
 
-      setIsLoading(true); // Set loading to true when starting to fetch data
+      setIsScheduleLoading(true); // Set loading to true when starting to fetch data
       setInProgress(false); // Set default to false
       setScheduleComplete(true); // Set default to true
 
@@ -163,7 +163,7 @@ export default function ScheduleDeliveries() {
         setDeliverySchedules([]);
         setIsScheduledToday(false);
       }
-      setIsLoading(false); // Set loading to false after fetching data
+      setIsScheduleLoading(false); // Set loading to false after fetching data
     }
 
     fetchData();
@@ -188,7 +188,7 @@ export default function ScheduleDeliveries() {
   // Schedule
   async function handleScheduleDelivery(profile: ScheduleProfile) {
     if (!date) return; // Return early if date is null
-    setIsLoading(true);
+    setIsScheduleLoading(true);
     setIsScheduling(true);
 
     let vehicles = profile.selected_vehicles;
@@ -259,7 +259,7 @@ export default function ScheduleDeliveries() {
       }
     }
     refreshData();
-    setIsLoading(false);
+    setIsScheduleLoading(false);
     setIsScheduling(false);
   }
 
@@ -379,7 +379,7 @@ export default function ScheduleDeliveries() {
                 <TooltipTrigger asChild>
                   <div>
                     <Button variant="outline"
-                      disabled={!(scheduleComplete == true && isScheduledToday == true) || isLoading == true}
+                      disabled={!(scheduleComplete == true && isScheduledToday == true) || isScheduleLoading == true}
                       onClick={e => handleScheduleAnalysis()}
                     >
                       Analysis
@@ -403,7 +403,7 @@ export default function ScheduleDeliveries() {
                 <TooltipTrigger asChild>
                   <div>
                     <Button variant="outline"
-                      disabled={isLoading == true || isScheduledToday == false || date! < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date! < new Date("1900-01-01") || inProgress === true}
+                      disabled={isScheduleLoading == true || isScheduledToday == false || date! < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date! < new Date("1900-01-01") || inProgress === true}
                       onClick={e => handleDeleteSchedule()}
                     >
                       Delete
@@ -431,7 +431,7 @@ export default function ScheduleDeliveries() {
                         {isScheduling == false &&
                           <Button className="border hover:cursor-pointer"
                             onClick={e => setScheduleDialogOpen(true)}
-                            disabled={date! < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date! < new Date("1900-01-01") || isScheduledToday != false || isLoading == true}
+                            disabled={date! < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date! < new Date("1900-01-01") || isScheduledToday != false || isScheduleLoading == true}
                           >
                             Schedule
                           </Button>
@@ -457,9 +457,9 @@ export default function ScheduleDeliveries() {
           </div>
         </div>
 
-        <DataTable columns={columns(refreshData)} data={deliverySchedules} isLoading={isLoading} />
+        <DataTable columns={columns(refreshData)} data={deliverySchedules} isLoading={isScheduleLoading} />
 
-        {deliverySchedules.length > 0 &&
+        {!isScheduleLoading && deliverySchedules.length > 0 &&
           <div className="flex flex-col justify-between">
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
               <div>
