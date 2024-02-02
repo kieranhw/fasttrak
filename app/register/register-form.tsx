@@ -87,7 +87,7 @@ const RegisterForm = ({ onRegister, message, email: initialEmail }: RegisterForm
                         <Input
                             type="text"
                             value={firstName}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => setFirstName(e.target.value)}
                             placeholder="John"
                             required
                             className="rounded-md px-4 py-2 bg-inherit border"
@@ -98,8 +98,8 @@ const RegisterForm = ({ onRegister, message, email: initialEmail }: RegisterForm
                         <Label className="">Last Name</Label>
                         <Input
                             type="text"
-                            value={firstName}
-                            onChange={(e) => setPassword(e.target.value)}
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
                             placeholder="Smith"
                             required
                             className="rounded-md px-4 py-2 bg-inherit border"
