@@ -68,11 +68,8 @@ export default function Login({
     return redirect("/login");
   }
 
-
-
-
   return (
-    <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
+    <div className="flex-1 flex flex-col w-full px-8 sm:max-w-[450px] justify-center gap-2">
 
 
       <div className="p-8 border rounded-lg drop-shadow-sm bg-gradient-to-b from-primary/25 via-card via-20% to-card">

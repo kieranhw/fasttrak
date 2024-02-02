@@ -8,7 +8,7 @@ import { PostgrestError } from "@supabase/supabase-js";
 
 // Fetch store as type Store from store id saved in user profile
 const fetchStoreForUser = async (): Promise<{ data: Store | null, error: PostgrestError | null }> => {
-    const { data: userProfile, error: userError } = await db.profiles.fetch.profile();
+    const { data: userProfile, error: userError } = await db.profiles.fetch.current();
 
     if (userError) {
         console.error("Error fetching user profile: ", userError);

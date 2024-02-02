@@ -6,7 +6,7 @@ import { UUID } from "crypto";
 
 const fetchVehicles = async (): Promise<Vehicle[] | null> => {
     try {
-        const { data: userProfile, error: userProfileError } = await db.profiles.fetch.profile();
+        const { data: userProfile, error: userProfileError } = await db.profiles.fetch.current();
 
         if (userProfileError || !userProfile || !userProfile.store_id) {
             console.error("Error fetching user profile or store_id is missing:", userProfileError);
@@ -72,7 +72,7 @@ const deleteVehicleById = async (id: UUID): Promise<boolean> => {
 
 export const createVehicle = async (vehicleData: Partial<Vehicle>): Promise<{ data: Vehicle | null, error: Error | null }> => {
     try {
-        const { data: userProfile, error: userProfileError } = await db.profiles.fetch.profile();
+        const { data: userProfile, error: userProfileError } = await db.profiles.fetch.current();
 
         if (userProfileError || !userProfile || !userProfile.store_id) {
             throw new Error("User profile not found or store_id is missing");
