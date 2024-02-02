@@ -12,6 +12,7 @@ import {
     AlertTitle,
 } from "@/components/ui/alert"
 import { Label } from '@/components/ui/label';
+import Link from 'next/link';
 
 interface LoginFormProps {
     onSignIn: (email: string, password: string) => Promise<void>;
@@ -87,8 +88,17 @@ const LoginForm = ({ onSignIn, message }: LoginFormProps) => {
                         </span>
                     </div>
                 </div>
+                <Link href="/register">
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        disabled={isLoading}
+                        className="w-full mt-2">
 
-                <Button type="submit" variant="secondary" disabled={isLoading}>Create Account</Button>
+                        Create Account
+                    </Button>
+
+                </Link>
 
 
             </form>
