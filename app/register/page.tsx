@@ -12,6 +12,9 @@ import RegisterForm from "./register-form"
 import { db } from "@/lib/db/db"
 import { useState } from "react"
 import { EmailChecker } from "./email-checker"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
+import validator from "validator"
 
 export const metadata: Metadata = {
     title: "Register",
@@ -23,26 +26,73 @@ export default function Login({
 }: {
     searchParams: { message: string };
 }) {
-    const signUp = async (email: string, password: string) => {
+    const signUp = async (email: string, password: string, confirmPassword: string, firstName: string, lastName: string) => {
         "use server";
+        console.log("Sign up called")
 
         const origin = headers().get("origin");
         const cookieStore = cookies();
         const supabase = createClient(cookieStore);
 
-        const { error } = await supabase.auth.signUp({
+        // Server side validation
+        // Check if the email is valid
+        
+        if (!validator.isEmail(email)) {
+            return redirect("/register?message=Invalid email");
+        }
+
+        // Check if the password is strong enough
+        // TODO: Implement client side
+        /*
+        if (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+            return redirect("/register?message=Weak password");
+        }
+        */
+
+        // Check if the password and confirmPassword match
+        if (password !== confirmPassword) {
+            return redirect("/register?message=Passwords do not match");
+        }
+
+        // Check if the firstName and lastName are not empty
+        if (!firstName || !lastName) {
+            return redirect("/register?message=First name and last name are required");
+        }
+    
+
+        const { data: user, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
                 emailRedirectTo: `${origin}/auth/callback`,
             },
         });
+        if (!error && user.user) {
+            console.log("Creating user")
+            console.log(firstName)
+            console.log(lastName)
+            const profileCreationResult = await db.profiles.create.byUser(user.user, firstName, lastName);
+            if (profileCreationResult.error) {
+                console.error("Error creating user profile:", profileCreationResult.error);
+            } else {
+                // log user in
+                const { error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                });
 
+                if (!error) {
+                    return redirect("/dashboard");
+                }
+            }
+        }
         if (error) {
-            return redirect("/login?message=Could not authenticate user");
+            console.log(error.message)
+            //return redirect("/login?message=Could not authenticate user");
         }
 
-        return redirect("/login?message=Check email to continue sign in process");
+        // Used for email confirmation
+        //return redirect("/login?message=Check email to continue sign in process");
     };
 
     const signOut = async () => {
@@ -59,35 +109,10 @@ export default function Login({
     return (
         <div className="flex-1 flex flex-col w-full px-8 sm:max-w-[450px] justify-center gap-2">
             <div className="p-8 border rounded-lg drop-shadow-sm bg-gradient-to-b from-primary/25 via-card via-20% to-card">
-                <Link
-                    href="/"
-                    className="absolute left-3 top-2 p-2 rounded-md no-underline text-muted-foreground hover:text-foreground transition-colors bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="mr-1 h-4 w-4 transition-transform group-hover:-translate-x-1"
-                    >
-                        <polyline points="15 18 9 12 15 6" />
-                    </svg>{" "}
-                    Back
-                </Link>
-                <div className="h-[80px] flex justify-center items-center">
-                    <div className="h-12 w-12 border rounded-lg drop-shadow-sm bg-card flex justify-center items-center font-bold text-2xl text-primary">
-                        <i>FT</i>
-                    </div>
-                </div>
-                <div className="flex w-full flex-col justify-center space-y-6">
 
+                <div className="flex w-full flex-col justify-center space-y-6">
                     <div>
-                        <EmailChecker signUp={signUp} />
+                        <EmailChecker signUp={signUp} errorMsg={searchParams.message} />
                     </div>
                 </div>
             </div>
