@@ -191,7 +191,7 @@ const RegisterForm = ({ onRegister, errorMsg, email: initialEmail, setEmailCheck
                         />
                     </div>
                     <p className="text-xs text-muted-foreground">
-                        Password must be a minimum of 8 characters with at least one special character.
+                        Passwords must match and be a minimum of 8 characters with at least one special character.
                     </p>
                     {!isLoading &&
                         <Button type="submit" disabled={isLoading || email == "" || password == "" || !passwordValid}>Next</Button>
