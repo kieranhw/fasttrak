@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import validator from 'validator';
+import { StageIndicators } from '@/components/ui/stage-indicator';
 
 interface RegisterFormProps {
     onRegister: (email: string, password: string, confirmPassword: string, firstName: string, lastName: string) => Promise<void>;
@@ -35,7 +36,7 @@ const RegisterForm = ({ onRegister, errorMsg, email: initialEmail, setEmailCheck
 
     // Decide on which error message to display, prioritising server errors first   
     const errorMessage = errorMsg || error;
-   
+
     // Password contains at least 8 characters, matches confirm password and one special character
     const passwordValid = password === confirmPassword && password.length >= 8 && /[^A-Za-z0-9]/.test(password);
 
@@ -126,21 +127,8 @@ const RegisterForm = ({ onRegister, errorMsg, email: initialEmail, setEmailCheck
                     </p>
                 }
 
-                <div className="px-28 h-2 mt-4 flex justify-center gap-2">
-                    {stage === 1 &&
-                        <>
-                            <div className="border border-primary rounded-lg bg-primary h-2 w-2">
-                            </div>
-                            <div className="border rounded-lg bg-card h-2 w-2"></div>
-                        </>
-                    }
-                    {stage === 2 &&
-                        <>
-                            <div className="border rounded-lg bg-card h-2 w-2"></div>
-                            <div className="border border-primary rounded-lg bg-primary h-2 w-2"></div>
-                        </>
-                    }
-                </div>
+                <StageIndicators currentStage={stage} totalStages={2} />
+
             </div>
             {errorMessage && stage === 2 &&
                 <Alert variant="destructive" className="mb-4">
