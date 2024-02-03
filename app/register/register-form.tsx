@@ -64,12 +64,13 @@ const RegisterForm = ({ onRegister, errorMsg, email: initialEmail, setEmailCheck
         setIsLoading(true);
 
         if (stage === 1 && validateFirstStage()) {
+            setError('')
             setStage(2); // Move to next stage only if first stage validates
         } else if (stage === 2 && validateSecondStage()) {
+            setError('')
             await onRegister(email, password, confirmPassword, firstName, lastName);
             return;
         }
-        setError('');
         setIsLoading(false);
     };
 
