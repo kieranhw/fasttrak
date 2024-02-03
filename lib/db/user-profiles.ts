@@ -53,17 +53,17 @@ const fetchUserProfileByEmail = async (email: string): Promise<{ data: UserProfi
         const { data, error } = await supabase
             .from('user_profiles')
             .select('*')
-            .eq('email', email) // Directly query the email column
-            .single();
+            .eq('email', email)
+            .maybeSingle();
 
         if (error || !data) {
-            console.error("Error fetching user profile by email or not found: ", error);
+            //console.error("Error fetching user profile by email or not found: ", error);
             return { data: null, error, found: false };
         }
 
         return { data, error: null, found: true };
     } catch (error) {
-        console.error("Error fetching user profile by email: ", error);
+        //console.error("Error fetching user profile by email: ", error);
         return { data: null, error: error as PostgrestError, found: false };
     }
 };
