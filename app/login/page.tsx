@@ -91,7 +91,7 @@ export default function Login({
           >
             <polyline points="15 18 9 12 15 6" />
           </svg>{" "}
-          Back
+          Home
         </Link>
         <div className="h-[80px] flex justify-center items-center">
           <div className="h-12 w-12 border rounded-lg drop-shadow-sm bg-card flex justify-center items-center font-bold text-2xl text-primary">

@@ -35,11 +35,12 @@ export default function Login({
         const supabase = createClient(cookieStore);
 
         // Server side validation
+
         // Check if the email is valid
-        
         if (!validator.isEmail(email)) {
-            return redirect("/register?message=Invalid email");
+            return redirect("/register?message=Email format is invalid");
         }
+
 
         // Check if the password is strong enough
         // TODO: Implement client side
@@ -58,7 +59,7 @@ export default function Login({
         if (!firstName || !lastName) {
             return redirect("/register?message=First name and last name are required");
         }
-    
+
 
         const { data: user, error } = await supabase.auth.signUp({
             email,
@@ -95,6 +96,13 @@ export default function Login({
         //return redirect("/login?message=Check email to continue sign in process");
     };
 
+    const validateEmail = async (email: string): Promise<Boolean> => {
+        "use server";
+        if (!validator.isEmail(email)) return false
+
+        return true
+    }
+
     const signOut = async () => {
         "use server";
 
@@ -112,7 +120,7 @@ export default function Login({
 
                 <div className="flex w-full flex-col justify-center space-y-6">
                     <div>
-                        <EmailChecker signUp={signUp} errorMsg={searchParams.message} />
+                        <EmailChecker validateEmail={validateEmail} signUp={signUp} errorMsg={searchParams.message} />
                     </div>
                 </div>
             </div>

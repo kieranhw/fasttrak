@@ -7,14 +7,15 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 
 interface EmailCheckerProps {
     signUp: (email: string, password: string, confirmPassword: string, firstName: string, lastName: string) => Promise<void>;
     errorMsg: string;
+    validateEmail: (email: string) => Promise<Boolean>;
 }
 
-export const EmailChecker = ({ signUp, errorMsg }: EmailCheckerProps) => {
+export const EmailChecker = ({ signUp, errorMsg, validateEmail }: EmailCheckerProps) => {
     const [email, setEmail] = useState('');
     const [emailChecked, setEmailChecked] = useState(false);
     const [emailExists, setEmailExists] = useState(false);
@@ -23,25 +24,34 @@ export const EmailChecker = ({ signUp, errorMsg }: EmailCheckerProps) => {
 
     const checkEmailExists = async (email: string) => {
         setIsLoading(true);
-        // Simulate checking email existence, adjust with actual API call
         try {
-            const { found } = await db.profiles.fetch.profile.byEmail(email); // Adjust based on actual API
+            const { found } = await db.profiles.fetch.profile.byEmail(email);
             setIsLoading(false);
             setEmailExists(found);
             if (!found) {
-                setEmailChecked(true);
+                const valid = await validateEmail(email);
+                if (valid) {
+                    setEmailChecked(true);
+                    setError('');
+                } else {
+                    setError("Email format is invalid");
+                }
+
             } else {
-                setError("Email already exists."); // Adjust error handling as needed
+                setError("Email already exists");
             }
         } catch (err) {
-            setError("Failed to check the email.");
-            setIsLoading(false);
+            setError("Failed to check the email");
         }
+        setIsLoading(false);
     };
 
     if (emailChecked && !emailExists) {
         return <RegisterForm setEmailChecked={setEmailChecked} onRegister={signUp} email={email} errorMsg={errorMsg} />;
     }
+
+    // Decide on which error message to display, prioritising server errors first
+    const errorMessage = errorMsg || error;
 
     return (
         <>
@@ -80,12 +90,12 @@ export const EmailChecker = ({ signUp, errorMsg }: EmailCheckerProps) => {
             </div>
 
             <div className="flex flex-col gap-4">
-                {error &&
+                {errorMessage &&
                     <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
                         <AlertTitle>Error</AlertTitle>
                         <AlertDescription>
-                            {error}
+                            {errorMessage}
                         </AlertDescription>
                     </Alert>
                 }
@@ -96,9 +106,14 @@ export const EmailChecker = ({ signUp, errorMsg }: EmailCheckerProps) => {
                     placeholder="Enter your email"
                     disabled={isLoading}
                 />
-                <Button onClick={() => checkEmailExists(email)} disabled={isLoading || !email}>
-                    Submit
-                </Button>
+                {!isLoading &&
+                    <Button type="submit" onClick={() => checkEmailExists(email)} disabled={isLoading || !email}>Register</Button>
+                }
+                {isLoading &&
+                    <Button type="button" disabled={true}>
+                        <div className="flex gap-2 items-center"><Loader2 size={16} className="animate-spin" /> Loading...</div>
+                    </Button>
+                }
                 <div className="relative mt-2">
                     <div className="absolute inset-0 flex items-center">
                         <span className="w-full border-t" />

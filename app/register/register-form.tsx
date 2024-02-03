@@ -14,6 +14,7 @@ import {
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import validator from 'validator';
 
 interface RegisterFormProps {
     onRegister: (email: string, password: string, confirmPassword: string, firstName: string, lastName: string) => Promise<void>;
@@ -30,33 +31,45 @@ const RegisterForm = ({ onRegister, errorMsg, email: initialEmail, setEmailCheck
     const [lastName, setLastName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [stage, setStage] = useState(1);
+    const [error, setError] = useState('');
+
+    // Decide on which error message to display, prioritising server errors first   
+    const errorMessage = errorMsg || error;
 
     const submitFirstStage = async (e: FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        // Validate email, password
-
-        // Wait 2 sec
-
         setStage(2)
-
-
         setIsLoading(false);
     };
 
     const submitSecondStage = async (e: FormEvent) => {
         e.preventDefault();
+        if (!validator.isAlpha(firstName) && !validator.isAlpha(lastName)) {
+            setError("First and last name format is invalid")
+            return
+        } else if (!validator.isAlpha(firstName)) {
+            setError("First name format is invalid")
+            return
+        } else if (!validator.isAlpha(lastName)) {
+            setError("Last name format is invalid")
+            return
+        }
+
         handleSignUp();
     }
 
+
     const handleSignUp = async () => {
         setIsLoading(true);
+
         await onRegister(email, password, confirmPassword, firstName, lastName);
-        setIsLoading(false);
     }
 
     const handleBackPressed = async (e: any) => {
         e.preventDefault()
+        if (isLoading) return
+
         if (stage === 1) {
             setStage(1)
             setEmailChecked(false)
@@ -64,6 +77,9 @@ const RegisterForm = ({ onRegister, errorMsg, email: initialEmail, setEmailCheck
             setStage(1)
         }
     }
+
+    // Password contains at least 8 characters, matches confirm password and one special character
+    const passwordValid = password === confirmPassword && password.length >= 8 && /[^A-Za-z0-9]/.test(password);
 
     return (
         <>
@@ -97,9 +113,17 @@ const RegisterForm = ({ onRegister, errorMsg, email: initialEmail, setEmailCheck
                 <h1 className="text-2xl font-semibold tracking-normal">
                     Create Account
                 </h1>
-                <p className="text-sm text-muted-foreground">
-                    Please enter your account information.
-                </p>
+                {stage === 1 &&
+                    <p className="text-sm text-muted-foreground">
+                        Please enter your account information
+                    </p>
+                }
+                {stage === 2 &&
+                    <p className="text-sm text-muted-foreground">
+                        Please enter your personal information
+                    </p>
+                }
+
                 <div className="px-28 h-2 mt-4 flex justify-center gap-2">
                     {stage === 1 &&
                         <>
@@ -116,12 +140,12 @@ const RegisterForm = ({ onRegister, errorMsg, email: initialEmail, setEmailCheck
                     }
                 </div>
             </div>
-            {errorMsg &&
+            {errorMessage && stage === 2 &&
                 <Alert variant="destructive" className="mb-4">
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Error</AlertTitle>
                     <AlertDescription>
-                        {errorMsg}.
+                        {errorMessage}.
                     </AlertDescription>
                 </Alert>
             }
@@ -164,14 +188,18 @@ const RegisterForm = ({ onRegister, errorMsg, email: initialEmail, setEmailCheck
                             disabled={isLoading}
                         />
                     </div>
+                    <p className="text-xs text-muted-foreground">
+                        Password must be a minimum of 8 characters with at least one special character.
+                    </p>
                     {!isLoading &&
-                        <Button type="submit" disabled={isLoading || email == "" || password == "" || password != confirmPassword}>Next</Button>
+                        <Button type="submit" disabled={isLoading || email == "" || password == "" || !passwordValid}>Next</Button>
                     }
                     {isLoading &&
                         <Button type="button" disabled={isLoading || email == "" || password == ""}>
                             <div className="flex gap-2 items-center"><Loader2 size={16} className="animate-spin" /> Loading...</div>
                         </Button>
                     }
+
                 </form>
 
 
@@ -206,7 +234,7 @@ const RegisterForm = ({ onRegister, errorMsg, email: initialEmail, setEmailCheck
                         </div>
                     </div>
                     {!isLoading &&
-                        <Button type="submit" disabled={isLoading || email == "" || password == "" || password != confirmPassword || !firstName || !lastName }>Register</Button>
+                        <Button type="submit" disabled={isLoading || email == "" || password == "" || password != confirmPassword || !firstName || !lastName}>Register</Button>
                     }
                     {isLoading &&
                         <Button type="submit" disabled={isLoading || email == "" || password == ""}>
