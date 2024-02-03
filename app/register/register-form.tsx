@@ -35,16 +35,15 @@ const RegisterForm = ({ onRegister, errorMsg, email: initialEmail, setEmailCheck
 
     // Decide on which error message to display, prioritising server errors first   
     const errorMessage = errorMsg || error;
+   
+    // Password contains at least 8 characters, matches confirm password and one special character
+    const passwordValid = password === confirmPassword && password.length >= 8 && /[^A-Za-z0-9]/.test(password);
 
-    const submitFirstStage = async (e: FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setStage(2)
-        setIsLoading(false);
+    const validateFirstStage = () => {
+        return password.length >= 8 && validator.equals(password, confirmPassword) && validator.matches(password, /[^A-Za-z0-9]/);
     };
 
-    const submitSecondStage = async (e: FormEvent) => {
-        e.preventDefault();
+    const validateSecondStage = () => {
         if (!validator.isAlpha(firstName) && !validator.isAlpha(lastName)) {
             setError("First and last name format is invalid")
             return
@@ -56,36 +55,39 @@ const RegisterForm = ({ onRegister, errorMsg, email: initialEmail, setEmailCheck
             return
         }
 
-        handleSignUp();
-    }
+        return validator.isAlpha(firstName) && validator.isAlpha(lastName);
+    };
 
-
-    const handleSignUp = async () => {
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
         setIsLoading(true);
 
-        await onRegister(email, password, confirmPassword, firstName, lastName);
-    }
-
-    const handleBackPressed = async (e: any) => {
-        e.preventDefault()
-        if (isLoading) return
-
-        if (stage === 1) {
-            setStage(1)
-            setEmailChecked(false)
-        } else if (stage === 2) {
-            setStage(1)
+        if (stage === 1 && validateFirstStage()) {
+            setStage(2); // Move to next stage only if first stage validates
+        } else if (stage === 2 && validateSecondStage()) {
+            await onRegister(email, password, confirmPassword, firstName, lastName);
+            return;
         }
-    }
+        setError('');
+        setIsLoading(false);
+    };
 
-    // Password contains at least 8 characters, matches confirm password and one special character
-    const passwordValid = password === confirmPassword && password.length >= 8 && /[^A-Za-z0-9]/.test(password);
+    const handleBackClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault();
+        if (isLoading) return;
+
+        if (stage > 1) {
+            setStage(stage - 1);
+        } else {
+            setEmailChecked(false);
+        }
+    };
 
     return (
         <>
             <Link
                 href="/register"
-                onClick={e => handleBackPressed(e)}
+                onClick={e => handleBackClick(e)}
                 className="absolute left-3 top-2 p-2 rounded-md no-underline text-muted-foreground hover:text-foreground transition-colors bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm"
             >
                 <svg
@@ -150,7 +152,7 @@ const RegisterForm = ({ onRegister, errorMsg, email: initialEmail, setEmailCheck
                 </Alert>
             }
             {stage === 1 &&
-                <form onSubmit={submitFirstStage} className="flex flex-col gap-y-4">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-y-4">
                     <div className="space-y-1">
                         <Label className="">Email</Label>
                         <Input
@@ -205,7 +207,7 @@ const RegisterForm = ({ onRegister, errorMsg, email: initialEmail, setEmailCheck
 
             }
             {stage === 2 &&
-                <form onSubmit={submitSecondStage} className="flex flex-col gap-y-4">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-y-4">
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">

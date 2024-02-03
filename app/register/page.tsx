@@ -36,30 +36,23 @@ export default function Login({
 
         // Server side validation
 
+        // Minimum 8 characters, include one special character
+        const passwordValid = password.length >= 8 && /[^A-Za-z0-9]/.test(password);
+
         // Check if the email is valid
-        if (!validator.isEmail(email)) {
-            return redirect("/register?message=Email format is invalid");
-        }
+        if (!validator.isEmail(email)) return redirect("/register?message=Email format is invalid");
 
+        // Check password requirements
+        if (!passwordValid) return redirect("/register?message=Password is weak");
 
-        // Check if the password is strong enough
-        // TODO: Implement client side
-        /*
-        if (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
-            return redirect("/register?message=Weak password");
-        }
-        */
+        // Check password matches
+        if (password !== confirmPassword) return redirect("/register?message=Passwords do not match");
 
-        // Check if the password and confirmPassword match
-        if (password !== confirmPassword) {
-            return redirect("/register?message=Passwords do not match");
-        }
+        // Check first and last name exist
+        if (!firstName || !lastName) return redirect("/register?message=First name and last name are required");
 
-        // Check if the firstName and lastName are not empty
-        if (!firstName || !lastName) {
-            return redirect("/register?message=First name and last name are required");
-        }
-
+        // Check first and last name are valid
+        if (!validator.isAlpha(firstName) || !validator.isAlpha(lastName)) return redirect("/register?message=Name format is invalid")
 
         const { data: user, error } = await supabase.auth.signUp({
             email,
@@ -68,15 +61,17 @@ export default function Login({
                 emailRedirectTo: `${origin}/auth/callback`,
             },
         });
+
+        // Sign up to auth service success
         if (!error && user.user) {
-            console.log("Creating user")
-            console.log(firstName)
-            console.log(lastName)
+            // Create user profile from user auth
             const profileCreationResult = await db.profiles.create.byUser(user.user, firstName, lastName);
             if (profileCreationResult.error) {
                 console.error("Error creating user profile:", profileCreationResult.error);
+
+                // TODO: Remove user's auth if profile cannot be created
             } else {
-                // log user in
+                // If success, log user in and redirect to dashboard
                 const { error } = await supabase.auth.signInWithPassword({
                     email,
                     password,
@@ -87,13 +82,11 @@ export default function Login({
                 }
             }
         }
-        if (error) {
-            console.log(error.message)
-            //return redirect("/login?message=Could not authenticate user");
-        }
 
-        // Used for email confirmation
-        //return redirect("/login?message=Check email to continue sign in process");
+        // Error signing up user to auth service
+        if (error) {
+            return redirect("/register?message=Could not register user, please try again.");
+        }
     };
 
     const validateEmail = async (email: string): Promise<Boolean> => {
