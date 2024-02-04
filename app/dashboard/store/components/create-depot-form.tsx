@@ -218,6 +218,7 @@ export function CreateDepotForm() {
                                     )}
                                 />
                                 <Button variant="secondary"
+                                    type="button"
                                     className="col-span-2"
                                     disabled={isGeocodeComplete || coordinatesEntered || !canGeocode}
                                     onClick={e => handleGeocode()}>
@@ -275,7 +276,7 @@ export function CreateDepotForm() {
                 </Tabs>
 
                 <div className="flex justify-end gap-2">
-                    <Button type="button" variant="secondary" onClick={e => resetForm()}>Reset</Button>
+                    <Button type="reset" variant="secondary" onClick={e => resetForm()}>Reset</Button>
                     <Button type="submit" disabled={!fieldsComplete}>Create Depot</Button>
                 </div>
 
