@@ -12,14 +12,7 @@ import { generateFT } from "@/lib/utils/generate-ids";
 import { Button } from "@/components/ui/button";
 import { Loader } from '@googlemaps/js-api-loader';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-
-const loader = new Loader({
-  apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY!,
-  version: "weekly",
-  libraries: ["geocoding"]
-});
-
-let geocoder: google.maps.Geocoder;
+import { geocodeAddresses as geocode } from "@/lib/utils/geocoder";
 
 export default function AddPackage() {
 
@@ -57,53 +50,25 @@ export default function AddPackage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   async function onSubmit(values: z.infer<typeof PackageSchema>) {
-    console.log("submitted")
-    console.log(values)
-
-    // Swap address lines to allow better geocoding results
-    if (values.recipient_address_2) {
-      // swap address 1 and 2
-      const temp = values.recipient_address_1;
-      values.recipient_address_1 = values.recipient_address_2;
-      values.recipient_address_2 = temp;
-    }
-
-    if (values.sender_address_2) {
-      // swap address 1 and 2
-      const temp = values.sender_address_1;
-      values.sender_address_1 = values.sender_address_2;
-      values.sender_address_2 = temp;
-    }
-
-    try {
-      await loader.importLibrary("geocoding");
-      geocoder = new google.maps.Geocoder();
-    } catch (err) {
-      console.error("Error loading Google Maps API: ", err);
-      alert("Failed to initialize geocoding service");
-      // TODO: Handle error alerts in a better way
-      return;
-    }
-
+    // Extract the addresses from the form values
     const senderAddress = `${values.sender_address_1}, ${values.sender_address_2}, ${values.sender_postcode}`;
     const recipientAddress = `${values.recipient_address_1}, ${values.recipient_address_2}, ${values.recipient_postcode}`;
 
-    const [resultSender, resultRecipient] = await Promise.all([
-      geocode({ address: senderAddress }),
-      geocode({ address: recipientAddress })
-    ]);
+    try {
+      const { resultOne: resultSender, resultTwo: resultRecipient } = await geocode(senderAddress, recipientAddress);
 
-    if (!resultSender || !resultRecipient) {
-      alert("Error formatting address, please try again")
-      return;
-    } else {
-      setIsDialogOpen(true);
-      setPackageDetails(prevState => ({
-        ...prevState,
-        formData: values,
-        senderGeocode: resultSender,
-        recipientGeocode: resultRecipient,
-      }));
+      if (resultSender && resultRecipient) {
+        setIsDialogOpen(true);
+        setPackageDetails({
+          formData: values,
+          senderGeocode: resultSender,
+          recipientGeocode: resultRecipient,
+        });
+      } else {
+        alert("Error formatting address, please try again");
+      }
+    } catch (error) {
+      alert("Geocoding error. Please try again later.");
     }
   }
 
@@ -137,26 +102,6 @@ export default function AddPackage() {
       // Increment key to re-render component
       setFormKey(prevKey => prevKey + 1);
     }
-  }
-
-
-  function geocode(request: google.maps.GeocoderRequest): Promise<google.maps.GeocoderResult[]> {
-    return new Promise((resolve, reject) => {
-      if (!geocoder) {
-        console.error("Geocoder is not initialized");
-        reject(new Error("Geocoder is not initialized"));
-        return;
-      }
-
-      geocoder.geocode(request, (results, status) => {
-        if (status === google.maps.GeocoderStatus.OK && results) {
-          console.log(results);
-          resolve(results);
-        } else {
-          alert("An addres you submitted is not valid, please check details and try again.");
-        }
-      });
-    });
   }
 
   return (
