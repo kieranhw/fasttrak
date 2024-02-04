@@ -78,11 +78,9 @@ export function CreateStoreForm() {
         }
     }
 
-
     useEffect(() => {
         form.setValue("passcode", generateIC());
     }, [])
-
 
     return (
         <Form {...form}>
@@ -131,7 +129,9 @@ export function CreateStoreForm() {
                         )}
                     />
                 </div>
-                <Button type="submit">Create Store</Button>
+                <div className="flex justify-end">
+                    <Button type="submit">Create Store</Button>
+                </div>
 
             </form>
         </Form >
