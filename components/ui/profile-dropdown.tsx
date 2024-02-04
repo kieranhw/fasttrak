@@ -63,7 +63,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ signOut }) => 
             <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="h-10 w-10 text-center items-center tracking-tight rounded-full">{initials}</Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 mr-2">
+            <DropdownMenuContent className="w-40 mr-2">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
