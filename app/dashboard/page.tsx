@@ -96,7 +96,7 @@ export default function Dashboard() {
   const name = "User"
 
   return (
-    <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1600px]">
+    <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4">
 
       <div className="flex flex-col gap-4">
         <div className="">

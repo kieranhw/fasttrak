@@ -6,7 +6,7 @@ import { StoreForm } from './components/store-form';
 import { db } from '@/lib/db/db';
 import { Store } from '@/types/store';
 import { CreateStoreForm } from './components/create-store-form';
-import { CreateDepotForm } from './components/create-depot-form';
+import { CreateDepotForm } from './components/create-depot-form-single';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
@@ -35,7 +35,7 @@ export default function Depot() {
   };
 
   return (
-    <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1600px]">
+    <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1400px]">
 
       <div className="flex flex-col mb-2">
         <h3 className="text-foreground font-bold text-3xl">Store</h3>
@@ -71,15 +71,19 @@ export default function Depot() {
         </div>
       }
 
-      <div className="my-2 border p-8 rounded-lg gap-4 flex flex-col bg-background">
+      <div className="my-2 border p-8 rounded-lg gap-4 flex flex-col bg-background min-h-[300px]">
         <div>
-          <div className="flex justify-between">
-            <h2 className="text-foreground font-bold text-2xl">Depots</h2>
+          <div className="flex flex-col justify-between gap-4">
 
-          </div>
-          <div className="flex justify-between">
-            {/* no depot */}
-            <p className="text-md text-muted-foreground">You currently have no depot, create one or join existing to get started.</p>
+            <div className="flex flex-col w-full">
+              <h2 className="text-foreground font-bold text-2xl">Depot</h2>
+              <p className="text-sm text-muted-foreground">You currently have no depot, create one to get started.</p>
+            </div>
+
+            <CreateDepotForm />
+
+
+            {/* use dialog when implemented multi depots, for now just single form
 
             <Dialog>
               <DialogTrigger asChild>
@@ -95,6 +99,8 @@ export default function Depot() {
                 </DialogHeader>
               </DialogContent>
             </Dialog>
+            */}
+
           </div>
         </div>
 

@@ -193,7 +193,6 @@ const RegisterForm = ({ onRegister, errorMsg, email: initialEmail, setEmailCheck
 
                 </form>
 
-
             }
             {stage === 2 &&
                 <form onSubmit={handleSubmit} className="flex flex-col gap-y-4">

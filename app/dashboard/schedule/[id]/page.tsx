@@ -95,7 +95,7 @@ export default function ScheduleDetails() {
 
     return (
         <TooltipProvider delayDuration={100}>
-            <div className="flex flex-col w-full justify-start gap-4 mx-auto p-4 max-w-[1600px]">
+            <div className="flex flex-col w-full justify-start gap-4 mx-auto p-4 max-w-[1400px]">
                 <div className="justify-start inline-flex">
                     <BreadcrumbLink text="Schedule" />
                     <BreadcrumbLink href={`/dashboard/schedule?date=${formatDateUrl(deliverySchedule?.delivery_date!)}`} text={formatDate(deliverySchedule?.delivery_date!)} />

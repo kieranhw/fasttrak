@@ -302,7 +302,7 @@ export default function ScheduleDeliveries() {
 
   return (
     <TooltipProvider delayDuration={100}>
-      <div className="flex flex-col w-full justify-start gap-4 mx-auto p-4 max-w-[1600px]">
+      <div className="flex flex-col w-full justify-start gap-4 mx-auto p-4 max-w-[1400px]">
         <h1 className="text-foreground font-bold text-3xl">Delivery Schedule</h1>
 
         <div className="flex items-center justify-between">

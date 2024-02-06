@@ -29,7 +29,7 @@ export default function ManagePackage() {
   const refreshData = () => setReload(prev => !prev);
 
   return (
-    <div className="flex flex-col w-full justify-start gap-4 mx-auto p-4 max-w-[1600px]">
+    <div className="flex flex-col w-full justify-start gap-4 mx-auto p-4 max-w-[1400px]">
       <div className="inline-flex justify-between">
         <h1 className="text-foreground font-bold text-3xl">History</h1>
       </div>
