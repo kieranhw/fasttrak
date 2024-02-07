@@ -32,9 +32,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { db } from "@/lib/db/db"
 import { Store } from "@/types/store"
 import { PostgrestError } from "@supabase/supabase-js"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { generateIC } from "@/lib/utils/generate-ids"
 import { storeFormSchema } from "./store-form"
+import { Loader2 } from "lucide-react"
 
 type StoreFormValues = z.infer<typeof storeFormSchema>
 
@@ -44,14 +45,21 @@ const defaultValues: Partial<StoreFormValues> = {
     passcode: "",
 }
 
-export function CreateStoreForm() {
+interface StoreFormProps {
+    refreshData: () => void;
+}
+
+export const CreateStoreForm: React.FC<StoreFormProps> = ({ refreshData }) => {
     const form = useForm<StoreFormValues>({
         resolver: zodResolver(storeFormSchema),
         defaultValues,
-        mode: "onChange",
+        mode: "onSubmit",
     })
 
+    const [isSubmitting, setIsSubmitting] = useState(false)
+
     async function onSubmit(data: StoreFormValues) {
+        setIsSubmitting(true);
         const store: Store = {
             store_name: data.name,
             invite_code: data.passcode,
@@ -60,15 +68,14 @@ export function CreateStoreForm() {
 
         try {
             const { data: createdStore, error } = await db.stores.create(store);
-            console.log(createdStore)
 
             if (error) {
                 console.log("Error occurred while creating store:", error);
                 // Handle the error case here
             } else if (createdStore && createdStore.store_id) {
                 // Here you have the created store with the UUID
-                // You can now use createdStore.store_id to update the user's profile
                 const updateResult = await db.profiles.update.store(createdStore.store_id);
+                refreshData();
             } else {
                 // Handle the case where the store was not returned
                 console.log("Store was not created.");
@@ -76,6 +83,8 @@ export function CreateStoreForm() {
         } catch (error) {
             console.error("An unexpected error occurred:", error);
         }
+
+        setIsSubmitting(false);
     }
 
     useEffect(() => {
@@ -129,8 +138,15 @@ export function CreateStoreForm() {
                         )}
                     />
                 </div>
-                <div className="flex justify-end">
-                    <Button type="submit">Create Store</Button>
+                <div className="w-full justify-end flex gap-2">
+                    {!isSubmitting &&
+                        <Button type="submit">Save Changes</Button>
+                    }
+                    {isSubmitting &&
+                        <Button type="submit" disabled={true} className="flex gap-2">
+                            <Loader2 size={16} className="animate-spin" /> Submitting
+                        </Button>
+                    }
                 </div>
 
             </form>

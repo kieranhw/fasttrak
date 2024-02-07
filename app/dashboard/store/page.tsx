@@ -6,33 +6,74 @@ import { StoreForm } from './components/store-form';
 import { db } from '@/lib/db/db';
 import { Store } from '@/types/store';
 import { CreateStoreForm } from './components/create-store-form';
-import { CreateDepotForm } from './components/create-depot-form-single';
+import { CreateDepotForm } from './components/depot-form';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
+import { Depot } from '@/types/depot';
 
-export default function Depot() {
+export default function Store() {
   const [store, setStore] = useState<Store | null>();
+  const [depot, setDepot] = useState<Depot | null>(null);
   const [loading, setLoading] = useState(true);
+  const [storeRefreshKey, setStoreRefreshKey] = useState(0);
+  const [depotRefreshKey, setDepotRefreshKey] = useState(0);
+  
 
-  // Fetch store upon page load, if store set store, else set store as null
   useEffect(() => {
-    async function fetchData() {
+    const fetchStore = async () => {
+      setLoading(true);
       const { data: store, error: storeError } = await db.stores.fetch.forUser();
       if (store) {
         setStore(store);
       } else {
+        console.error("Unable to retrieve user store.", storeError);
         setStore(null);
-        console.error("Unable to retrieve user store. " + storeError)
       }
       setLoading(false);
+    };
+  
+    fetchStore();
+  }, [storeRefreshKey]);
+  
+  useEffect(() => {
+    const fetchDepot = async () => {
+      if (!store) {
+        setDepot(null);
+        return;
+      }
+      setLoading(true);
+      const { data: depot, error: depotError } = await db.depots.fetch.forStore(store);
+      if (depot) {
+        setDepot(depot[0]); // Assuming you want the first depot
+      } else {
+        console.error("Unable to retrieve user depot.", depotError);
+        setDepot(null);
+      }
+      setLoading(false);
+    };
+  
+    if (store) {
+      fetchDepot();
     }
-    fetchData();
-  }, []);
+  }, [depotRefreshKey, store]); // Depend on store to re-fetch depot when the store changes
+
+  const refreshStore = () => {
+    setStoreRefreshKey(oldKey => oldKey + 1);
+  }
+
+  const refreshDepot = () => {
+    setDepotRefreshKey(oldKey => oldKey + 1);
+  }
 
   const handleStoreUpdate = (updatedStore: Store) => {
     setStore(updatedStore);
   };
+  
+  const handleDepotUpdate = (updatedDepot: Depot) => {
+    setDepot(updatedDepot);
+  };
+  
 
   return (
     <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1400px]">
@@ -46,10 +87,10 @@ export default function Depot() {
 
 
       {store && !loading &&
-        <StoreForm store={store} onStoreUpdate={handleStoreUpdate} />
+        <StoreForm store={store} onStoreUpdate={handleStoreUpdate} refreshData={refreshStore}/>
       }
       {loading &&
-        <StoreForm store={null} onStoreUpdate={handleStoreUpdate} />
+        <StoreForm store={null} onStoreUpdate={handleStoreUpdate} refreshData={refreshStore}/>
       }
 
       {!store && !loading &&
@@ -64,49 +105,54 @@ export default function Depot() {
               <TabsTrigger value="join">Join Existing</TabsTrigger>
             </TabsList>
             <TabsContent value="new">
-              <CreateStoreForm />
+              <CreateStoreForm refreshData={refreshStore}/>
             </TabsContent>
             <TabsContent value="join"></TabsContent>
           </Tabs>
         </div>
       }
 
-      <div className="my-2 border p-8 rounded-lg gap-4 flex flex-col bg-background min-h-[300px]">
-        <div>
-          <div className="flex flex-col justify-between gap-4">
+      {store &&
+        <div className="my-2 border p-8 rounded-lg gap-4 flex flex-col bg-background min-h-[300px]">
+          <div>
+            <div className="flex flex-col justify-between gap-4">
+              <div className="flex flex-col w-full">
+                {!depot &&
+                  <>
+                    <h2 className="text-foreground font-bold text-2xl">Create Depot</h2>
+                    <p className="text-sm text-muted-foreground">You currently have no depot, create one to get started. </p>
+                  </>
+                }
+                {depot &&
+                  <>
+                    <h2 className="text-foreground font-bold text-2xl">Depot</h2>
+                  </>
+                }
+              </div>
 
-            <div className="flex flex-col w-full">
-              <h2 className="text-foreground font-bold text-2xl">Depot</h2>
-              <p className="text-sm text-muted-foreground">You currently have no depot, create one to get started.</p>
+              {!loading && <CreateDepotForm depot={depot} onDepotUpdate={handleDepotUpdate} refreshData={refreshDepot}/>}
+              {loading && <CreateDepotForm depot={null} onDepotUpdate={handleDepotUpdate} refreshData={refreshDepot}/>}
+              {/* use dialog when implemented multi depots, for now just single form
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button type="submit">Create Depot</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Create Depot</DialogTitle>
+                      <DialogDescription>
+                        Add a new depot to your store.
+                      </DialogDescription>
+                      <CreateDepotForm />
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+                */}
             </div>
-
-            <CreateDepotForm />
-
-
-            {/* use dialog when implemented multi depots, for now just single form
-
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button type="submit">Create Depot</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create Depot</DialogTitle>
-                  <DialogDescription>
-                    Add a new depot to your store.
-                  </DialogDescription>
-                  <CreateDepotForm />
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
-            */}
-
           </div>
+
         </div>
-
-      </div>
-
-
+      }
 
     </div>
   );
