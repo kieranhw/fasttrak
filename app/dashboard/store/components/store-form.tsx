@@ -34,6 +34,19 @@ import { db } from "@/lib/db/db"
 import { generateIC } from "@/lib/utils/generate-ids"
 import { Loader2 } from "lucide-react"
 
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { GrLogout } from "react-icons/gr";
+
 export const storeFormSchema = z.object({
     name: z.string({
         required_error: "Please enter a store name.",
@@ -63,6 +76,7 @@ type StoreFormValues = z.infer<typeof storeFormSchema>
 interface StoreFormProps {
     store: Store | null;
     onStoreUpdate: (store: Store) => void;
+    refreshData: () => void;
 }
 
 // This can come from your database or API.
@@ -71,7 +85,7 @@ const defaultValues: Partial<StoreFormValues> = {
     passcode: "",
 }
 
-export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate }) => {
+export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate, refreshData }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const form = useForm<StoreFormValues>({
@@ -150,6 +164,22 @@ export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate }) =>
 
         setIsSubmitting(false);
     }
+
+    async function leaveStore() {
+        const storeName = store?.store_name;
+        const res = await db.profiles.leaveStore();
+
+        if (res.error) {
+            console.log("Error occurred while leaving store:", res.error);
+        } else {
+            refreshData();
+            toast({
+                title: "Success",
+                description: storeName ? `You have successfully left the store: ${storeName}.` : "You have successfully left the store.",
+            });
+        }
+    }
+
 
     return (
         <div className="my-2 border p-8 rounded-lg gap-4 flex flex-col bg-background">
@@ -230,27 +260,50 @@ export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate }) =>
                     </div>
 
 
-                    <div className="w-full justify-end flex gap-2">
-                        <Button type="reset" variant="secondary" disabled={!isFormChanged || isSubmitting}
-                            onClick={e => {
-                                if (store && store.store_id) {
-                                    form.setValue("name", store.store_name);
-                                    form.setValue("passcode", store.invite_code);
-                                }
-                                form.clearErrors();
-                            }}>
-                            Reset
-                        </Button>
-                        {!isSubmitting &&
-                            <Button type="submit" disabled={!isFormChanged}>Save Changes</Button>
-                        }
-                        {isSubmitting &&
-                            <Button type="submit" disabled={true} className="flex gap-2">
-                                <Loader2 size={16} className="animate-spin" /> Submitting
-                            </Button>
-                        }
-                    </div>
+                    <div className="flex justify-between">
+                        <div className="w-full justify-start flex">
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    {store && store.store_id &&
+                                        <Button type="button" variant="link" className="p-0 text-sm font-normal text-muted-foreground hover:text-destructive transition-none gap-2">Leave Store <GrLogout /></Button>
+                                    }
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This action will remove you from the store and revoke access to any store information. You may <b>not</b> be able to re-join using the same invite code.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={e => leaveStore()}>Continue</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
+                        <div className="w-full justify-end flex gap-2">
 
+                            <Button type="reset" variant="secondary" disabled={!isFormChanged || isSubmitting}
+                                onClick={e => {
+                                    if (store && store.store_id) {
+                                        form.setValue("name", store.store_name);
+                                        form.setValue("passcode", store.invite_code);
+                                    }
+                                    form.clearErrors();
+                                }}>
+                                Reset
+                            </Button>
+                            {!isSubmitting &&
+                                <Button type="submit" disabled={!isFormChanged}>Save Changes</Button>
+                            }
+                            {isSubmitting &&
+                                <Button type="submit" disabled={true} className="flex gap-2">
+                                    <Loader2 size={16} className="animate-spin" /> Submitting
+                                </Button>
+                            }
+                        </div>
+                    </div>
 
 
 

@@ -100,6 +100,28 @@ const createProfileByUser = async (user: User, firstName: string, lastName: stri
     }
 };
 
+const leaveStore = async (): Promise<{ data: UserProfile | null, error: PostgrestError | null }> => {
+    try {
+        const user = await supabase.auth.getUser();
+        const userId = user.data.user?.id;
+
+        if (!userId) {
+            console.error("User not found");
+            return { data: null, error: null };
+        }
+
+        const { data, error } = await supabase
+            .from('user_profiles')
+            .update({ store_id: null })
+            .eq('user_id', userId)
+            .single();
+
+        return { data: data ?? null, error };
+    } catch (error) {
+        console.error("Error leaving store: ", error);
+        return { data: null, error: error as PostgrestError };
+    }
+}
 
 export const profiles = {
     create: {
@@ -115,4 +137,5 @@ export const profiles = {
     update: {
         store: updateUserStore,
     },
+    leaveStore: leaveStore,
 };
