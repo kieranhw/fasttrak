@@ -18,8 +18,8 @@ export default function Store() {
   const [loading, setLoading] = useState(true);
   const [storeRefreshKey, setStoreRefreshKey] = useState(0);
   const [depotRefreshKey, setDepotRefreshKey] = useState(0);
-  
 
+  // Update store from DB
   useEffect(() => {
     const fetchStore = async () => {
       setLoading(true);
@@ -32,10 +32,11 @@ export default function Store() {
       }
       setLoading(false);
     };
-  
-    fetchStore();
+
+    if (storeRefreshKey > 0) fetchStore();
   }, [storeRefreshKey]);
-  
+
+  // Update depot from DB
   useEffect(() => {
     const fetchDepot = async () => {
       if (!store) {
@@ -45,35 +46,60 @@ export default function Store() {
       setLoading(true);
       const { data: depot, error: depotError } = await db.depots.fetch.forStore(store);
       if (depot) {
-        setDepot(depot[0]); // Assuming you want the first depot
+        setDepot(depot[0]);
       } else {
         console.error("Unable to retrieve user depot.", depotError);
         setDepot(null);
       }
       setLoading(false);
     };
-  
-    if (store) {
-      fetchDepot();
-    }
-  }, [depotRefreshKey, store]); // Depend on store to re-fetch depot when the store changes
 
+    if (depotRefreshKey > 0) fetchDepot();
+  }, [depotRefreshKey]);
+
+  // Fetch data on load
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const { data: store, error: storeError } = await db.stores.fetch.forUser();
+      if (store) {
+        setStore(store);
+        const { data: depot, error: depotError } = await db.depots.fetch.forStore(store);
+        if (depot) {
+          setDepot(depot[0]);
+        } else {
+          console.error("Unable to retrieve user depot.", depotError);
+          setDepot(null);
+        }
+      } else {
+        console.error("Unable to retrieve user store.", storeError);
+        setStore(null);
+      }
+      setLoading(false)
+    }
+    fetchData();
+  }, []);
+
+  // Update store state via query to DB
   const refreshStore = () => {
     setStoreRefreshKey(oldKey => oldKey + 1);
   }
 
+  // Update depot state via query to DB
   const refreshDepot = () => {
     setDepotRefreshKey(oldKey => oldKey + 1);
   }
 
+  // Update store state locally without querying DB
   const handleStoreUpdate = (updatedStore: Store) => {
     setStore(updatedStore);
   };
-  
+
+  // Update depot state locally without querying DB
   const handleDepotUpdate = (updatedDepot: Depot) => {
     setDepot(updatedDepot);
   };
-  
+
 
   return (
     <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4 max-w-[1400px]">
@@ -87,10 +113,10 @@ export default function Store() {
 
 
       {store && !loading &&
-        <StoreForm store={store} onStoreUpdate={handleStoreUpdate} refreshData={refreshStore}/>
+        <StoreForm store={store} onStoreUpdate={handleStoreUpdate} refreshData={refreshStore} />
       }
       {loading &&
-        <StoreForm store={null} onStoreUpdate={handleStoreUpdate} refreshData={refreshStore}/>
+        <StoreForm store={null} onStoreUpdate={handleStoreUpdate} refreshData={refreshStore} />
       }
 
       {!store && !loading &&
@@ -105,14 +131,14 @@ export default function Store() {
               <TabsTrigger value="join">Join Existing</TabsTrigger>
             </TabsList>
             <TabsContent value="new">
-              <CreateStoreForm refreshData={refreshStore}/>
+              <CreateStoreForm refreshData={refreshStore} />
             </TabsContent>
             <TabsContent value="join"></TabsContent>
           </Tabs>
         </div>
       }
 
-      {store &&
+      {store && !loading &&
         <div className="my-2 border p-8 rounded-lg gap-4 flex flex-col bg-background min-h-[300px]">
           <div>
             <div className="flex flex-col justify-between gap-4">
@@ -130,8 +156,8 @@ export default function Store() {
                 }
               </div>
 
-              {!loading && <CreateDepotForm depot={depot} onDepotUpdate={handleDepotUpdate} refreshData={refreshDepot}/>}
-              {loading && <CreateDepotForm depot={null} onDepotUpdate={handleDepotUpdate} refreshData={refreshDepot}/>}
+              {!loading && <CreateDepotForm depot={depot} onDepotUpdate={handleDepotUpdate} refreshData={refreshDepot} />}
+              {loading && <CreateDepotForm depot={null} onDepotUpdate={handleDepotUpdate} refreshData={refreshDepot} />}
               {/* use dialog when implemented multi depots, for now just single form
                 <Dialog>
                   <DialogTrigger asChild>
