@@ -76,7 +76,7 @@ type StoreFormValues = z.infer<typeof storeFormSchema>
 interface StoreFormProps {
     store: Store | null;
     onStoreUpdate: (store: Store) => void;
-    refreshData: () => void;
+    refreshStore: () => void;
 }
 
 // This can come from your database or API.
@@ -85,7 +85,7 @@ const defaultValues: Partial<StoreFormValues> = {
     passcode: "",
 }
 
-export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate, refreshData }) => {
+export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate, refreshStore }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const form = useForm<StoreFormValues>({
@@ -172,7 +172,7 @@ export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate, refr
         if (res.error) {
             console.log("Error occurred while leaving store:", res.error);
         } else {
-            refreshData();
+            refreshStore();
             toast({
                 title: "Success",
                 description: storeName ? `You have successfully left the store: ${storeName}.` : "You have successfully left the store.",

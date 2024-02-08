@@ -113,10 +113,10 @@ export default function Store() {
 
 
       {store && !loading &&
-        <StoreForm store={store} onStoreUpdate={handleStoreUpdate} refreshData={refreshStore} />
+        <StoreForm store={store} onStoreUpdate={handleStoreUpdate} refreshStore={refreshStore}/>
       }
       {loading &&
-        <StoreForm store={null} onStoreUpdate={handleStoreUpdate} refreshData={refreshStore} />
+        <StoreForm store={null} onStoreUpdate={handleStoreUpdate} refreshStore={refreshStore}/>
       }
 
       {!store && !loading &&

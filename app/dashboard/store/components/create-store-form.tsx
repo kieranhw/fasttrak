@@ -77,7 +77,7 @@ export const CreateStoreForm: React.FC<StoreFormProps> = ({ refreshStore, refres
                 // Here you have the created store with the UUID
                 const updateResult = await db.profiles.update.store(createdStore.store_id);
                 refreshStore();
-                refreshDepot()
+                refreshDepot(); // Clear previous states if page not refreshed
             } else {
                 // Handle the case where the store was not returned
                 console.log("Store was not created.");
