@@ -131,7 +131,7 @@ export default function Store() {
               <TabsTrigger value="join">Join Existing</TabsTrigger>
             </TabsList>
             <TabsContent value="new">
-              <CreateStoreForm refreshData={refreshStore} />
+              <CreateStoreForm refreshStore={refreshStore} refreshDepot={refreshDepot}/>
             </TabsContent>
             <TabsContent value="join"></TabsContent>
           </Tabs>
