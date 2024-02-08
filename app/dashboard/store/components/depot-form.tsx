@@ -192,13 +192,13 @@ export const CreateDepotForm: React.FC<CreateDepotFormProps> = ({ depot, onDepot
         const mandatoryAddressFields = watchedFields.address_1 !== "" && watchedFields.postcode !== "";
         // Assuming days_active is an array of values. Adjust accordingly if it's not.
         const fieldsComplete = watchedFields.depot_lat !== "" && watchedFields.depot_lng !== "" && watchedFields.name !== "" && watchedFields.days_active.some((field: string) => field !== "") && watchedFields.dispatch_time !== "";
-        
+
         setAddressEntered(anyAddressField);
         setCoordinatesEntered(anyCoordinate);
         setCanGeocode(mandatoryAddressFields);
         setFieldsComplete(fieldsComplete);
     }, [watchedFields]); // Dependency array now watches the 'watched' object instead of 'watchedFields'
-    
+
 
     async function handleGeocode() {
         const address = `${getValues("address_1")}, ${getValues("address_2")}, ${getValues("postcode")}`;
@@ -221,7 +221,7 @@ export const CreateDepotForm: React.FC<CreateDepotFormProps> = ({ depot, onDepot
         setIsGeocodeComplete(false);
         setAddressEntered(false);
     }
-    
+
 
     async function revertForm() {
         // Reverse values back to the original depot that was loaded in
@@ -242,11 +242,11 @@ export const CreateDepotForm: React.FC<CreateDepotFormProps> = ({ depot, onDepot
                 // Assuming days_active is an array. Use JSON.stringify for a quick comparison.
                 JSON.stringify(depot.days_active.sort()) !== JSON.stringify(watchedFields.days_active.sort()) ||
                 depot.dispatch_time !== watchedFields.dispatch_time;
-    
+
             setIsFormChanged(formChanged);
         }
     }, [watchedFields, depot]);
-    
+
 
     const onCoordinateChange = (name: any, e: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = e.target
@@ -435,14 +435,21 @@ export const CreateDepotForm: React.FC<CreateDepotFormProps> = ({ depot, onDepot
                             }
                             {isSubmitting &&
                                 <Button type="submit" disabled={true} className="flex gap-2">
-                                    <Loader2 size={16} className="animate-spin" /> Submitting
+                                    <Loader2 size={16} className="animate-spin" /> Submitting...
                                 </Button>
                             }
                         </>
                     } {depot &&
                         <>
                             <Button type="reset" disabled={!isFormChanged} variant="secondary" onClick={e => revertForm()}>Reset</Button>
-                            <Button type="submit" disabled={!fieldsComplete || !isFormChanged}>Save Changes</Button>
+
+                            {isSubmitting &&
+                                <Button type="submit" disabled={true} className="flex gap-2">
+                                    <Loader2 size={16} className="animate-spin" /> Saving...
+                                </Button>
+                            } {!isSubmitting &&
+                                <Button type="submit" disabled={!fieldsComplete || !isFormChanged}>Save Changes</Button>
+                            }
                         </>
                     }
                 </div>
