@@ -107,15 +107,14 @@ export const CreateDepotForm: React.FC<CreateDepotFormProps> = ({ depot, onDepot
             depot_lng: "",
             postcode: "",
             days_active: [],
-            dispatch_time: "",
         },
         mode: "onSubmit",
     });
 
     const { setValue, getValues, control, watch } = form;
+    const [isFormChanged, setIsFormChanged] = useState(false);
 
     useEffect(() => {
-        console.log(depot)
         if (depot) {
             setValue("name", depot.depot_name);
             setValue("depot_lat", depot.depot_lat.toString());
@@ -128,7 +127,7 @@ export const CreateDepotForm: React.FC<CreateDepotFormProps> = ({ depot, onDepot
     async function onSubmit(data: DepotFormValues) {
         setIsSubmitting(true);
 
-        // Update store
+        // Update depot
         const updatedDepot: Depot = {
             depot_name: data.name,
             depot_lat: parseFloat(data.depot_lat),
@@ -184,19 +183,22 @@ export const CreateDepotForm: React.FC<CreateDepotFormProps> = ({ depot, onDepot
     const [isGeocodeComplete, setIsGeocodeComplete] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const watchFields = watch(['address_1', 'address_2', 'postcode', 'depot_lat', 'depot_lng', 'name']);
+    const watchedFields = form.watch();
 
     useEffect(() => {
         // Logic based on watched fields
-        const anyAddressField = watchFields[0] !== "" || watchFields[1] !== "" || watchFields[2] !== "";
-        const anyCoordinate = watchFields[3] !== "" || watchFields[4] !== "";
-        const mandatoryAddressFields = watchFields[0] !== "" && watchFields[2] !== "";
-        const fieldsComplete = watchFields[3] != "" && watchFields[4] != "" && watchFields[5] != "";
+        const anyAddressField = watchedFields.address_1 !== "" || watchedFields.address_2 !== "" || watchedFields.postcode !== "";
+        const anyCoordinate = watchedFields.depot_lat !== "" || watchedFields.depot_lng !== "";
+        const mandatoryAddressFields = watchedFields.address_1 !== "" && watchedFields.postcode !== "";
+        // Assuming days_active is an array of values. Adjust accordingly if it's not.
+        const fieldsComplete = watchedFields.depot_lat !== "" && watchedFields.depot_lng !== "" && watchedFields.name !== "" && watchedFields.days_active.some((field: string) => field !== "") && watchedFields.dispatch_time !== "";
+        
         setAddressEntered(anyAddressField);
         setCoordinatesEntered(anyCoordinate);
-        setCanGeocode(mandatoryAddressFields)
-        setFieldsComplete(fieldsComplete)
-    }, [watchFields]);
+        setCanGeocode(mandatoryAddressFields);
+        setFieldsComplete(fieldsComplete);
+    }, [watchedFields]); // Dependency array now watches the 'watched' object instead of 'watchedFields'
+    
 
     async function handleGeocode() {
         const address = `${getValues("address_1")}, ${getValues("address_2")}, ${getValues("postcode")}`;
@@ -215,10 +217,11 @@ export const CreateDepotForm: React.FC<CreateDepotFormProps> = ({ depot, onDepot
     }
 
     async function resetForm() {
-        form.reset()
-        setIsGeocodeComplete(false)
-        setAddressEntered(false)
+        form.reset();
+        setIsGeocodeComplete(false);
+        setAddressEntered(false);
     }
+    
 
     async function revertForm() {
         // Reverse values back to the original depot that was loaded in
@@ -231,13 +234,19 @@ export const CreateDepotForm: React.FC<CreateDepotFormProps> = ({ depot, onDepot
         }
     }
 
-    async function isDepotChanged() {
-        // Detect if any of the fields have been changed
-        const name = getValues("name") !== depot?.depot_name;
-        const lat = getValues("depot_lat") !== depot?.depot_lat.toString();
-        const lng = getValues("depot_lng") !== depot?.depot_lng.toString();
-        return name || lat || lng;
-    }
+    useEffect(() => {
+        if (depot) {
+            const formChanged = depot.depot_name !== watchedFields.name ||
+                depot.depot_lat !== parseFloat(watchedFields.depot_lat) ||
+                depot.depot_lng !== parseFloat(watchedFields.depot_lng) ||
+                // Assuming days_active is an array. Use JSON.stringify for a quick comparison.
+                JSON.stringify(depot.days_active.sort()) !== JSON.stringify(watchedFields.days_active.sort()) ||
+                depot.dispatch_time !== watchedFields.dispatch_time;
+    
+            setIsFormChanged(formChanged);
+        }
+    }, [watchedFields, depot]);
+    
 
     const onCoordinateChange = (name: any, e: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = e.target
@@ -385,19 +394,19 @@ export const CreateDepotForm: React.FC<CreateDepotFormProps> = ({ depot, onDepot
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Dispatch Time</FormLabel>
-                                    <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select onValueChange={field.onChange} value={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select a schedule deadline" />
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            <SelectItem value="04:00">4:00</SelectItem>
-                                            <SelectItem value="05:00">5:00</SelectItem>
-                                            <SelectItem value="06:00">6:00</SelectItem>
-                                            <SelectItem value="07:00">7:00</SelectItem>
-                                            <SelectItem value="08:00">8:00</SelectItem>
-                                            <SelectItem value="09:00">9:00</SelectItem>
+                                            <SelectItem value="04:00">04:00</SelectItem>
+                                            <SelectItem value="05:00">05:00</SelectItem>
+                                            <SelectItem value="06:00">06:00</SelectItem>
+                                            <SelectItem value="07:00">07:00</SelectItem>
+                                            <SelectItem value="08:00">08:00</SelectItem>
+                                            <SelectItem value="09:00">09:00</SelectItem>
                                             <SelectItem value="10:00">10:00</SelectItem>
                                             <SelectItem value="11:00">11:00</SelectItem>
                                             <SelectItem value="12:00">12:00</SelectItem>
@@ -432,8 +441,8 @@ export const CreateDepotForm: React.FC<CreateDepotFormProps> = ({ depot, onDepot
                         </>
                     } {depot &&
                         <>
-                            <Button type="reset" variant="secondary" onClick={e => revertForm()}>Reset</Button>
-                            <Button type="submit" disabled={!fieldsComplete}>Save Changes</Button>
+                            <Button type="reset" disabled={!isFormChanged} variant="secondary" onClick={e => revertForm()}>Reset</Button>
+                            <Button type="submit" disabled={!fieldsComplete || !isFormChanged}>Save Changes</Button>
                         </>
                     }
                 </div>
