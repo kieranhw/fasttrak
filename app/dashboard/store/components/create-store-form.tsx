@@ -46,10 +46,11 @@ const defaultValues: Partial<StoreFormValues> = {
 }
 
 interface StoreFormProps {
-    refreshData: () => void;
+    refreshStore: () => void;
+    refreshDepot: () => void;
 }
 
-export const CreateStoreForm: React.FC<StoreFormProps> = ({ refreshData }) => {
+export const CreateStoreForm: React.FC<StoreFormProps> = ({ refreshStore, refreshDepot }) => {
     const form = useForm<StoreFormValues>({
         resolver: zodResolver(storeFormSchema),
         defaultValues,
@@ -75,7 +76,8 @@ export const CreateStoreForm: React.FC<StoreFormProps> = ({ refreshData }) => {
             } else if (createdStore && createdStore.store_id) {
                 // Here you have the created store with the UUID
                 const updateResult = await db.profiles.update.store(createdStore.store_id);
-                refreshData();
+                refreshStore();
+                refreshDepot()
             } else {
                 // Handle the case where the store was not returned
                 console.log("Store was not created.");
