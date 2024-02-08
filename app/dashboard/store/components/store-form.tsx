@@ -95,17 +95,17 @@ export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate, refr
     });
 
     // Subscribe to form value changes
-    const watchedFormValues = form.watch();
+    const watchedFields = form.watch();
     const [isFormChanged, setIsFormChanged] = useState(false);
 
     useEffect(() => {
         if (store) {
             setIsFormChanged(
-                store.store_name !== watchedFormValues.name ||
-                store.invite_code !== watchedFormValues.passcode
+                store.store_name !== watchedFields.name ||
+                store.invite_code !== watchedFields.passcode
             );
         }
-    }, [watchedFormValues, store]);
+    }, [watchedFields, store]);
 
 
     // Set form fields
