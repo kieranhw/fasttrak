@@ -119,7 +119,7 @@ export const CreateStoreForm: React.FC<StoreFormProps> = ({ refreshData }) => {
                                 <FormLabel>Invite Code</FormLabel>
                                 <FormControl>
                                     <div className="flex gap-2">
-                                        <div className="flex justify-start border items-center p-2 px-3 h-10 text-start text-sm text-muted-foreground rounded-lg flex-grow">{field.value}</div>
+                                        <div className="flex justify-start border items-center p-2 px-3 h-10 shadow-sm text-start text-sm text-muted-foreground rounded-lg flex-grow">{field.value}</div>
                                         <Button
                                             type="button"
                                             variant="secondary"

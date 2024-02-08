@@ -196,7 +196,7 @@ export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate, refr
                                     <FormControl>
                                         <>
                                             {store === null &&
-                                                <div className="flex justify-start border items-center p-2 px-3 h-10 text-start text-sm text-muted-foreground rounded-md flex-grow gap-2">
+                                                <div className="flex justify-start border items-center p-2 px-3 h-10 shadow-sm text-start text-sm text-muted-foreground rounded-md flex-grow gap-2">
                                                     <Loader2 size={16} className="animate-spin" /> Loading...
                                                 </div>
                                             }
@@ -221,12 +221,12 @@ export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate, refr
                                     <FormControl>
                                         <div className="flex gap-2">
                                             {store === null &&
-                                                <div className="flex justify-start border items-center p-2 px-3 h-10 text-start text-sm text-muted-foreground rounded-md flex-grow gap-2">
+                                                <div className="flex justify-start border items-center p-2 px-3 h-10 shadow-sm text-start text-sm text-muted-foreground rounded-md flex-grow gap-2">
                                                     <Loader2 size={16} className="animate-spin" /> Loading...
                                                 </div>
                                             }
                                             {store != null &&
-                                                <div className="flex justify-start border items-center p-2 px-3 h-10 text-start text-sm text-muted-foreground rounded-md flex-grow">{field.value}</div>
+                                                <div className="flex justify-start border items-center p-2 px-3 h-10 shadow-sm text-start text-sm text-muted-foreground rounded-md flex-grow">{field.value}</div>
                                             }
                                             <Button
                                                 type="button"
