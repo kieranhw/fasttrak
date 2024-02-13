@@ -59,7 +59,7 @@ export default function ScheduleDeliveries() {
       const month = dateString.slice(2, 4);
       const year = dateString.slice(4, 8);
       const newDate = new Date(`${year}-${month}-${day}`);
-  
+
       if (!isNaN(newDate.valueOf()) && isDateWithinLimit(newDate)) {
         // Only call handleDateChange if the new date is different from the current date
         if (!date || newDate.toDateString() !== date.toDateString()) {
@@ -72,7 +72,7 @@ export default function ScheduleDeliveries() {
       handleDateChange(new Date());
     }
   }, [searchParams]);
-  
+
 
   const handleDateChange = (selectedDate: number | SetStateAction<Date>) => {
     console.log("date called")
@@ -177,6 +177,23 @@ export default function ScheduleDeliveries() {
   }, [graph, solution])
 
   const refreshData = () => setReload(prev => !prev);
+
+  const refreshSchedule = async (updatedSchedule: DeliverySchedule) => {
+
+    if (updatedSchedule) {
+      const updatedSchedules = deliverySchedules.map(schedule => {
+        if (schedule.schedule_id === updatedSchedule.schedule_id) {
+          return updatedSchedule;
+        }
+        return schedule;
+      });
+
+      setDeliverySchedules(updatedSchedules);
+      buildGraph(updatedSchedules);
+    } else {
+      refreshData();
+    }
+  }
 
   async function buildGraph(schedules: DeliverySchedule[]) {
     // Create graph and solution
@@ -303,7 +320,13 @@ export default function ScheduleDeliveries() {
   return (
     <TooltipProvider delayDuration={100}>
       <div className="flex flex-col w-full justify-start gap-4 mx-auto p-4 max-w-[1400px]">
-        <h1 className="text-foreground font-bold text-3xl">Delivery Schedule</h1>
+        <div className="flex flex-col">
+          <h1 className="text-foreground font-bold text-3xl">Delivery Schedule</h1>
+          <p className="text-md text-muted-foreground">
+            Create a delivery schedule or manage an existing one.
+          </p>
+        </div>
+
 
         <div className="flex items-center justify-between">
           <div className="inline-flex justify-between w-full">
@@ -457,7 +480,7 @@ export default function ScheduleDeliveries() {
           </div>
         </div>
 
-        <DataTable columns={columns(refreshData)} data={deliverySchedules} isLoading={isScheduleLoading} />
+        <DataTable columns={columns(refreshSchedule)} data={deliverySchedules} isLoading={isScheduleLoading} />
 
         {!isScheduleLoading && deliverySchedules.length > 0 &&
           <div className="flex flex-col justify-between">

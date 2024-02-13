@@ -37,7 +37,7 @@ import {
     HoverCardTrigger,
 } from "@/components/ui/hover-card"
 
-export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] => [
+export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => void): ColumnDef<DeliverySchedule>[] => [
     {
         accessorKey: "route_number",
         header: "Route",
@@ -45,7 +45,7 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
             const routeNumber = row.getValue("route_number")?.toString()
 
             return (
-                    <p className="text-muted-foreground">{routeNumber}</p>
+                <p className="text-muted-foreground">{routeNumber}</p>
             )
         }
 
@@ -175,9 +175,6 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
             const [inProgressAlertOpen, setInProgressAlertOpen] = useState(false)
             const [completeAlertOpen, setCompleteAlertOpen] = useState(false)
 
-
-
-
             async function handleUpdateStatus(id: UUID, status: DeliveryStatus) {
 
                 // Update schedule status
@@ -185,12 +182,12 @@ export const columns = (refreshData: () => void): ColumnDef<DeliverySchedule>[] 
 
                 if (res) {
                     console.log("Delivery status updated successfully.")
+                    refreshSchedule(res.data!);
 
                 } else {
                     console.warn("Failed to update delivery status.");
                 }
 
-                refreshData();
             }
 
 
