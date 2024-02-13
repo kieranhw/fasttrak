@@ -1,4 +1,4 @@
-import { Package, PriorityType } from "@/types/package"
+import { CurrentState, Package, PriorityType } from "@/types/package"
 import { Vehicle } from "@/types/vehicle"
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule"
 import { UUID } from "crypto"
@@ -46,6 +46,8 @@ export const generatePackages = async (numPackages: number): Promise<Package[]> 
             sender_address_lng: senderAddress.lng,
             sender_phone: "07" + faker.number.int({ min: 0o0, max: 999999999 }),
             status: "Pending",
+            current_state: CurrentState.Pending,
+            delivery_attempts: 0,
             weight: faker.number.int({ min: 5, max: 20 }),
             volume: parseFloat(faker.number.float({ min: 0.1, max: 1 }).toPrecision(2)),
             fragile: false,
