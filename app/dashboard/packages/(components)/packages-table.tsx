@@ -24,26 +24,19 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
-
-interface DataTableProps<TData, TValue> {
+interface PackagesTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   refreshData: () => void;
 }
 
 
-export function DataTable<TData, TValue>({
+export function PackagesTable<TData, TValue>({
   columns,
   data,
   refreshData,
-}: DataTableProps<TData, TValue>) {
+}: PackagesTableProps<TData, TValue>) {
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])

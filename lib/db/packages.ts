@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/client";
-import { Package } from "@/types/package";
+import { supabase } from "@/lib/supabase/client";
+import { Package, CurrentState } from "@/types/package";
 import { UUID } from "crypto";
 import { db } from "./db";
 import { DeliveryStatus } from "@/types/delivery-schedule";
@@ -7,7 +7,6 @@ import { cookies } from "next/headers";
 
 // Fetch all packages for a user
 const fetchPackages = async () => {
-    const supabase = createClient();
 
     // Fetch store for user
     const { data: store, error } = await db.stores.fetch.forUser();
@@ -37,7 +36,6 @@ const fetchPackages = async () => {
 // Fetch all packages for a user where "status" is "Pending" (i.e. not scheduled for delivery)
 const fetchPackagesByPending = async () => {
     // Fetch store for user
-    const supabase = createClient();
 
     // Fetch store for user
     const { data: store, error } = await db.stores.fetch.forUser();
@@ -70,7 +68,6 @@ const fetchPackagesByIds = async (ids: UUID[]) => {
     if (!ids) {
         return ([] as Package[]);
     }
-    const supabase = createClient();
 
     let { data: packages, error } = await supabase
         .from('packages')
@@ -84,12 +81,64 @@ const fetchPackagesByIds = async (ids: UUID[]) => {
     }
 }
 
+// Fetch packages for store ID which are not delivered
+const fetchPackagesInventory = async () => {
+
+    // Get store ID
+    const { data: store, error } = await db.stores.fetch.forUser();
+
+    if (!store) {
+        console.error("User not attached to store");
+        return;
+    } if (error) {
+        console.error("Error fetching store: ", error);
+        return;
+    } else {
+        const { data: packages, error } = await supabase
+            .from('packages')
+            .select('*')
+            .eq('store_id', store.store_id)
+            .eq('current_state', CurrentState.Pending || CurrentState.InTransit || CurrentState.Scheduled || CurrentState.Return);
+        if (error) {
+            console.error("Error fetching packages: ", error);
+            return;
+        } else {
+            return (packages as Package[]);
+        }
+    }
+}
+
+// Fetch packages for store ID, select where PackageStatus = "Pending" | "In Transit"
+const fetchPackageDeliveryHistory = async () => {
+    // Get store ID
+    const { data: store, error } = await db.stores.fetch.forUser();
+
+    if (!store) {
+        console.error("User not attached to store");
+        return;
+    } if (error) {
+        console.error("Error fetching store: ", error);
+        return;
+    } else {
+        const { data: packages, error } = await supabase
+            .from('packages')
+            .select('*')
+            .eq('store_id', store.store_id)
+            .eq('current_state', CurrentState.Delivered);
+        if (error) {
+            console.error("Error fetching packages: ", error);
+            return;
+        } else {
+            return (packages as Package[]);
+        }
+    }
+}
+
 
 // Remove package by ID
 // TODO: Ensure data consistency by removing package from all delivery schedules
 const removePackageById = async (id: UUID) => {
     console.log("Removing package: " + id)
-    const supabase = createClient();
 
     // Fetch store for user
     const { data: store, error } = await db.stores.fetch.forUser();
@@ -120,7 +169,6 @@ const updatePackageStatusByIds = async (ids: UUID[], status: DeliveryStatus) => 
     if (!ids) {
         return;
     }
-    const supabase = createClient();
 
     if (status === DeliveryStatus.Completed) {
         // Remove personal information from packages and set status to delivered
@@ -158,6 +206,8 @@ export const packages = {
         all: fetchPackages,
         pending: fetchPackagesByPending,
         byIds: fetchPackagesByIds,
+        inventory: fetchPackagesInventory,
+        history: fetchPackageDeliveryHistory,
     },
     update: {
         status: {
