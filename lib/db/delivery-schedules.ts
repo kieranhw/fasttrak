@@ -1,9 +1,10 @@
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { Package } from "@/types/package";
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { UUID } from "crypto";
 import { db } from "./db";
 import { Vehicle } from "@/types/vehicle";
+import { PostgrestError } from "@supabase/supabase-js";
 
 // Helper function to fetch store and handle errors
 const fetchStoreAndHandleError = async () => {
@@ -20,7 +21,6 @@ export const fetchSchedulesByDate = async (date: Date): Promise<DeliverySchedule
     try {
         const store = await fetchStoreAndHandleError();
         const formattedDate = date.toISOString().slice(0, 10);
-        const supabase = createClient();
 
         const { data: schedules, error } = await supabase
             .from('delivery_schedules')
@@ -55,7 +55,6 @@ const fetchPackagesForSchedule = async (packageIds: UUID[]): Promise<Package[]> 
 // Fetch schedule by ID
 export const fetchScheduleById = async (scheduleId: UUID): Promise<DeliverySchedule | null> => {
     try {
-        const supabase = createClient();
         const { data: schedule, error } = await supabase
             .from('delivery_schedules')
             .select('*')
@@ -76,9 +75,11 @@ export const fetchScheduleById = async (scheduleId: UUID): Promise<DeliverySched
 };
 
 // Update schedule status by ID
-const updateScheduleStatus = async (scheduleId: UUID, status: DeliveryStatus): Promise<boolean | string> => {
+const updateScheduleStatus = async (
+    scheduleId: UUID,
+    status: DeliveryStatus
+): Promise<{ data: DeliverySchedule | null, error: PostgrestError | null }> => {
     try {
-        const supabase = createClient();
         const { error } = await supabase
             .from('delivery_schedules')
             .update({ status: status })
@@ -86,16 +87,27 @@ const updateScheduleStatus = async (scheduleId: UUID, status: DeliveryStatus): P
 
         if (error) throw new Error(`Error updating schedule status: ${error.message}`);
 
-        const schedule = await fetchScheduleById(scheduleId);
-        if (schedule) {
-            const packageIds = schedule.package_order.map(pkg => pkg.package_id);
-            await db.packages.update.status.byIds(packageIds, status);
-        }
+        // Fetch the updated schedule
+        const updatedSchedule = await fetchScheduleById(scheduleId);
+        if (!updatedSchedule) throw new Error('Failed to fetch the updated schedule');
 
-        return true;
+        // Assuming package_order is an array of package details within the schedule
+        // and db.packages.update.status.byIds updates the status of given package IDs
+        const packageIds = updatedSchedule.package_order.map(pkg => pkg.package_id);
+        await db.packages.update.status.byIds(packageIds, status);
+
+        return { data: updatedSchedule, error: null };
     } catch (error) {
         console.error("Error in updateScheduleStatus:", error);
-        return `Error updating schedule status: ${error}`;
+        return {
+            data: null,
+            error: {
+                message: `Error updating schedule status: ${(error as Error).message}`,
+                details: '',
+                hint: '',
+                code: '' // You may want to adjust the error code based on the actual error
+            },
+        };
     }
 };
 
