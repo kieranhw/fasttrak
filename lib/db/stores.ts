@@ -3,7 +3,6 @@ import { UserProfile } from "@/types/user-profile";
 import { UUID } from "crypto";
 import { db } from "./db";
 import { Store } from "@/types/store";
-import { cookies } from "next/headers";
 import { PostgrestError } from "@supabase/supabase-js";
 
 // Fetch store as type Store from store id saved in user profile
