@@ -1,8 +1,14 @@
 import { UUID } from "crypto"
 
 export type PriorityType = "Express" | "Standard";
-export type PackageStatus = "Pending" | "In Transit" | "Delivered";
-export type CurrentState = "Pending" | "Scheduled" | "In-Transit" | "Return" | "Delivered";
+export type PackageStatus = "Pending" | "In-Transit" | "Delivered";
+export enum CurrentState {
+    Pending = "Pending",
+    Scheduled = "Scheduled",
+    InTransit = "In-Transit",
+    Return = "Return",
+    Delivered = "Delivered"
+}
 
 export type Package = {
     package_id: UUID
@@ -19,7 +25,8 @@ export type Package = {
     sender_address_lng?: number
     sender_phone: string
     status: PackageStatus
-    current_state?: CurrentState
+    current_state: CurrentState
+    delivery_attempts: number
     weight: number
     volume: number
     fragile?: boolean
