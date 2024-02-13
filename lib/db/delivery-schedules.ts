@@ -91,8 +91,7 @@ const updateScheduleStatus = async (
         const updatedSchedule = await fetchScheduleById(scheduleId);
         if (!updatedSchedule) throw new Error('Failed to fetch the updated schedule');
 
-        // Assuming package_order is an array of package details within the schedule
-        // and db.packages.update.status.byIds updates the status of given package IDs
+        // Update package statuses
         const packageIds = updatedSchedule.package_order.map(pkg => pkg.package_id);
         await db.packages.update.status.byIds(packageIds, status);
 
@@ -105,7 +104,7 @@ const updateScheduleStatus = async (
                 message: `Error updating schedule status: ${(error as Error).message}`,
                 details: '',
                 hint: '',
-                code: '' // You may want to adjust the error code based on the actual error
+                code: ''
             },
         };
     }
