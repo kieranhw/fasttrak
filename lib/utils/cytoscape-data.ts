@@ -107,7 +107,7 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
     const cy = cytoscape({
         container: document.getElementById('cy'),
         maxZoom: 1.5,
-        minZoom: 0.25,
+        minZoom: 0.15,
         elements: {
             nodes: cyNodes,
             edges: cyEdges,
@@ -119,7 +119,7 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
                 selector: 'node',
                 style: {
                     'label': '',  // Initially, labels are empty
-                    'font-size': '24px',
+                    'font-size': '32px',
                     'text-wrap': 'wrap',
                 }
             },
@@ -134,7 +134,7 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
                     'control-point-distances': [20],
                     'control-point-weights': [0.5],
                     'label': '',
-                    'font-size': '24px',
+                    'font-size': '32px',
                     'text-background-color': 'data(color)',
                     'text-background-opacity': 1,
                     'text-background-padding': '5px',
