@@ -1,7 +1,7 @@
 import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
-import { Graph, Node, Edge, createGraph, calculateDistance } from '../model/graph';
-import { VehicleRoute, VRPSolution } from '../model/vrp';
+import { Graph, Node, Edge, createGraph, calculateDistance } from '../models/graph';
+import { VehicleRoute, VRPSolution } from '../models/vrp';
 import { calculateTraversalMins } from "../../scheduling/create-schedules";
 import { PriorityQueue } from "../../scheduling/priority-queue";
 import { ScheduleProfile } from "@/types/schedule-profile";
@@ -25,7 +25,7 @@ import { ScheduleProfile } from "@/types/schedule-profile";
  * @param timeWindow Number of hours to deliver packages
  * @returns VRPSolution, results in the minimum required number of vehicles to service all packages
  */
-export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], profile: ScheduleProfile): Promise<VRPSolution> {
+export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], profile: ScheduleProfile): Promise<[VRPSolution, PriorityQueue]> {
     const solution = new VRPSolution();
     const availableVehicles = [...vehicles];
 
@@ -98,7 +98,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
 
             const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
             route.nodes = shortestPath;
-            route.updateTotalTime(deliveryTime);
+            route.updateMeasurements(deliveryTime);
         }
 
 
@@ -146,7 +146,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
 
             const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
             route.nodes = shortestPath;
-            route.updateTotalTime(deliveryTime);
+            route.updateMeasurements(deliveryTime);
         }
 
         // If the package cannot be added to any route, dequeue the package indefinitely
@@ -173,7 +173,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
 
                 const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
                 route.nodes = shortestPath;
-                route.updateTotalTime(deliveryTime);
+                route.updateMeasurements(deliveryTime);
                 break;
             }
         }
@@ -187,7 +187,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
     for (const route of solution.routes) {
         const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
         route.nodes = shortestPath;
-        route.updateTotalTime(deliveryTime);
+        route.updateMeasurements(deliveryTime);
     }
 
     // Step 5: Close routes back to depot
@@ -197,7 +197,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
 
     console.log("remaining packages" + backupQueue.getData().length);
 
-    return solution;
+    return [solution, backupQueue];
 
 }
 

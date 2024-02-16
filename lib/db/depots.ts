@@ -19,7 +19,7 @@ const createDepot = async (depot: Omit<Depot, 'id'>): Promise<{ data: Depot | nu
     const depotWithStoreId = { ...depot, store_id: store.data?.store_id };
 
     const { data, error } = await supabase
-        .from('depots') 
+        .from('depots')
         .insert([depotWithStoreId])
         .select()
         .single();
@@ -37,6 +37,22 @@ const fetchDepotsForStore = async (store: Store): Promise<{ data: Depot[] | null
     return { data, error };
 }
 
+// Fetches depot for user store, user can only be in one store therefore
+const fetchDepotsForUserStore = async (): Promise<{ data: Depot | null, error: PostgrestError | null }> => {
+    const store = await db.stores.fetch.forUser();
+    if (!store) {
+        return { data: null, error: { message: 'Store ID not found for the user', details: '', hint: '', code: '' } };
+    }
+
+    const { data, error } = await supabase
+        .from('depots')
+        .select()
+        .eq('store_id', store.data?.store_id)
+        .single();
+
+    return { data, error };
+}
+
 const updateDepotById = async (id: UUID, updatedDepot: Depot): Promise<{ data: Depot | null, error: PostgrestError | null }> => {
     const { data, error } = await supabase
         .from('depots')
@@ -50,14 +66,14 @@ const updateDepotById = async (id: UUID, updatedDepot: Depot): Promise<{ data: D
 
 export const depots = {
     fetch: {
-        //forUser: fetchDepotsForUser,
+        forUser: fetchDepotsForUserStore,
         forStore: fetchDepotsForStore,
     },
     create: createDepot,
     update: {
         byId: updateDepotById,
-        
+
     }
-    
+
 
 };

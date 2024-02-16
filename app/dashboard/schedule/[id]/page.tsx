@@ -10,8 +10,8 @@ import { columns } from "./components/columns"
 import { db } from "@/lib/db/db";
 import { UUID } from "crypto";
 import { Package } from "@/types/package";
-import { Graph } from "@/lib/routing/model/graph";
-import { VRPSolution } from "@/lib/routing/model/vrp";
+import { Graph } from "@/lib/routing/models/graph";
+import { VRPSolution } from "@/lib/routing/models/vrp";
 import { displayGraph } from "../../../../lib/utils/cytoscape-data";
 import { CytoscapeGraph } from "../../../../components/CytoscapeGraph";
 import { BreadcrumbLink } from "@/components/ui/breadcrumb-link";

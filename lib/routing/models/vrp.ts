@@ -8,9 +8,9 @@ import { ScheduleProfile } from "@/types/schedule-profile";
 // Model of one individual vehicle route
 export class VehicleRoute {
     public nodes: Node[] = [];
-    public totalCost: number = 0; // distance in miles
-    public currentWeight: number = 0;
-    public currentVolume: number = 0;
+    public totalDistance: number = 0; // distance in miles
+    public currentWeight: number = 0; // in pounds
+    public currentVolume: number = 0; // in cubic feet
     public totalTime: number = 0;  // in minutes
 
     constructor(
@@ -20,9 +20,20 @@ export class VehicleRoute {
         this.nodes.push(depotNode);
     }
 
+    clone(): VehicleRoute {
+        const clonedRoute = new VehicleRoute(this.vehicle, this.depotNode.clone());
+        // Properly clone each Node
+        clonedRoute.nodes = this.nodes.map(node => node.clone());
+        clonedRoute.totalDistance = this.totalDistance;
+        clonedRoute.currentWeight = this.currentWeight;
+        clonedRoute.currentVolume = this.currentVolume;
+        clonedRoute.totalTime = this.totalTime;
+        return clonedRoute;
+    }
+
     // Check if the vehicle can add a package to the route
     canAddPackage(pkg: Package, pkgNode: Node, timeRequired: number, timeWindow: number, driverBreak: number): boolean {
-        
+
         // Convert tw to minutes
         const timeWindowMins = (timeWindow * 60) - driverBreak;
 
@@ -33,7 +44,7 @@ export class VehicleRoute {
         return (
             this.currentWeight + pkg.weight <= this.vehicle.max_load &&
             this.currentVolume + pkg.volume <= this.vehicle.max_volume &&
-            this.totalTime + timeRequired + timeRequiredToDepot <= timeWindowMins 
+            this.totalTime + timeRequired + timeRequiredToDepot <= timeWindowMins
         );
     }
 
@@ -69,7 +80,7 @@ export class VehicleRoute {
 
     addNode(node: Node, cost: number, timeRequired: number): void {
         this.nodes.push(node);
-        this.totalCost += cost;
+        this.totalDistance += cost;
         this.totalTime += timeRequired;
         if (node.pkg) {
             this.currentWeight += node.pkg.weight;
@@ -83,28 +94,48 @@ export class VehicleRoute {
         const cost = calculateDistance(lastNode, depot);
         const timeRequired = calculateTraversalMins(cost);
         this.totalTime += timeRequired;
-        this.totalCost += cost;
+        this.totalDistance += cost;
         this.nodes.push(depot);
     }
 
-    // Update the total time of the route, used when shuffling order of nodes
-    updateTotalTime(deliveryTime: number): void {
+    updateMeasurements(deliveryTime: number): void {
+        // Reset totals before calculation
+        this.totalDistance = 0;
         this.totalTime = 0;
-        for (let i = 0; i < this.nodes.length - 1; i++) {
-            const node = this.nodes[i];
-            const nextNode = this.nodes[i + 1];
-            const cost = calculateDistance(node, nextNode);
-            const travelTime = calculateTraversalMins(cost);
+        this.currentWeight = 0;
+        this.currentVolume = 0;
 
-            let timeRequired = 0;
-            if (nextNode.isDepot) {
-                timeRequired = travelTime;
-            } else {
-                timeRequired = travelTime + deliveryTime;
+        // Iterate through all nodes to update distance, weight, volume, and time
+        for (let i = 0; i < this.nodes.length - 1; i++) {
+            const currentNode = this.nodes[i];
+            const nextNode = this.nodes[i + 1];
+
+            // Update weight and volume for each package node
+            if (currentNode.pkg) {
+                this.currentWeight += currentNode.pkg.weight;
+                this.currentVolume += currentNode.pkg.volume;
             }
-            this.totalTime += timeRequired;
+
+            // Calculate distance and time to next node
+            if (nextNode) {
+                const distanceToNextNode = calculateDistance(currentNode, nextNode);
+                this.totalDistance += distanceToNextNode;
+
+                const travelTimeToNextNode = calculateTraversalMins(distanceToNextNode);
+                // If the next node is not the depot, add delivery time to the total time
+                this.totalTime += nextNode.isDepot ? travelTimeToNextNode : (travelTimeToNextNode + deliveryTime);
+            }
         }
+
+        // Ensure the loop accounts for the last node to depot transition if it's not explicitly handled
+        if (this.nodes.length > 1 && !this.nodes[this.nodes.length - 1].isDepot) {
+            const lastNodeToDepotDistance = calculateDistance(this.nodes[this.nodes.length - 1], this.depotNode);
+            this.totalDistance += lastNodeToDepotDistance;
+            this.totalTime += calculateTraversalMins(lastNodeToDepotDistance);
+        }
+
     }
+
 }
 
 export class VRPSolution {
@@ -115,6 +146,14 @@ export class VRPSolution {
     }
 
     get totalCost(): number {
-        return this.routes.reduce((sum, route) => sum + route.totalCost, 0);
+        return this.routes.reduce((sum, route) => sum + route.totalDistance, 0);
+    }
+
+    clone(): VRPSolution {
+        const clonedSolution = new VRPSolution();
+        this.routes.forEach(route => {
+            clonedSolution.addRoute(route.clone());
+        });
+        return clonedSolution;
     }
 }

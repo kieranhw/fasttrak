@@ -32,6 +32,11 @@ export class Node {
         public isDepot: boolean = false  // Identifier to check if the node is a depot
     ) { }
 
+    clone(): Node {
+        // Create a new Node instance with copied values
+        return new Node(this.pkg, {...this.coordinates}, this.isDepot);
+    }
+
     // Find the nearest neighbor by cost
     findNearestNeighbor(graph: Graph): Node | null {
         // Initially, set nearestNode and minCost to null and Infinity, respectively
@@ -117,8 +122,8 @@ export async function createGraph(packages: Package[], depotCoordinates: Locatio
                 // Connect to the depot node
                 graph.addEdge(new Edge(node, depotNode, calculateDistance(node, depotNode)));
 
-                // Connect to the five nearest neighbors
-                for (let i = 0; i < 5; i++) {
+                // Connect to the 25 nearest neighbors
+                for (let i = 0; i < 25; i++) {
                     if (distances[i]) {  // Check if distances[i] exists before accessing its properties
                         const nearestNode = distances[i].node;
                         graph.addEdge(new Edge(node, nearestNode, distances[i].distance));

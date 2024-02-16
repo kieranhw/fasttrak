@@ -1,7 +1,7 @@
 import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
-import { Graph, Node, Edge, createGraph, calculateDistance } from '../model/graph';
-import { VehicleRoute, VRPSolution } from '../model/vrp';
+import { Graph, Node, Edge, createGraph, calculateDistance } from '../models/graph';
+import { VehicleRoute, VRPSolution } from '../models/vrp';
 import { calculateTraversalMins } from "../../scheduling/create-schedules";
 import { displayGraph } from "../../utils/cytoscape-data";
 import { ScheduleProfile } from "@/types/schedule-profile";

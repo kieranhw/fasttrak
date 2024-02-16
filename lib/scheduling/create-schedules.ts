@@ -3,11 +3,13 @@ import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
 import { roundRobinAllocation } from "../routing/algorithms/algorithm-2";
 import { geospatialClustering } from "../routing/algorithms/algorithm-3";
-import { Edge, Graph, Node, calculateDistance, createGraph } from "../routing/model/graph";
-import { VRPSolution, VehicleRoute } from "../routing/model/vrp";
+import { Edge, Graph, Node, calculateDistance, createGraph } from "../routing/models/graph";
+import { VRPSolution, VehicleRoute } from "../routing/models/vrp";
 import { UUID } from "crypto";
 import axios from 'axios';
 import { ScheduleProfile } from "@/types/schedule-profile";
+import { db } from "../db/db";
+import { hybridAlgorithm } from "../routing/algorithms/algorithm-4";
 
 // API Gateway endpoint URL
 const apiGatewayEndpoint = 'https://e266yv3o3eojn6auayc5za77c40pmdhb.lambda-url.eu-north-1.on.aws/';
@@ -28,18 +30,23 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
     console.log("profile:", profile)
 
     // TODO: Get depot here, set to variable to be used in createGraph
-    // Create a graph where each node represents a package, and each edge represents a delivery location
-    // Nodes are connected to the depot node (depot node is the starting point and end point), and 5 nearest neighbors
+    const depot = await db.depots.fetch.forUser();
 
-    // Run the VRP algorithm to generate a solution
-    //const vrpSolution = await geospatialClustering(graph, vehiclesData, 8);
+    if (!depot || !depot.data?.depot_lat || !depot.data?.depot_lng) {
+        return;
+    }
 
-
+    // TODO: Run the VRP algorithm to generate a solution, send to calculate average speed utils
+    //const vrpSolution = await randomRoutes(graph, vehiclesData, 8);
+    const averageSpeed = 5; // miles per hour
+    
     // TODO: update lambda code to accept profile
     // schedule packages on AWS Lambda
     const data = {
         packages: packagesData,
         vehicles: vehiclesData,
+        depot: depot,
+        averageSpeed: averageSpeed,
         timeWindow: 8
     };
 
@@ -65,12 +72,17 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
     // If Lambda request fails, run algorithm locally
     // TODO: Add 30 second timeout for local processing
     if (vrpSolution.routes.length === 0) {
-        const graph = await createGraph(packagesData, { lat: 53.403782, lng: -2.971970 }, true);
+        const graph = await createGraph(packagesData, { lat: depot.data.depot_lat, lng: depot.data.depot_lng}, true);
         if (graph.nodes.length === 0) {
             console.log("No packages to schedule.");
             return;
         }
-        vrpSolution = await geospatialClustering(graph, vehiclesData, profile)
+        /*
+        const res = await geospatialClustering(graph, vehiclesData, profile)
+        vrpSolution = res[0];
+        */
+
+        vrpSolution = await hybridAlgorithm(graph, vehiclesData, profile);
         console.log("scheduling locally")
     }
 
@@ -82,6 +94,8 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
             vehicle_id: route.vehicle.vehicle_id,
             store_id: undefined as unknown as UUID,
             vehicle: route.vehicle,
+            depot_lat: depot.data.depot_lat,
+            depot_lng: depot.data.depot_lng,
             package_order: route.nodes.map(node => node.pkg as Package),
             delivery_date: date,
             route_number: schedules.length + 1,
@@ -90,7 +104,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
             num_packages: route.nodes.length - 2, // minus 2 to exclude depot nodes
             estimated_duration_mins: route.totalTime, // TODO: Calculate real duration
             actual_duration_mins: 0,
-            distance_miles: route.totalCost.toFixed(2) as unknown as number,
+            distance_miles: route.totalDistance.toFixed(2) as unknown as number,
             load_weight: route.currentWeight,
             load_volume: route.currentVolume,
             created_at: new Date()

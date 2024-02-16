@@ -1,6 +1,6 @@
 import { DeliverySchedule } from "@/types/delivery-schedule";
-import { Edge, Graph, Node, calculateDistance, createGraph } from "../routing/model/graph";
-import { VRPSolution, VehicleRoute } from "../routing/model/vrp";
+import { Edge, Graph, Node, calculateDistance, createGraph } from "../routing/models/graph";
+import { VRPSolution, VehicleRoute } from "../routing/models/vrp";
 
 export async function createGraphAndSolutionFromScheduleArray(schedules: DeliverySchedule[]): Promise<[Graph, VRPSolution]> {
     const graph = new Graph();
@@ -8,7 +8,7 @@ export async function createGraphAndSolutionFromScheduleArray(schedules: Deliver
 
     // TODO: Get real depot coords
     // Create nodes for depot, assuming all schedules share the same depot
-    const depotCoordinates = { lat: 53.403782, lng: -2.971970 };
+    const depotCoordinates = { lat: schedules[0].depot_lat, lng: schedules[0].depot_lng };
     const depotNode = new Node(null, depotCoordinates, true);
     graph.addNode(depotNode);
     console.log(schedules)

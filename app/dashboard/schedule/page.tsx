@@ -179,7 +179,6 @@ export default function ScheduleDeliveries() {
   const refreshData = () => setReload(prev => !prev);
 
   const refreshSchedule = async (updatedSchedule: DeliverySchedule) => {
-
     if (updatedSchedule) {
       const updatedSchedules = deliverySchedules.map(schedule => {
         if (schedule.schedule_id === updatedSchedule.schedule_id) {
@@ -188,6 +187,7 @@ export default function ScheduleDeliveries() {
         return schedule;
       });
 
+      setInProgress(true);
       setDeliverySchedules(updatedSchedules);
       buildGraph(updatedSchedules);
     } else {
@@ -259,6 +259,8 @@ export default function ScheduleDeliveries() {
             distance_miles: deliverySchedule[schedule].distance_miles,
             load_weight: deliverySchedule[schedule].load_weight,
             load_volume: deliverySchedule[schedule].load_volume,
+            depot_lat: deliverySchedule[schedule].depot_lat,
+            depot_lng: deliverySchedule[schedule].depot_lng,
           })
         if (error) {
           alert(error.message)
