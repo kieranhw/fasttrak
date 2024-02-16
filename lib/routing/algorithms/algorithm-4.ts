@@ -18,7 +18,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     const ga = new GeneticAlgorithm(initialSolution, graph, new PriorityQueue()); // Adjust the GeneticAlgorithm constructor as needed
     
     // Define the number of generations and other GA parameters as necessary
-    const numGenerations = 2500000; 
+    const numGenerations = 10000000; 
 
     // Evolve the solution
     const optimizedSolution = ga.evolve(numGenerations);

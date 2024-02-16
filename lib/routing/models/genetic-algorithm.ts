@@ -47,8 +47,8 @@ export class GeneticAlgorithm {
         const clone1 = Object.assign(Object.create(Object.getPrototypeOf(parent1)), parent1);
         const clone2 = Object.assign(Object.create(Object.getPrototypeOf(parent2)), parent2);
 
-        // Determine the segment size for crossover (between 2 and 5 nodes)
-        const segmentSize = Math.floor(Math.random() * 4) + 2; // 2 to 5
+        // Determine the segment size for crossover (between 1 and 4 nodes)
+        const segmentSize = Math.floor(Math.random() * 4) + 1; // 1 to 4
 
         // Choose random start index for the segment in each parent, ensuring the segment fits
         const startIndex1 = Math.floor(Math.random() * (clone1.nodes.length - segmentSize - 2)) + 1;
