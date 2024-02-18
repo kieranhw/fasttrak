@@ -40,12 +40,14 @@ export class GeneticAlgorithm {
         }
 
         // Step 4: Crossover
-        offspring = crossover(offspring);
+        if (offspring.routes.length > 1) {
+            offspring = crossover(offspring);
+        }
 
         // Step 5: Mutation
         for (const route of offspring.routes) {
-            // 20% chance of mutation
-            if (Math.random() < 0.1) {
+            // 20% chance of mutation if there is more than one route
+            if (Math.random() < 0.1 || offspring.routes.length === 1) {
                 const mutatedRoute = mutate(route, this.deliveryNetwork.depot as Node);
                 offspring.routes[offspring.routes.indexOf(route)] = mutatedRoute;
             }
