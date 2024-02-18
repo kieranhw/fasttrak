@@ -26,7 +26,7 @@ export function insert(offspring: VRPSolution, remainingPackages: PriorityQueue)
         const driverBreak = 30 //TODO: GET THIS
 
         // Calculate the travel cost and time required to travel from the last node in the route to the next node
-        const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], node);
+        const travelCost = calculateDistance(route.nodes[route.nodes.length - 2], node);
         const travelTime = calculateTraversalMins(travelCost) + deliveryTime; // Calculate time required to traverse nodes, plus time to deliver package
 
         // Check if the package can be added to the vehicle route
@@ -34,8 +34,6 @@ export function insert(offspring: VRPSolution, remainingPackages: PriorityQueue)
             (route as any).addNode(node, travelCost, travelTime);
             remainingPackages.dequeue();
             route.updateTime(deliveryTime);
-            console.log("adding package to route")
-
             break;
         }
     }
@@ -50,6 +48,8 @@ export function insert(offspring: VRPSolution, remainingPackages: PriorityQueue)
     if (newFitness < 999) {
         return clonedOffspring;
     } else {
+        // If the new offspring has more than 2 penalties, return the original offspring
+        remainingPackages.enqueue(node);
         return offspring;
     }
 }
