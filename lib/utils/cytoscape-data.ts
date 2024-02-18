@@ -73,11 +73,15 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
             label = 'Unknown';
         }
 
+        const pkgAddress = node.pkg ? node.pkg.recipient_address : null;
+
+
         return {
             data: {
                 id: index.toString(),
                 label,
-                isDepot: node.isDepot ? 'true' : 'false'
+                isDepot: node.isDepot ? 'true' : 'false',
+                pkgAddress,
             },
             position: { x, y }
         };
@@ -87,19 +91,28 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
     solution.routes.forEach((route, index) => {
         route.nodes.slice(0, -1).forEach((node, i) => {
             const nextNode = route.nodes[i + 1];
-            const edgeCost = calculateDistance(node, nextNode); // Calculating the distance between the two nodes
-            const minutesToTraverse = calculateTraversalMins(edgeCost); // Estimating the minutes required to traverse the distance
-            const routeName = `${minutesToTraverse.toFixed(2)} mins`;
-            cyEdges.push({
-                data: {
-                    source: graph.nodes.indexOf(node).toString(),
-                    target: graph.nodes.indexOf(nextNode).toString(),
-                    color: ['red', 'green', 'blue', 'yellow', 'purple', 'pink', 'orange', 'cyan'][index % 8],  // Different colors for first 8 routes
-                    label: routeName,
-                    routeName,  // Add route attribute
-                    minutes: minutesToTraverse  // Add minutes to traverse edge
-                }
-            });
+    
+            // Get the indices of the current and next node in the graph.nodes array
+            const sourceIndex = graph.nodes.indexOf(node);
+            const targetIndex = graph.nodes.indexOf(nextNode);
+    
+            // Prevent creating an edge if source and target nodes are the same or have the same package address
+            if (sourceIndex !== targetIndex && cyNodes[sourceIndex].data.pkgAddress !== cyNodes[targetIndex].data.pkgAddress) {
+                const edgeCost = calculateDistance(node, nextNode); // Existing calculation logic...
+                const minutesToTraverse = calculateTraversalMins(edgeCost);
+                const routeName = `${minutesToTraverse.toFixed(2)} mins`;
+    
+                cyEdges.push({
+                    data: {
+                        source: sourceIndex.toString(),
+                        target: targetIndex.toString(),
+                        color: ['red', 'green', 'blue', 'yellow', 'purple', 'pink', 'orange', 'cyan'][index % 8],
+                        label: routeName,
+                        routeName,
+                        minutes: minutesToTraverse
+                    }
+                });
+            }
         });
     });
 
