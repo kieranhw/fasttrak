@@ -8,10 +8,12 @@ import { ScheduleProfile } from "@/types/schedule-profile";
 // Model of one individual vehicle route
 export class VehicleRoute {
     public nodes: Node[] = [];
-    public totalDistance: number = 0; // distance in miles
-    public currentWeight: number = 0; // in pounds
-    public currentVolume: number = 0; // in cubic feet
+
+    // measurements
     public totalTime: number = 0;  // in minutes
+    public totalDistance: number = 0; // distance in miles
+    public currentWeight: number = 0; // in kg
+    public currentVolume: number = 0; // in cubic meters
 
     constructor(
         public vehicle: Vehicle,
@@ -98,42 +100,59 @@ export class VehicleRoute {
         this.nodes.push(depot);
     }
 
-    updateMeasurements(deliveryTime: number): void {
-        // Reset totals before calculation
-        this.totalDistance = 0;
+    updateTime(deliveryTime: number): void {
         this.totalTime = 0;
-        this.currentWeight = 0;
-        this.currentVolume = 0;
-
-        // Iterate through all nodes to update distance, weight, volume, and time
         for (let i = 0; i < this.nodes.length - 1; i++) {
-            const currentNode = this.nodes[i];
+            const node = this.nodes[i];
             const nextNode = this.nodes[i + 1];
+            const cost = calculateDistance(node, nextNode);
+            const travelTime = calculateTraversalMins(cost);
 
-            // Update weight and volume for each package node
-            if (currentNode.pkg) {
-                this.currentWeight += currentNode.pkg.weight;
-                this.currentVolume += currentNode.pkg.volume;
+            let timeRequired = 0;
+            if (nextNode.isDepot) {
+                timeRequired = travelTime;
+            } else {
+                timeRequired = travelTime + deliveryTime;
             }
+            this.totalTime += timeRequired;
+        }
+    }
 
-            // Calculate distance and time to next node
-            if (nextNode) {
-                const distanceToNextNode = calculateDistance(currentNode, nextNode);
-                this.totalDistance += distanceToNextNode;
+    /***
+     * Update all measurements of the route, to be used only during the genetic algorithm
+     * when the route is being modified i.e. crossover, mutation, insertion
+     * 
+     * @param deliveryTime - time required to deliver a package
+     * @returns void
+     */
+    updateMeasurements(deliveryTime: number): void {
+        this.totalTime = 0;
+        this.totalDistance = 0;
+        this.currentVolume = 0;
+        this.currentWeight = 0;
+        for (let i = 0; i < this.nodes.length - 1; i++) {
+            const node = this.nodes[i];
+            const nextNode = this.nodes[i + 1];
+            const distance = calculateDistance(node, nextNode);
+            const travelTime = calculateTraversalMins(distance);
 
-                const travelTimeToNextNode = calculateTraversalMins(distanceToNextNode);
-                // If the next node is not the depot, add delivery time to the total time
-                this.totalTime += nextNode.isDepot ? travelTimeToNextNode : (travelTimeToNextNode + deliveryTime);
+            let timeRequired = 0;
+            if (nextNode.isDepot) {
+                timeRequired = travelTime;
+            } else {
+                timeRequired = travelTime + deliveryTime;
+            }
+            
+            // Add the total time and distance
+            this.totalTime += timeRequired;
+            this.totalDistance += distance;
+
+            // Add up the weight and volume measurements
+            if (node.pkg) {
+                this.currentWeight += node.pkg.weight;
+                this.currentVolume += node.pkg.volume;
             }
         }
-
-        // Ensure the loop accounts for the last node to depot transition if it's not explicitly handled
-        if (this.nodes.length > 1 && !this.nodes[this.nodes.length - 1].isDepot) {
-            const lastNodeToDepotDistance = calculateDistance(this.nodes[this.nodes.length - 1], this.depotNode);
-            this.totalDistance += lastNodeToDepotDistance;
-            this.totalTime += calculateTraversalMins(lastNodeToDepotDistance);
-        }
-
     }
 
 }

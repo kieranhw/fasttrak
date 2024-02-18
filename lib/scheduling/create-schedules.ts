@@ -77,11 +77,10 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
             console.log("No packages to schedule.");
             return;
         }
-        /*
-        const res = await geospatialClustering(graph, vehiclesData, profile)
-        vrpSolution = res[0];
-        */
-
+        
+        //const res = await geospatialClustering(graph, vehiclesData, profile)
+        //vrpSolution = res[0];
+        
         vrpSolution = await hybridAlgorithm(graph, vehiclesData, profile);
         console.log("scheduling locally")
     }

@@ -128,7 +128,6 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
 
         // Iterate route centroids trying to add a package to each route, if not possible, continue to next route
         for (const { route } of routeCentroids) {
-            
             // Calculate the travel cost and time required to travel from the last node in the route to the next node
             const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], node);
             const travelTime = calculateTraversalMins(travelCost) + deliveryTime; // Calculate time required to traverse nodes, plus time to deliver package
@@ -188,17 +187,17 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
     for (const route of solution.routes) {
         const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
         route.nodes = shortestPath;
+        route.updateTime(deliveryTime);
     }
 
     // Step 5: Close routes back to depot
     for (const route of solution.routes) {
         route.closeRoute(graph.depot as Node);
-        route.updateMeasurements(deliveryTime);
     }
 
-    console.log("remaining packages" + mainQueue.getData().length);
+    console.log("remaining packages" + backupQueue.getData().length);
 
-    return [solution, mainQueue];
+    return [solution, backupQueue];
 
 }
 
