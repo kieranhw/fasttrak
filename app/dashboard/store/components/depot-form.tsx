@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useFieldArray, useForm } from "react-hook-form"
 import { z } from "zod"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/utils"
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -34,7 +34,7 @@ import { Store } from "@/types/store"
 import { PostgrestError } from "@supabase/supabase-js"
 import { useEffect, useState } from "react"
 import { generateIC } from "@/lib/utils/generate-ids"
-import { geocodeAddress as geocoder } from "@/lib/utils/geocoder"
+import { geocodeAddress as geocoder } from "@/lib/google-maps/geocoder"
 import { sanitizeFloat } from "@/lib/utils/validation"
 import { Depot } from "@/types/depot"
 import { Loader2 } from "lucide-react"

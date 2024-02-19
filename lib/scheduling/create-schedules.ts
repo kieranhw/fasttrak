@@ -1,15 +1,15 @@
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
-import { roundRobinAllocation } from "../routing/algorithms/algorithm-2";
-import { geospatialClustering } from "../routing/algorithms/algorithm-3";
+import { roundRobinAllocation } from "../routing/algorithms/rr-fifo";
+import { geospatialClustering } from "../routing/algorithms/k-means";
 import { Edge, Graph, Node, calculateDistance, createGraph } from "../routing/models/graph";
 import { VRPSolution, VehicleRoute } from "../routing/models/vrp";
 import { UUID } from "crypto";
 import axios from 'axios';
 import { ScheduleProfile } from "@/types/schedule-profile";
 import { db } from "../db/db";
-import { hybridAlgorithm } from "../routing/algorithms/algorithm-4";
+import { hybridAlgorithm } from "../routing/algorithms/hybrid-algorithm";
 
 // API Gateway endpoint URL
 const apiGatewayEndpoint = 'https://e266yv3o3eojn6auayc5za77c40pmdhb.lambda-url.eu-north-1.on.aws/';
