@@ -20,8 +20,8 @@ export function calculateEfficiencyScores(vrpSolution: VRPSolution): { TE: numbe
     let weightCapacity = 0;
 
     vrpSolution.routes.forEach(route => {
-        totalDrivingTime += route.totalTime;
-        totalMilesDriven += route.totalDistance;
+        totalDrivingTime += route.eucTimeMins;
+        totalMilesDriven += route.eucDistanceMiles;
         totalPackagesDelivered += route.nodes.filter(node => node.pkg !== null).length;
         volumeUtilised += route.currentVolume;
         volumeCapacity += route.vehicle.max_volume;

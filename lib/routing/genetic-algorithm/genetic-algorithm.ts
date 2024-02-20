@@ -68,6 +68,8 @@ export class GeneticAlgorithm {
         if (Math.random() < 0.2) {
             this.bestGeneration = insert(this.bestGeneration, this.remainingPackages);
         }
+
+
     }
 
     public evolve(generations: number): VRPSolution {
@@ -94,7 +96,7 @@ export class GeneticAlgorithm {
         }
         console.log("End Population Fitness: ", endFitness)
         console.log("End population package count: ", this.bestGeneration.routes.reduce((sum, route) => sum + route.nodes.length, 0))
-
+        this.bestGeneration.updateRouteMetrics();
         return this.bestGeneration;
     }
 }

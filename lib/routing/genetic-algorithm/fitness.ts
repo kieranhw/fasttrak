@@ -13,8 +13,8 @@ export function routeFitness(route: VehicleRoute): number {
     const p3 = 500; // Penalty for time window violation
 
     const packageCount = Math.max(route.nodes.length - 2, 1); // Ensure no division by zero
-    const distance = route.totalDistance / packageCount;
-    const time = route.totalTime / packageCount;
+    const distance = route.eucDistanceMiles / packageCount; // Calculate average euc distance per package
+    const time = route.eucTimeMins / packageCount; // Calculate average actual time per package
 
     // Ensure efficiencies are calculated such that higher values are better
     let spaceEfficiency = (route.currentVolume / route.vehicle.max_volume);
@@ -22,7 +22,7 @@ export function routeFitness(route: VehicleRoute): number {
 
     const spacePenalty = spaceEfficiency > 1 ? spaceEfficiency = p1 : 0;
     const loadPenalty = loadEfficiency > 1 ? loadEfficiency = p2 : 0;
-    const timeWindowViolation = Math.max(0, route.totalTime - TimeWindowMins); // Ensure it's non-negative
+    const timeWindowViolation = Math.max(0, route.eucTimeMins - TimeWindowMins); // Ensure it's non-negative
     const timeWindowPenalty = p3 * timeWindowViolation; // This should always be a positive addition to the fitness score
 
     const fitnessInfo = {

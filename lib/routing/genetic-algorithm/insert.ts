@@ -33,7 +33,7 @@ export function insert(offspring: VRPSolution, remainingPackages: PriorityQueue)
         if ((route as any).canAddPackage(node.pkg, node, travelTime, timeWindow, driverBreak)) {
             (route as any).addNode(node, travelCost, travelTime);
             remainingPackages.dequeue();
-            route.updateTime(deliveryTime);
+            route.updateEuclideanTime(deliveryTime);
             break;
         }
     }

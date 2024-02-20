@@ -83,6 +83,8 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
         
         vrpSolution = await hybridAlgorithm(graph, vehiclesData, profile);
         console.log("scheduling locally")
+
+        console.log(vrpSolution)
     }
 
     // Initialize an empty array to hold delivery schedules for each vehicle
@@ -101,9 +103,9 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
             start_time: date,
             status: DeliveryStatus.Scheduled,
             num_packages: route.nodes.length - 2, // minus 2 to exclude depot nodes
-            estimated_duration_mins: route.totalTime, // TODO: Calculate real duration
+            estimated_duration_mins: route.actualTimeMins, 
             actual_duration_mins: 0,
-            distance_miles: route.totalDistance.toFixed(2) as unknown as number,
+            distance_miles: route.actualDistanceMiles.toFixed(2) as unknown as number,
             load_weight: route.currentWeight,
             load_volume: route.currentVolume,
             created_at: new Date()
@@ -117,9 +119,10 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
 }
 
 // Estimate duration based on distance and time to deliver each package
-export function calculateTraversalMins(distance: number): number {
-    const averageSpeed = 8; // mph
-
+export function calculateTraversalMins(distance: number, averageSpeed?: number): number {
+    if (!averageSpeed || averageSpeed == 0) {
+        averageSpeed = 10; // miles per hour
+    }
     // estimated time to travel distance in minutes 
     const estimatedDuration = (distance / averageSpeed) * 60;
 

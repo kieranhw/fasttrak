@@ -5,12 +5,12 @@ import { UUID } from "crypto"
 import { faker } from '@faker-js/faker';
 import { generateFT } from "@/lib/utils/generate-ids";
 import { db } from "@/lib/db/db";
-import { addressData as evenAddresses } from "./liverpool-addresses-even";
-import { addressData as randomAddresses } from "./liverpool-addresses-random";
+import { addressData as evenAddresses } from "./wide-liverpool-addresses-even";
+import { addressData as randomAddresses } from "./wide-liverpool-addresses-random";
 
 export const generatePackages = async (numPackages: number): Promise<Package[]> => {
     const packages: Package[] = [];
-    const addresses: { address: string, lat: number, lng: number }[] = randomAddresses;
+    const addresses: { address: string, lat: number, lng: number }[] = evenAddresses;
 
     console.log("addresses:" + addresses.length);
 
@@ -21,7 +21,7 @@ export const generatePackages = async (numPackages: number): Promise<Package[]> 
             'max': priorities.length - 1
         });
 
-        // Ensure recipient and sender addresses are different
+        // Select recipient and sender addresses which are different
         const [recipientAddress, senderAddress] = faker.helpers.shuffle(addresses).slice(0, 2);
 
         const { data: store, error} = await db.stores.fetch.forUser();
@@ -51,7 +51,7 @@ export const generatePackages = async (numPackages: number): Promise<Package[]> 
             current_state: CurrentState.Pending,
             delivery_attempts: 0,
             weight: faker.number.int({ min: 5, max: 20 }),
-            volume: parseFloat(faker.number.float({ min: 0.1, max: 1 }).toPrecision(2)),
+            volume: parseFloat(faker.number.float({ min: 0.1, max: 0.4 }).toPrecision(2)),
             fragile: false,
             priority: priorities[randomNumber],
             delivery_notes: faker.lorem.words(10),

@@ -98,7 +98,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
 
             const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
             route.nodes = shortestPath;
-            route.updateTime(deliveryTime);
+            route.updateEuclideanTime(deliveryTime);
         }
 
 
@@ -133,7 +133,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
             const travelTime = calculateTraversalMins(travelCost) + deliveryTime; // Calculate time required to traverse nodes, plus time to deliver package
 
             // If travel cost is more than triple the average time to travel for this route, skip this route
-            const averageTimeToTravel = route.totalTime / route.nodes.length;
+            const averageTimeToTravel = route.eucTimeMins / route.nodes.length;
             if (travelCost < averageTimeToTravel * 3) break;
 
             // Check if the package can be added to the vehicle route
@@ -146,7 +146,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
 
             const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
             route.nodes = shortestPath;
-            route.updateTime(deliveryTime);
+            route.updateEuclideanTime(deliveryTime);
         }
 
         // If the package cannot be added to any route, dequeue the package indefinitely
@@ -173,7 +173,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
 
                 const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
                 route.nodes = shortestPath;
-                route.updateTime(deliveryTime);
+                route.updateEuclideanTime(deliveryTime);
                 break;
             }
         }
@@ -187,7 +187,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
     for (const route of solution.routes) {
         const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
         route.nodes = shortestPath;
-        route.updateTime(deliveryTime);
+        route.updateEuclideanTime(deliveryTime);
     }
 
     // Step 5: Close routes back to depot
