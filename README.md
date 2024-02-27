@@ -6,7 +6,7 @@ kieranhardwick260@gmail.com
 
 ### About
 
-This software is designed and implemented as a project for my final year dissertation. The aim of the project was to create a system that generates optimised routes for 'last mile' delivery schedules. The system is inspired by research into the Vehicle Routing Problem (VRP) and Travelling Salesman Problem (TSP). As the problem is NP-hard, the goal is to find a 'good enough' optimisation solution, such that computation is fast and could scale to the size of a realistic last mile service.
+This software is currently under development as my final year dissertation. The aim of the project was to create a system that generates optimised routes for 'last mile' delivery schedules. The system is inspired by research into the Vehicle Routing Problem (VRP) and Travelling Salesman Problem (TSP). As the problem is NP-hard, the goal is to find a 'good enough' optimisation solution, such that computation is fast and could scale to the size of a realistic last mile service.
 
 A modern user interface provides a platform to manage the network of delivery operations including creating and managing vehicles, packages and detailed analytical reports. The application is built with React and NextJS written in TypeScript, with the back end making AWS Lambda function calls to handle compute heavy data processing. Data is stored within a cloud hosted PostgreSQL database.
 
