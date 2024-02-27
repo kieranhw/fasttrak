@@ -17,10 +17,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { IoAnalytics } from "react-icons/io5";
+import { BsQuestionCircleFill } from "react-icons/bs";
 
 import {
   Calculator,
-  Calendar,
   CreditCard,
   Settings,
   Smile,
@@ -60,10 +60,12 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { MdError } from "react-icons/md";
-import { MouseEvent } from "react";
+import { MouseEvent, useState } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import NotificationItem from "@/components/ui/notification-item";
+import { Calendar } from "@/components/ui/calendar"
+
 
 export type Notification = {
   severity: number;
@@ -76,7 +78,7 @@ const notifications: Notification[] = [
   {
     severity: 3,
     title: "No Store",
-    description: "You dont have a store yet, click here to get started.",
+    description: "Click here to create or join a store",
     onClickLink: "/dashboard/store",
   },
   {
@@ -87,13 +89,19 @@ const notifications: Notification[] = [
   {
     severity: 1,
     title: "Delivery schedule complete",
-    description: "Schedule from depot 1 completed succesfully",
+    description: "Schedule for 27/02/24 completed",
+  },
+  {
+    severity: 1,
+    title: "Delivery schedule complete",
+    description: "Schedule for 27/02/24 completed",
   },
 ]
 
 function renderInfoCard() {
+
   return (
-    <Card className="col-span-2 h-[360px]">
+    <Card className="col-span-2 h-[320px]">
       <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
         <div className="flex items-center justify-between w-full">
           <CardTitle className="text-lg font-medium">
@@ -118,32 +126,39 @@ function renderInfoCard() {
           Key statistics for this month
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-3">
-          <div className="h-15 border p-2 items-center justify-center flex flex-col m-2 text-center bg-accent rounded-lg">
-            <div className="text-2xl font-bold">271</div>
-            <p className="text-xs text-muted-foreground">
-              Schedules
-            </p>
-          </div>
-
-          <div className="h-15 border p-2 items-center justify-center flex flex-col m-2 text-center bg-accent rounded-lg">
-            <div className="text-2xl font-bold">335</div>
-            <p className="text-xs text-muted-foreground">
-              Packages
-            </p>
-          </div>
-
-          <div className="h-15 border p-2 items-center justify-center flex flex-col m-2 text-center bg-accent rounded-lg">
-            <div className="text-2xl font-bold">834</div>
-            <p className="text-xs text-muted-foreground">
-              Deliveries
-            </p>
+      <CardContent className="border-t my-2 p-0 h-[230px]">
+        <div className="w-full h-[230px] flex flex-col justify-between">
+          <div className="flex flex-wrap h-full">
+            <div className="items-start w-1/2 justify-center flex flex-col text-start border-r border-b pl-8">
+              <div className="text-3xl font-bold">12</div>
+              <p className="text-xs text-muted-foreground">
+                Schedules Created
+              </p>
+            </div>
+            <div className="items-start w-1/2 justify-center flex flex-col text-start border-b pl-8">
+              <div className="text-3xl font-bold">288</div>
+              <p className="text-xs text-muted-foreground">
+                Packages Delivered
+              </p>
+            </div>
+            <div className="items-start w-1/2 justify-center flex flex-col text-start border-r pl-8">
+              <div className="text-3xl font-bold">1048 mi</div>
+              <p className="text-xs text-muted-foreground">
+                Miles Driven
+              </p>
+            </div>
+            <div className="items-start w-1/2 justify-center flex flex-col text-start pl-8">
+              <div className="text-3xl font-bold">52.5</div>
+              <div className="flex gap-1 items-center w-full hover:text-primary">
+                <p className="text-xs text-muted-foreground">
+                  Delivery Efficiency
+                </p>
+                <BsQuestionCircleFill className="text-muted-foreground h-3 my-0" />
+              </div>
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 mt-2 justify-end text-sm text-muted-foreground hover:underline hover:cursor-pointer">
-          <IoAnalytics size={16} />View detailed analytics
-        </div>
+
       </CardContent>
     </Card>
   )
@@ -151,7 +166,7 @@ function renderInfoCard() {
 
 function renderShortcutsCard() {
   return (
-    <Card className="col-span-2 h-[360px]">
+    <Card className="col-span-2 h-[320px]">
       <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
         <div className="flex items-center justify-between w-full">
           <CardTitle className="text-lg font-medium">
@@ -176,12 +191,12 @@ function renderShortcutsCard() {
           Choose an action to begin
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <Command className="rounded-lg border mt-2 h-[250px]">
+      <CardContent className="p-0">
+        <Command className="rounded-b-lg rounded-t-none border-t mt-2 h-[230px] w-full">
           <CommandInput placeholder="I want to..." />
-          <CommandList>
+          <CommandList className="no-scrollbar">
             <CommandEmpty>No results found.</CommandEmpty>
-            <CommandGroup heading="Create New">
+            <CommandGroup heading="Create New" className="mx-4">
               <CommandItem>
                 <span>Register a new vehicle</span>
               </CommandItem>
@@ -190,7 +205,7 @@ function renderShortcutsCard() {
               </CommandItem>
             </CommandGroup>
             <CommandSeparator />
-            <CommandGroup heading="Delivery Scheduling">
+            <CommandGroup heading="Delivery Scheduling" className="mx-4">
               <CommandItem>
                 <span>Schedule a delivery for today</span>
               </CommandItem>
@@ -202,7 +217,7 @@ function renderShortcutsCard() {
               </CommandItem>
             </CommandGroup>
             <CommandSeparator />
-            <CommandGroup heading="Data Management">
+            <CommandGroup heading="Data Management" className="mx-4">
               <CommandItem>
                 <span>View package inventory</span>
               </CommandItem>
@@ -214,7 +229,7 @@ function renderShortcutsCard() {
               </CommandItem>
             </CommandGroup>
             <CommandSeparator />
-            <CommandGroup heading="Settings">
+            <CommandGroup heading="Settings" className="mx-4">
               <CommandItem>
                 <span>Edit store information</span>
               </CommandItem>
@@ -234,7 +249,7 @@ function renderShortcutsCard() {
 
 function renderNotificationsCard() {
   return (
-    <Card className="col-span-2 h-[360px]">
+    <Card className="col-span-2 h-[320px]">
       <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
         <div className="flex items-center justify-between w-full">
           <CardTitle className="text-lg font-medium">
@@ -259,8 +274,8 @@ function renderNotificationsCard() {
           Items requiring your attention
         </CardDescription>
       </CardHeader>
-      <CardContent className="">
-        <div className="mt-2 h-[250px] overflow-y-auto">
+      <CardContent className="p-0 border-t mt-2">
+        <div className="h-[230px] no-scrollbar overflow-y-auto">
           <Table>
             {notifications.length === 0 &&
               <TableCaption>There are no notifications.</TableCaption>
@@ -298,8 +313,21 @@ export default function Dashboard() {
           {renderInfoCard()}
           {renderNotificationsCard()}
           {renderShortcutsCard()}
+
         </div>
 
+
+        <div className="mt-2">
+          <h1 className="text-foreground font-bold text-2xl">Analytics</h1>
+          <div className="flex justify-between">
+            <p className="text-md text-muted-foreground">
+              A short overview of your system's performance.
+            </p>
+            <div className="flex items-center gap-2 justify-end text-sm text-muted-foreground hover:underline hover:cursor-pointer my-2">
+              <IoAnalytics size={16} />View detailed analytics
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )

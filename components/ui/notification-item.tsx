@@ -23,7 +23,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification }) => 
   return (
       <TableRow className={rowClassNames} onClick={handleRowClick}>
         <TableCell className="font-medium">
-          <div className={`h-3 w-3 rounded-full ${bgColorClass}`} />
+          <div className={`h-3 w-3 rounded-full ml-2 ${bgColorClass}`} />
         </TableCell>
         <TableCell className="w-full">
           <div className="flex flex-col">
