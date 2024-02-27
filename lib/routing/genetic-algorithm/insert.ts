@@ -3,8 +3,9 @@ import { VRPSolution, VehicleRoute } from "../models/vrp";
 import { routeFitness } from "./fitness";
 import { calculateTraversalMins } from "@/lib/scheduling/create-schedules";
 import { calculateDistance } from "../models/graph";
+import { ScheduleProfile } from "@/types/schedule-profile";
 
-export function insert(offspring: VRPSolution, remainingPackages: PriorityQueue): VRPSolution {
+export function insert(offspring: VRPSolution, remainingPackages: PriorityQueue, profile: ScheduleProfile): VRPSolution {
     // 1. Peek node from priority queue 
     const node = remainingPackages.peek();
     if (!node) return offspring;
@@ -18,23 +19,26 @@ export function insert(offspring: VRPSolution, remainingPackages: PriorityQueue)
     // 3. Clone the offspring and select the first route which can accommodate the package
     const clonedOffspring = offspring.clone();
 
-    // Iterate the routes, and try to add the package
-    for (const route of clonedOffspring.routes) {
+    // Iterate the routes as shuffled order, and try to add the package
+    for (const route of clonedOffspring.routes.sort(() => Math.random() - 0.5)){
         // Check if the route can accommodate the package
-        const deliveryTime = 3 //TODO: GET THIS
-        const timeWindow = 60 * 8 //TODO: GET THIS
-        const driverBreak = 30 //TODO: GET THIS
+        const deliveryTime = profile.delivery_time;
+        const timeWindow = (profile.time_window * 60) - 15;
 
-        // Calculate the travel cost and time required to travel from the last node in the route to the next node
-        const travelCost = calculateDistance(route.nodes[route.nodes.length - 2], node);
-        const travelTime = calculateTraversalMins(travelCost) + deliveryTime; // Calculate time required to traverse nodes, plus time to deliver package
+        // Update the measurements of the route
+        route.updateMeasurements(deliveryTime);
 
-        // Check if the package can be added to the vehicle route
-        if ((route as any).canAddPackage(node.pkg, node, travelTime, timeWindow, driverBreak)) {
-            (route as any).addNode(node, travelCost, travelTime);
-            remainingPackages.dequeue();
-            route.updateEuclideanTime(deliveryTime);
-            break;
+        if (route.actualTimeMins < timeWindow && route.currentVolume + node.pkg!.volume <= route.vehicle.max_volume && route.currentWeight + node.pkg!.weight <= route.vehicle.max_load) {
+            // Calculate the travel cost and time required to travel from the last node in the route to the new node
+            const travelCost = calculateDistance(route.nodes[route.nodes.length - 2], node, route.distanceMultiplier);
+            const travelTime = calculateTraversalMins(travelCost) + deliveryTime; // Calculate time required to traverse nodes, plus time to deliver package
+
+            // Check if the package can be added to the vehicle route
+            if (route.canAddPackage(node.pkg!, node, travelTime, timeWindow)) {
+                route.addNode(node, travelTime);
+                remainingPackages.dequeue();
+                break;
+            }
         }
     }
 
@@ -44,8 +48,8 @@ export function insert(offspring: VRPSolution, remainingPackages: PriorityQueue)
         newFitness += routeFitness(route);
     }
 
-    // If new fitness has less than 2 penalties, prevent early convergence
-    if (newFitness < 999) {
+    // If new fitness has no penalties, return
+    if (newFitness < 499) {
         return clonedOffspring;
     } else {
         // If the new offspring has more than 2 penalties, return the original offspring

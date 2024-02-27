@@ -1,10 +1,12 @@
 import { DeliverySchedule } from "@/types/delivery-schedule";
 import { Edge, Graph, Node, calculateDistance, createGraph } from "../routing/models/graph";
 import { VRPSolution, VehicleRoute } from "../routing/models/vrp";
+import { OptimisationProfile, ScheduleProfile } from "@/types/schedule-profile";
 
 export async function createGraphAndSolutionFromScheduleArray(schedules: DeliverySchedule[]): Promise<[Graph, VRPSolution]> {
     const graph = new Graph();
     const solution = new VRPSolution();
+
 
     // TODO: Get real depot coords
     // Create nodes for depot, assuming all schedules share the same depot
@@ -30,15 +32,25 @@ export async function createGraphAndSolutionFromScheduleArray(schedules: Deliver
         }
     }
 
+    // TODO: Test if manual setting works. This should not affect the graph because it is not being processed, only
+    // for building a visualisation
+    const scheduleProfile: ScheduleProfile = {
+        optimisation_profile: OptimisationProfile.Eco,
+        time_window: 8,
+        delivery_time: 3,
+        selected_vehicles: schedules.map(schedule => schedule.vehicle)
+    }
+
     // Create VehicleRoutes and VRPSolution from schedules
     for (const schedule of schedules) {
-        const route = new VehicleRoute(schedule.vehicle, depotNode);
+
+        const route = new VehicleRoute(schedule.vehicle, depotNode, scheduleProfile);
         for (const pkg of schedule.package_order) {
             if (pkg) {
                 const pkgNode = graph.nodes.find(node => node.pkg?.package_id === pkg.package_id);
                 if (pkgNode) {
                     const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode);
-                    route.addNode(pkgNode, travelCost, 0);  // Assume timeRequired is 0 for simplicity
+                    route.addNode(pkgNode, 0);  // Assume timeRequired is 0 for simplicity
                 }
             }
 
@@ -69,13 +81,22 @@ export async function createGraphAndSolutionFromSchedule(schedule: DeliverySched
         graph.addEdge(new Edge(depotNode, pkgNode, calculateDistance(depotNode, pkgNode)));
     }
 
+    // TODO: Test if manual setting works. This should not affect the graph because it is not being processed, only
+    // for building a visualisation
+    const scheduleProfile: ScheduleProfile = {
+        optimisation_profile: OptimisationProfile.Eco,
+        time_window: 8,
+        delivery_time: 3,
+        selected_vehicles: [schedule.vehicle]
+    }
+
     // Create VehicleRoute and VRPSolution from schedule
-    const route = new VehicleRoute(schedule.vehicle, depotNode);
+    const route = new VehicleRoute(schedule.vehicle, depotNode, scheduleProfile);
     for (const pkg of schedule.package_order) {
         const pkgNode = graph.nodes.find(node => node.pkg?.package_id === pkg.package_id);
         if (pkgNode) {
             const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode);
-            route.addNode(pkgNode, travelCost, 0);  // Assume timeRequired is 0 for simplicity
+            route.addNode(pkgNode, 0);  // Assume timeRequired is 0 for simplicity
         }
     }
     route.closeRoute(depotNode);

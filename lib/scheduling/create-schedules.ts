@@ -121,7 +121,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
 // Estimate duration based on distance and time to deliver each package
 export function calculateTraversalMins(distance: number, averageSpeed?: number): number {
     if (!averageSpeed || averageSpeed == 0) {
-        averageSpeed = 10; // miles per hour
+        averageSpeed = 20; // miles per hour
     }
     // estimated time to travel distance in minutes 
     const estimatedDuration = (distance / averageSpeed) * 60;

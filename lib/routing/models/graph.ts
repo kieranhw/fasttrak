@@ -34,7 +34,7 @@ export class Node {
 
     clone(): Node {
         // Create a new Node instance with copied values
-        return new Node(this.pkg, {...this.coordinates}, this.isDepot);
+        return new Node(this.pkg, { ...this.coordinates }, this.isDepot);
     }
 
     // Find the nearest neighbor by cost
@@ -69,8 +69,8 @@ export class Edge {
     ) { }
 }
 
-// Calculate distance between nodes
-export function calculateDistance(node1: Node, node2: Node): number {
+// Calculate distance between nodes using the Haversine formula
+export function calculateDistance(node1: Node, node2: Node, multiplier?: number): number {
     const dx = node1.coordinates.lat - node2.coordinates.lat;
     const dy = node1.coordinates.lng - node2.coordinates.lng
 
@@ -78,11 +78,21 @@ export function calculateDistance(node1: Node, node2: Node): number {
 
     const miles = dist * 69.172;
 
+    // Convert to non-euclidean distance if multiplier
+    if (multiplier) {
+        return miles * multiplier;
+    }
+
     return miles;
 }
 
 // Exported function to create graph from supplied data
-export async function createGraph(packages: Package[], depotCoordinates: Location, complete: boolean = false): Promise<Graph> {
+export async function createGraph(
+    packages: Package[],
+    depotCoordinates: Location,
+    complete: boolean = false,
+    multiplier: number = 0): Promise<Graph> {
+
     const graph = new Graph();
 
     // Create node for depot, starting point and end point
@@ -99,12 +109,16 @@ export async function createGraph(packages: Package[], depotCoordinates: Locatio
         graph.addNode(new Node(pkg, coordinates));
     }
 
+    // If euclidean create the function calculateDistance as the euclidean distance
+    const dist = (node1: Node, node2: Node) => calculateDistance(node1, node2, multiplier !== 0 ? multiplier : undefined);
+
     if (complete) {
         // Connect edges to all nodes
         for (const node1 of graph.nodes) {
             for (const node2 of graph.nodes) {
                 if (node1 !== node2) {
-                    graph.addEdge(new Edge(node1, node2, calculateDistance(node1, node2)));
+                    // Add an edge between node1 and node2 with distance as cost
+                    graph.addEdge(new Edge(node1, node2, dist(node1, node2)));
                 }
             }
         }
@@ -114,13 +128,13 @@ export async function createGraph(packages: Package[], depotCoordinates: Locatio
             if (node !== depotNode) {
                 const distances = graph.nodes.map(otherNode => ({
                     node: otherNode,
-                    distance: calculateDistance(node, otherNode)
+                    distance: dist(node, otherNode)
                 })).filter(distObj => distObj.node !== node && distObj.node !== depotNode);  // Exclude current node and depot node
 
                 distances.sort((a, b) => a.distance - b.distance);
 
                 // Connect to the depot node
-                graph.addEdge(new Edge(node, depotNode, calculateDistance(node, depotNode)));
+                graph.addEdge(new Edge(node, depotNode, dist(node, depotNode)));
 
                 // Connect to the 25 nearest neighbors
                 for (let i = 0; i < 25; i++) {

@@ -78,7 +78,6 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
                     optimisationProfile: 'Eco',
                     timeWindow: '8',
                     deliveryTime: '3',
-                    driverBreak: '30',
                 });
             }, 200);
 
@@ -99,7 +98,6 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
         optimisationProfile: 'Eco',
         timeWindow: '8',
         deliveryTime: '3',
-        driverBreak: '30',
     });
 
     const isSubmitDisabled = () => {
@@ -107,7 +105,6 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
             formFields.optimisationProfile === '' ||
             formFields.timeWindow === '' ||
             formFields.deliveryTime === '' ||
-            formFields.driverBreak === '' ||
             selectedVehicles.length === 0 ||
             (numPendingPackages !== null && Number(numPendingPackages) === 0) ||
             isLoading == true
@@ -122,7 +119,6 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
             optimisation_profile: formFields.optimisationProfile as OptimisationProfile,
             time_window: parseInt(formFields.timeWindow),
             delivery_time: parseInt(formFields.deliveryTime),
-            driver_break: parseInt(formFields.driverBreak),
         };
 
         console.log(scheduleProfile);
@@ -282,23 +278,6 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
                 </Select>
             </div>
 
-            <div className="flex justify-between gap-4">
-                <Label className="my-auto justify-center line-clamp-1">Driver Break</Label>
-                <Select value={formFields.driverBreak}
-                    onValueChange={(e) => setFormFields({ ...formFields, driverBreak: e.valueOf() })}>
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select Time" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectLabel>Driver Break</SelectLabel>
-                            <SelectItem value="30">30 Minutes</SelectItem>
-                            <SelectItem value="45">45 Minutes</SelectItem>
-                            <SelectItem value="60">60 Minutes</SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
-            </div>
 
             <DialogFooter>
                 <>

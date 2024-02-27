@@ -12,5 +12,4 @@ export type ScheduleProfile = {
     optimisation_profile: OptimisationProfile,
     time_window: number, // time window in hours
     delivery_time: number, // est time to deliver each parcel in minutes
-    driver_break: number, // break time in minutes
 }
