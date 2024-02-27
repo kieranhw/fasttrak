@@ -1,13 +1,7 @@
 import { VRPSolution, VehicleRoute } from "../routing/models/vrp";
-import { Package } from "@/types/package";
-import { Loader } from '@googlemaps/js-api-loader';
 import { Node, calculateDistance } from "../routing/models/graph";
 import { calculateTraversalMins } from "../scheduling/create-schedules";
-const loader = new Loader({
-    apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY!,
-    version: "weekly",
-    libraries: ["routes"],
-});
+import { loader } from "./loader";
 
 let service: google.maps.DirectionsService;
 
