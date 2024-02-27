@@ -56,12 +56,12 @@ export function DataTable<TData, TValue>({
     },
   })
 
-   // Calculate the number of empty rows to fill the table
-   const emptyRows = Math.max(0, table.initialState.pagination.pageSize - table.getRowModel().rows.length);
+  // Calculate the number of empty rows to fill the table
+  const emptyRows = Math.max(0, table.initialState.pagination.pageSize - table.getRowModel().rows.length);
 
   return (
     <>
-      <div className="rounded-md border">
+      <div className="rounded-md border bg-background">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

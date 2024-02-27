@@ -105,12 +105,12 @@ export default function ScheduleDetails() {
                     <h1 className="text-foreground font-bold text-3xl">Route Details</h1>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div className="">
+                <div className="flex flex-col lg:flex-row gap-4">
+                    <div className="w-full lg:w-1/2">
                         <DataTable columns={columns(refreshData)} data={packages!} />
                     </div>
-                    <div className="">
-                        <div className="border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1 h-12">
+                    <div className="w-full lg:w-1/2">
+                        <div className="border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1 h-12 bg-background">
                             <p className="text-muted-foreground font-medium text-sm m-2">Delivery Network</p>
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -123,7 +123,7 @@ export default function ScheduleDetails() {
                                 </TooltipContent>
                             </Tooltip>
                         </div>
-                        <div className="border rounded-t-none rounded-md border-divider h-[436px]">
+                        <div className="border rounded-t-none rounded-md border-divider h-[395px]">
                             {graph && solution &&
                                 <CytoscapeGraph graph={graph} solution={solution} />
                             }
@@ -131,42 +131,11 @@ export default function ScheduleDetails() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
-                    <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
-                        <h1 className="font-bold text-xl">Vehicle</h1>
-                        <p>Registration</p>
-                        <p className="text-sm text-muted-foreground">Manufacturer Model Year</p>
-                        <br />
-                        <p className="text-sm">250 / 300 kg utilised</p>
-                        <p className="text-sm">12 / 15 m<sup>3</sup> utilised</p>
-                    </div>
-                    <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
-                        <h1 className="font-bold text-xl">Packages</h1>
-                        <p className="text-md">X Packages</p>
-                        <br />
-                        <p className="text-sm">Average Weight / Package: Xkg</p>
-                        <p className="text-sm">Average Volume / Package: Xkg</p>
-                    </div>
-                    <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
-                        <h1 className="font-bold text-xl">Route</h1>
-                        <p className="text-md">X Stops (Distinct Locations)</p>
-                        <br />
-                        <p className="text-sm">Driving Time: Xh Xm</p>
-                        <p className="text-sm">Driving Distance: X miles</p>
-                    </div>
-                    <div className="flex flex-col border rounded-md border-divider min-h-[200px] p-4">
-                        <h1 className="font-bold text-xl">Optimisation</h1>
-                        <p className="text-md">Lowest Distance</p>
-                        <br />
-                        <p className="text-sm">This route has been optimised to reduce the amount of
-                            total distance travelled.</p>
-                    </div>
+              
 
 
 
-
-                </div>
-            </div >
+            </div>
         </TooltipProvider>
 
     )
