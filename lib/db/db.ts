@@ -4,6 +4,7 @@ import { schedules } from './delivery-schedules';
 import { profiles } from './user-profiles';
 import { stores } from './stores';
 import { depots } from './depots';
+import { misc } from './misc';
 
 export const db = {
     packages,
@@ -11,5 +12,6 @@ export const db = {
     schedules,
     profiles,
     stores,
-    depots
+    depots,
+    misc
 };

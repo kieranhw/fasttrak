@@ -14,7 +14,7 @@ const fetchStoreForUser = async (): Promise<{ data: Store | null, error: Postgre
         return { data: null, error: userError };
     }
 
-    if (!userProfile) {
+    if (!userProfile || !userProfile.store_id) {
         console.error("User profile not found");
         return { data: null, error: null };
     }

@@ -60,7 +60,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { MdError } from "react-icons/md";
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import NotificationItem from "@/components/ui/notification-item";
@@ -72,6 +72,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import Image from "next/image";
+import { db } from "@/lib/db/db";
+import { DashboardInfo } from "@/types/misc";
+import { Skeleton } from "@/components/ui/skeleton"
+import { set } from "date-fns";
 
 export type Notification = {
   severity: number;
@@ -105,7 +109,195 @@ const notifications: Notification[] = [
 ]
 
 function renderInfoCard() {
+  const [info, setInfo] = useState<DashboardInfo | undefined | null>(undefined);
+  const [noStore, setNoStore] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
+  useEffect(() => {
+    setIsLoading(true);
+    async function getInfo() {
+      const res = await db.misc.fetch.dashboardInfo();
+      if (res.error) {
+        setInfo(null);
+        setNoStore(true);
+      } else if (res.data) {
+        localStorage.setItem('dashboardInfo', JSON.stringify(res.data));
+        setInfo(res.data!);
+        setNoStore(false);
+      }
+
+    }
+
+    const cachedInfo = localStorage.getItem('dashboardInfo');
+    if (cachedInfo) {
+      setInfo(JSON.parse(cachedInfo));
+      getInfo(); // Update the cache
+    } else {
+      getInfo();
+    }
+    setIsLoading(false);
+  }, []);
+
+  return (
+    <Card className="col-span-2 h-[320px]">
+      <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
+        <div className="flex items-center justify-between w-full">
+          <CardTitle className="text-lg font-medium">
+            {info?.store.store_name || "Store Name"}
+
+          </CardTitle>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            className="h-4 w-4 text-muted-foreground"
+          >
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        </div>
+        {noStore && !isLoading &&
+          <CardDescription className="text-red-500">
+            You have no store, create or join one first.
+          </CardDescription>
+        }
+
+        {info && !noStore &&
+          <CardDescription>
+            Your store's statistics for this month
+          </CardDescription>
+        }
+
+        {isLoading &&
+          <CardDescription>
+            Loading...
+          </CardDescription>
+        }
+
+      </CardHeader>
+      {info &&
+        <CardContent className="border-t my-2 p-0 h-[230px]">
+          <div className="w-full h-[230px] flex flex-col justify-between">
+            <div className="flex flex-wrap h-full">
+              <div className="items-start w-1/2 justify-center flex flex-col text-start border-r border-b pl-8">
+                <div className="text-3xl font-bold">{info?.schedules_created || 0}</div>
+                <p className="text-xs text-muted-foreground">
+                  Schedules Created
+                </p>
+              </div>
+              <div className="items-start w-1/2 justify-center flex flex-col text-start border-b pl-8">
+                <div className="text-3xl font-bold">{info?.packages_scheduled || 0}</div>
+                <p className="text-xs text-muted-foreground">
+                  Packages Scheduled
+                </p>
+              </div>
+              <div className="items-start w-1/2 justify-center flex flex-col text-start border-r pl-8">
+                <div className="text-3xl font-bold">{info?.miles_driven || 0} mi</div>
+                <p className="text-xs text-muted-foreground">
+                  Miles Driven
+                </p>
+              </div>
+              <div className="items-start w-1/2 justify-center flex flex-col text-start pl-8">
+                <div className="text-3xl font-bold">{info?.delivery_efficiency || 0}</div>
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger className="cursor-default flex gap-1 items-center w-full">
+                      <p className="text-xs text-muted-foreground">
+                        Delivery Efficiency
+                      </p>
+                      <BsQuestionCircleFill className="text-muted-foreground h-3 my-0 hover:text-primary transition" />
+                    </TooltipTrigger>
+                    <TooltipContent className="w-3/4">
+                      <p>Delivery efficiency is calculated as:</p>
+                      <Image priority src="/images/eff-equation.png" width={698} height={160} alt="Image demonstrating the FastTrak dashboard" className="w-full h-full" />
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      }
+      {noStore &&
+        <CardContent className="border-t my-2 p-0 h-[230px]">
+          <div className="w-full h-[230px] flex flex-col justify-between">
+            <div className="flex flex-wrap h-full">
+              <div className="items-start w-1/2 justify-center flex flex-col text-start border-r border-b pl-8">
+                <div className="text-3xl font-bold">{info?.schedules_created || 0}</div>
+                <p className="text-xs text-muted-foreground">
+                  Schedules Created
+                </p>
+              </div>
+              <div className="items-start w-1/2 justify-center flex flex-col text-start border-b pl-8">
+                <div className="text-3xl font-bold">{info?.packages_scheduled || 0}</div>
+                <p className="text-xs text-muted-foreground">
+                  Packages Scheduled
+                </p>
+              </div>
+              <div className="items-start w-1/2 justify-center flex flex-col text-start border-r pl-8">
+                <div className="text-3xl font-bold">{info?.miles_driven || 0} mi</div>
+                <p className="text-xs text-muted-foreground">
+                  Miles Driven
+                </p>
+              </div>
+              <div className="items-start w-1/2 justify-center flex flex-col text-start pl-8">
+                <div className="text-3xl font-bold">{info?.delivery_efficiency || 0}</div>
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger className="cursor-default flex gap-1 items-center w-full">
+                      <p className="text-xs text-muted-foreground">
+                        Delivery Efficiency
+                      </p>
+                      <BsQuestionCircleFill className="text-muted-foreground h-3 my-0 hover:text-primary transition" />
+                    </TooltipTrigger>
+                    <TooltipContent className="w-3/4">
+                      <p>Delivery efficiency is calculated as:</p>
+                      <Image priority src="/images/eff-equation.png" width={698} height={160} alt="Image demonstrating the FastTrak dashboard" className="w-full h-full" />
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      }
+
+      {!info && !noStore &&
+        <CardContent className="border-t my-2 p-0 h-[230px]">
+          <div className="w-full h-[230px] flex flex-col justify-between">
+            <div className="flex flex-wrap h-full">
+              <div className="items-start w-1/2 justify-center flex flex-col text-start border-r border-b pl-8">
+                <Skeleton className="h-8 w-12 mb-1" />
+                <Skeleton className="h-4 w-[120px]" />
+              </div>
+              <div className="items-start w-1/2 justify-center flex flex-col text-start border-b pl-8">
+                <Skeleton className="h-8 w-12 mb-1" />
+                <Skeleton className="h-4 w-[120px]" />
+              </div>
+              <div className="items-start w-1/2 justify-center flex flex-col text-start border-r pl-8">
+                <Skeleton className="h-8 w-12 mb-1" />
+                <Skeleton className="h-4 w-[120px]" />
+              </div>
+              <div className="items-start w-1/2 justify-center flex flex-col text-start pl-8">
+                <Skeleton className="h-8 w-12 mb-1" />
+                <Skeleton className="h-4 w-[120px]" />
+              </div>
+            </div>
+          </div>
+        </CardContent>}
+
+    </Card>
+  )
+}
+
+function renderInfoCardSkeleton() {
   return (
     <Card className="col-span-2 h-[320px]">
       <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
@@ -132,49 +324,7 @@ function renderInfoCard() {
           Key statistics for this month
         </CardDescription>
       </CardHeader>
-      <CardContent className="border-t my-2 p-0 h-[230px]">
-        <div className="w-full h-[230px] flex flex-col justify-between">
-          <div className="flex flex-wrap h-full">
-            <div className="items-start w-1/2 justify-center flex flex-col text-start border-r border-b pl-8">
-              <div className="text-3xl font-bold">12</div>
-              <p className="text-xs text-muted-foreground">
-                Schedules Created
-              </p>
-            </div>
-            <div className="items-start w-1/2 justify-center flex flex-col text-start border-b pl-8">
-              <div className="text-3xl font-bold">288</div>
-              <p className="text-xs text-muted-foreground">
-                Packages Delivered
-              </p>
-            </div>
-            <div className="items-start w-1/2 justify-center flex flex-col text-start border-r pl-8">
-              <div className="text-3xl font-bold">1048 mi</div>
-              <p className="text-xs text-muted-foreground">
-                Miles Driven
-              </p>
-            </div>
-            <div className="items-start w-1/2 justify-center flex flex-col text-start pl-8">
-              <div className="text-3xl font-bold">52.5</div>
 
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger className="cursor-default flex gap-1 items-center w-full">
-                    <p className="text-xs text-muted-foreground">
-                      Delivery Efficiency
-                    </p>
-                    <BsQuestionCircleFill className="text-muted-foreground h-3 my-0 hover:text-primary transition" />
-                  </TooltipTrigger>
-                  <TooltipContent className="w-3/4">
-                    <p>Delivery efficiency is calculated as:</p>
-                    <Image priority src="/images/eff-equation.png" width={698} height={160} alt="Image demonstrating the FastTrak dashboard" className="w-full h-full" />
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </div>
-        </div>
-
-      </CardContent>
     </Card>
   )
 }
