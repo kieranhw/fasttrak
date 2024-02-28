@@ -65,7 +65,13 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import NotificationItem from "@/components/ui/notification-item";
 import { Calendar } from "@/components/ui/calendar"
-
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import Image from "next/image";
 
 export type Notification = {
   severity: number;
@@ -149,12 +155,21 @@ function renderInfoCard() {
             </div>
             <div className="items-start w-1/2 justify-center flex flex-col text-start pl-8">
               <div className="text-3xl font-bold">52.5</div>
-              <div className="flex gap-1 items-center w-full hover:text-primary">
-                <p className="text-xs text-muted-foreground">
-                  Delivery Efficiency
-                </p>
-                <BsQuestionCircleFill className="text-muted-foreground h-3 my-0" />
-              </div>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger className="cursor-default flex gap-1 items-center w-full">
+                    <p className="text-xs text-muted-foreground">
+                      Delivery Efficiency
+                    </p>
+                    <BsQuestionCircleFill className="text-muted-foreground h-3 my-0 hover:text-primary transition" />
+                  </TooltipTrigger>
+                  <TooltipContent className="w-3/4">
+                    <p>Delivery efficiency is calculated as:</p>
+                    <Image priority src="/images/eff-equation.png" width={698} height={160} alt="Image demonstrating the FastTrak dashboard" className="w-full h-full" />
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         </div>
