@@ -128,16 +128,33 @@ export default function ScheduleDeliveries() {
     async function fetchData() {
       if (!date) {
         console.log("no date"); // Return early if date is null
-        return
+        return;
       }
 
-      setIsScheduleLoading(true); // Set loading to true when starting to fetch data
-      setInProgress(false); // Set default to false
-      setScheduleComplete(true); // Set default to true
+      const formattedDate = format(date, 'yyyy-MM-dd');
+      const cacheKey = `schedules2-${formattedDate}`;
+      const cachedData = localStorage.getItem(cacheKey);
+
+      if (cachedData) {
+        console.log("Using cached data for", formattedDate);
+        const schedules = JSON.parse(cachedData);
+        setDeliverySchedules(schedules);
+        setIsScheduledToday(true);
+        buildGraph(schedules);
+        setIsScheduleLoading(false);
+      } else {
+        // Set loading state if no cached data
+        setIsScheduleLoading(true); 
+        setInProgress(false);
+        setScheduleComplete(true); 
+      }
 
       let schedules = await db.schedules.fetch.byDate(date);
 
       if (schedules && schedules.length > 0) {
+        // Cache the fetched schedules in local storage
+        localStorage.setItem(cacheKey, JSON.stringify(schedules));
+
         setDeliverySchedules(schedules as DeliverySchedule[]);
         // sort data by route number
         schedules.sort((a, b) => a.route_number - b.route_number);
@@ -151,13 +168,12 @@ export default function ScheduleDeliveries() {
           }
 
           // Check all schedules for completion
-          // Default is set to true, if any schedule is not completed, set to false
           if (schedule.status !== DeliveryStatus.Completed) {
             setScheduleComplete(false);
           }
         });
 
-        buildGraph(schedules)
+        buildGraph(schedules);
 
       } else {
         setDeliverySchedules([]);
@@ -168,6 +184,7 @@ export default function ScheduleDeliveries() {
 
     fetchData();
   }, [reload, date]);
+
 
   // Generate graph once data is loaded
   useEffect(() => {
