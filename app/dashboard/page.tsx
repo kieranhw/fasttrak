@@ -59,7 +59,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { MdError } from "react-icons/md";
+import { MdError, MdShortcut, MdSwitchAccessShortcut } from "react-icons/md";
 import { MouseEvent, useEffect, useState } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -76,6 +76,8 @@ import { db } from "@/lib/db/db";
 import { DashboardInfo } from "@/types/misc";
 import { Skeleton } from "@/components/ui/skeleton"
 import { set } from "date-fns";
+import { FaWarehouse } from "react-icons/fa";
+import { IoMdNotifications } from "react-icons/io";
 
 export type Notification = {
   severity: number;
@@ -144,22 +146,9 @@ function renderInfoCard() {
         <div className="flex items-center justify-between w-full">
           <CardTitle className="text-lg font-medium">
             {info?.store.store_name || "Store Name"}
-
           </CardTitle>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            className="h-4 w-4 text-muted-foreground"
-          >
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-          </svg>
+          <FaWarehouse size={18}/>
+
         </div>
         {noStore && !isLoading &&
           <CardDescription className="text-red-500">
@@ -197,7 +186,7 @@ function renderInfoCard() {
                 </p>
               </div>
               <div className="items-start w-1/2 justify-center flex flex-col text-start border-r pl-8">
-                <div className="text-3xl font-bold">{info?.miles_driven || 0} mi</div>
+                <div className="text-3xl font-bold">{info?.miles_driven || 0} <span className="text-lg">mi</span></div>
                 <p className="text-xs text-muted-foreground">
                   Miles Driven
                 </p>
@@ -241,7 +230,7 @@ function renderInfoCard() {
                 </p>
               </div>
               <div className="items-start w-1/2 justify-center flex flex-col text-start border-r pl-8">
-                <div className="text-3xl font-bold">{info?.miles_driven || 0} mi</div>
+                <div className="text-3xl font-bold">{info?.miles_driven || 0} <span className="text-lg">mi</span></div>
                 <p className="text-xs text-muted-foreground">
                   Miles Driven
                 </p>
@@ -297,37 +286,6 @@ function renderInfoCard() {
   )
 }
 
-function renderInfoCardSkeleton() {
-  return (
-    <Card className="col-span-2 h-[320px]">
-      <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
-        <div className="flex items-center justify-between w-full">
-          <CardTitle className="text-lg font-medium">
-            Store Name
-          </CardTitle>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            className="h-4 w-4 text-muted-foreground"
-          >
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-          </svg>
-        </div>
-        <CardDescription>
-          Key statistics for this month
-        </CardDescription>
-      </CardHeader>
-
-    </Card>
-  )
-}
 
 function renderShortcutsCard() {
   return (
@@ -337,20 +295,7 @@ function renderShortcutsCard() {
           <CardTitle className="text-lg font-medium">
             Shortcuts
           </CardTitle>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            className="h-4 w-4 text-muted-foreground"
-          >
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-          </svg>
+          <MdSwitchAccessShortcut size={20}/>
         </div>
         <CardDescription>
           Choose an action to begin
@@ -420,20 +365,8 @@ function renderNotificationsCard() {
           <CardTitle className="text-lg font-medium">
             Notifications
           </CardTitle>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            className="h-4 w-4 text-muted-foreground"
-          >
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-          </svg>
+          <IoMdNotifications size={20} />
+
         </div>
         <CardDescription>
           Items requiring your attention

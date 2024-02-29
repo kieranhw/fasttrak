@@ -131,30 +131,16 @@ export default function ScheduleDeliveries() {
         return;
       }
 
-      const formattedDate = format(date, 'yyyy-MM-dd');
-      const cacheKey = `schedules2-${formattedDate}`;
-      const cachedData = localStorage.getItem(cacheKey);
 
-      if (cachedData) {
-        console.log("Using cached data for", formattedDate);
-        const schedules = JSON.parse(cachedData);
-        setDeliverySchedules(schedules);
-        setIsScheduledToday(true);
-        buildGraph(schedules);
-        setIsScheduleLoading(false);
-      } else {
-        // Set loading state if no cached data
-        setIsScheduleLoading(true); 
-        setInProgress(false);
-        setScheduleComplete(true); 
-      }
+      // Set loading state if no cached data
+      setIsScheduleLoading(true);
+      setInProgress(false);
+      setScheduleComplete(true);
+
 
       let schedules = await db.schedules.fetch.byDate(date);
 
       if (schedules && schedules.length > 0) {
-        // Cache the fetched schedules in local storage
-        localStorage.setItem(cacheKey, JSON.stringify(schedules));
-
         setDeliverySchedules(schedules as DeliverySchedule[]);
         // sort data by route number
         schedules.sort((a, b) => a.route_number - b.route_number);
@@ -304,6 +290,7 @@ export default function ScheduleDeliveries() {
       for (const schedule in deliverySchedules) {
         let packageOrderIds = [];
 
+
         for (const pkg in deliverySchedules[schedule].package_order) {
           packageOrderIds.push(deliverySchedules[schedule].package_order[pkg].package_id)
         }
@@ -321,7 +308,6 @@ export default function ScheduleDeliveries() {
             .from('delivery_schedules')
             .delete()
             .match({ schedule_id: deliverySchedules[schedule].schedule_id })
-
           if (error) {
             alert(error.message)
           }
