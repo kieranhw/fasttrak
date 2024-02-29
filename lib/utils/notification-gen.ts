@@ -158,7 +158,7 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
         notifications.push({
             severity: 3, // Red
             title: "No Vehicles",
-            description: "Click here to add a vehicle to get started.",
+            description: "Click here to add a vehicle.",
             onClickLink: "/dashboard/vehicles"
         });
     }
