@@ -43,7 +43,7 @@ export default function Sidebar() {
     const activeLink = "sidebar-item inline-flex font-medium text-primary p-2 w-full justify-start ml-4 transition-none";
 
     return (
-        <aside className="min-w-[220px] max-w-[220px] border-r px-4">
+        <aside className="hidden lg:block min-w-[220px] max-w-[220px] border-r px-4">
             <div className="flex justify-between items-center min-h-[60px] max-h-[60px]">
                 <p className="text-primary text-2xl font-bold">FastTrak</p>
             </div>

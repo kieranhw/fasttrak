@@ -78,37 +78,9 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { set } from "date-fns";
 import { FaWarehouse } from "react-icons/fa";
 import { IoMdNotifications } from "react-icons/io";
+import { Notification } from "@/types/misc";
+import { getNotifications } from "@/lib/utils/notification-gen";
 
-export type Notification = {
-  severity: number;
-  title: string;
-  description: string;
-  onClickLink?: string;
-}
-
-const notifications: Notification[] = [
-  {
-    severity: 3,
-    title: "No Store",
-    description: "Click here to create or join a store",
-    onClickLink: "/dashboard/store",
-  },
-  {
-    severity: 2,
-    title: "Warning",
-    description: "Vehicle RX21 ABE is unavailable today",
-  },
-  {
-    severity: 1,
-    title: "Delivery schedule complete",
-    description: "Schedule for 27/02/24 completed",
-  },
-  {
-    severity: 1,
-    title: "Delivery schedule complete",
-    description: "Schedule for 27/02/24 completed",
-  },
-]
 
 function renderInfoCard() {
   const [info, setInfo] = useState<DashboardInfo | undefined | null>(undefined);
@@ -127,16 +99,13 @@ function renderInfoCard() {
         setInfo(res.data!);
         setNoStore(false);
       }
-
     }
 
     const cachedInfo = localStorage.getItem('dashboardInfo');
     if (cachedInfo) {
       setInfo(JSON.parse(cachedInfo));
-      getInfo(); // Update the cache
-    } else {
-      getInfo();
     }
+    getInfo(); // Update the cache
     setIsLoading(false);
   }, []);
 
@@ -145,9 +114,9 @@ function renderInfoCard() {
       <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
         <div className="flex items-center justify-between w-full">
           <CardTitle className="text-lg font-medium">
-            {info?.store.store_name || "Store Name"}
+            Store Overview
           </CardTitle>
-          <FaWarehouse size={18}/>
+          <FaWarehouse size={18} />
 
         </div>
         {noStore && !isLoading &&
@@ -295,7 +264,7 @@ function renderShortcutsCard() {
           <CardTitle className="text-lg font-medium">
             Shortcuts
           </CardTitle>
-          <MdSwitchAccessShortcut size={20}/>
+          <MdSwitchAccessShortcut size={20} />
         </div>
         <CardDescription>
           Choose an action to begin
@@ -358,40 +327,133 @@ function renderShortcutsCard() {
 }
 
 function renderNotificationsCard() {
-  return (
-    <Card className="col-span-2 h-[320px]">
-      <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
-        <div className="flex items-center justify-between w-full">
-          <CardTitle className="text-lg font-medium">
-            Notifications
-          </CardTitle>
-          <IoMdNotifications size={20} />
+  const [notifications, setNotifications] = useState<Notification[] | undefined>(undefined);
 
-        </div>
-        <CardDescription>
-          Items requiring your attention
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="p-0 border-t mt-2">
-        <div className="h-[230px] no-scrollbar overflow-y-auto">
-          <Table>
-            {notifications.length === 0 &&
-              <TableCaption>There are no notifications.</TableCaption>
-            }
-            <TableBody>
-              {notifications.map((notification, index) => (
-                <NotificationItem key={index} notification={notification} />
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
-  )
+  useEffect(() => {
+    async function fetchData() {
+      // Initial cache attempt
+      const cachedNotifications = localStorage.getItem('notifications');
+      if (cachedNotifications) {
+        setNotifications(JSON.parse(cachedNotifications));
+      }
+
+      // Always fetch updates
+      try {
+        const res = await getNotifications();
+        if (!res.error && res.data) {
+          setNotifications(res.data);
+          localStorage.setItem('notifications', JSON.stringify(res.data));
+        } else {
+          // Handle the case where fetching fails but cached data is available
+          if (!cachedNotifications) {
+            setNotifications([]); // No cache and fetch failed, set to empty
+          }
+        }
+      } catch (error) {
+        console.error("Fetching notifications failed:", error);
+        // Fallback to empty if no cache and fetch fails
+        if (!cachedNotifications) setNotifications([]);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  if (notifications == undefined) {
+    return (
+      <Card className="col-span-2 h-[320px]">
+        <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
+          <div className="flex items-center justify-between w-full">
+            <CardTitle className="text-lg font-medium">
+              Notifications
+            </CardTitle>
+            <IoMdNotifications size={20} />
+
+          </div>
+          <CardDescription>
+            Items requiring your attention
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0 border-t mt-2">
+          <div className="h-[230px] no-scrollbar overflow-y-auto">
+            <Table>
+              <TableBody>
+                <TableRow className={``}>
+                  <TableCell className="font-medium">
+                    <div className={`h-3 w-3 rounded-full ml-2`} />
+                  </TableCell>
+                  <TableCell className="w-full">
+                    <div className="flex flex-col">
+                      <Skeleton className="h-4 w-16 mb-1" />
+                      <Skeleton className="h-4 w-[150px]" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+                <TableRow className={``}>
+                  <TableCell className="font-medium">
+                    <div className={`h-3 w-3 rounded-full ml-2`} />
+                  </TableCell>
+                  <TableCell className="w-full">
+                    <div className="flex flex-col">
+                      <Skeleton className="h-4 w-16 mb-1" />
+                      <Skeleton className="h-4 w-[150px]" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+                <TableRow className={``}>
+                  <TableCell className="font-medium">
+                    <div className={`h-3 w-3 rounded-full ml-2`} />
+                  </TableCell>
+                  <TableCell className="w-full">
+                    <div className="flex flex-col">
+                      <Skeleton className="h-4 w-16 mb-1" />
+                      <Skeleton className="h-4 w-[150px]" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+  else {
+    return (
+      <Card className="col-span-2 h-[320px]">
+        <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
+          <div className="flex items-center justify-between w-full">
+            <CardTitle className="text-lg font-medium">
+              Notifications
+            </CardTitle>
+            <IoMdNotifications size={20} />
+
+          </div>
+          <CardDescription>
+            Items requiring your attention
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0 border-t mt-2">
+          <div className="h-[230px] no-scrollbar overflow-y-auto">
+            <Table>
+              {notifications && notifications.length === 0 &&
+                <TableCaption>There are no notifications.</TableCaption>
+              }
+              <TableBody>
+                {notifications && notifications.map((notification, index) => (
+                  <NotificationItem key={index} notification={notification} />
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 }
 
 export default function Dashboard() {
-  const name = "User"
+
 
   return (
     <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4">
@@ -401,17 +463,16 @@ export default function Dashboard() {
           <h1 className="text-foreground font-bold text-3xl">Dashboard</h1>
           <div className="flex justify-between">
             <p className="text-md text-muted-foreground">
-              Hello {name}, here's an overview of your delivery system.
+              Here's an overview of your delivery system.
             </p>
           </div>
         </div>
 
 
-        <div className="grid grid-cols-4 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-4">
           {renderInfoCard()}
           {renderNotificationsCard()}
           {renderShortcutsCard()}
-
         </div>
 
 

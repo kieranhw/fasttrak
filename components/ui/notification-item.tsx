@@ -1,6 +1,6 @@
 import { useRouter } from 'next/navigation';
 import { TableRow, TableCell } from "@/components/ui/table";
-import { Notification } from '@/app/dashboard/page';
+import { Notification } from '@/types/misc';
 
 type NotificationItemProps = {
   notification: Notification;
@@ -21,7 +21,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification }) => 
   const rowClassNames = `${notification.onClickLink ? "hover:cursor-pointer" : ""} w-full`;
 
   return (
-      <TableRow className={rowClassNames} onClick={handleRowClick}>
+      <TableRow className={`${rowClassNames}`} onClick={handleRowClick}>
         <TableCell className="font-medium">
           <div className={`h-3 w-3 rounded-full ml-2 ${bgColorClass}`} />
         </TableCell>
