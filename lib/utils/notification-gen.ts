@@ -164,6 +164,8 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
     }
 
     if (notifications) {
+        // Sort notifications from highest severity to lowest
+        notifications.sort((a, b) => b.severity - a.severity);
         return { data: notifications, error: null };
     } else {
         return { data: [], error: { message: "No notifications found", details: "", hint: "", code: "" } };

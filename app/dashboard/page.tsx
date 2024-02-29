@@ -383,7 +383,7 @@ function renderNotificationsCard() {
                     <div className={`h-3 w-3 rounded-full ml-2`} />
                   </TableCell>
                   <TableCell className="w-full">
-                    <div className="flex flex-col">
+                    <div className="h-10 flex flex-col justify-center ">
                       <Skeleton className="h-4 w-16 mb-1" />
                       <Skeleton className="h-4 w-[150px]" />
                     </div>
@@ -394,7 +394,7 @@ function renderNotificationsCard() {
                     <div className={`h-3 w-3 rounded-full ml-2`} />
                   </TableCell>
                   <TableCell className="w-full">
-                    <div className="flex flex-col">
+                    <div className="h-10 flex flex-col justify-center ">
                       <Skeleton className="h-4 w-16 mb-1" />
                       <Skeleton className="h-4 w-[150px]" />
                     </div>
@@ -405,7 +405,7 @@ function renderNotificationsCard() {
                     <div className={`h-3 w-3 rounded-full ml-2`} />
                   </TableCell>
                   <TableCell className="w-full">
-                    <div className="flex flex-col">
+                    <div className="h-10 flex flex-col justify-center ">
                       <Skeleton className="h-4 w-16 mb-1" />
                       <Skeleton className="h-4 w-[150px]" />
                     </div>
