@@ -333,16 +333,16 @@ function renderNotificationsCard() {
     async function fetchData() {
       // Initial cache attempt
       const cachedNotifications = localStorage.getItem('notifications');
-      if (cachedNotifications) {
-        setNotifications(JSON.parse(cachedNotifications));
-      }
+      //if (cachedNotifications) {
+        //setNotifications(JSON.parse(cachedNotifications));
+      //}
 
       // Always fetch updates
       try {
         const res = await getNotifications();
         if (!res.error && res.data) {
           setNotifications(res.data);
-          localStorage.setItem('notifications', JSON.stringify(res.data));
+          //localStorage.setItem('notifications', JSON.stringify(res.data));
         } else {
           // Handle the case where fetching fails but cached data is available
           if (!cachedNotifications) {

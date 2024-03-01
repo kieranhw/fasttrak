@@ -42,9 +42,7 @@ export default function DashboardLayout({
                         {children}
                     </div>
                     <Toaster />
-
                 </div>
-
             </div>
         </div>
 
