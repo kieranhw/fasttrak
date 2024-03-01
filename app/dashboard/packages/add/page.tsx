@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Loader } from '@googlemaps/js-api-loader';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { geocodeAddresses as geocode } from "@/lib/google-maps/geocoder";
+import { toast } from "@/components/ui/use-toast";
 
 export default function AddPackage() {
 
@@ -70,6 +71,8 @@ export default function AddPackage() {
     } catch (error) {
       alert("Geocoding error. Please try again later.");
     }
+
+
   }
 
   async function confirmPackage(values: z.infer<typeof PackageSchema>, resultSender: google.maps.GeocoderResult[], resultRecipient: google.maps.GeocoderResult[]) {
@@ -98,6 +101,10 @@ export default function AddPackage() {
       alert(error.message)
     } else {
       setIsDialogOpen(false);
+      toast({
+        title: "Success!",
+        description: "Your package has been added.",
+      });
       form.reset();
       // Increment key to re-render component
       setFormKey(prevKey => prevKey + 1);
@@ -110,10 +117,7 @@ export default function AddPackage() {
         <h1 className="text-foreground font-bold text-3xl my-auto">Add Package</h1>
       </div>
 
-      {/* TODO: Add success / error messages */}
       <PackageForm key={formKey} onSubmit={onSubmit} form={form} />
-
-
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
