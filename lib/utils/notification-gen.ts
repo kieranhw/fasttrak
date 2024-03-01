@@ -3,6 +3,7 @@ import { db } from "../db/db";
 import { el } from "date-fns/locale";
 import { PostgrestError } from "@supabase/supabase-js";
 import { format, isToday, parseISO, compareAsc } from 'date-fns';
+import { DeliveryStatus } from "@/types/delivery-schedule";
 
 export const getNotifications = async (): Promise<{ data: Notification[], error: PostgrestError | null }> => {
     // Notifications: 
@@ -101,6 +102,33 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
                     onClickLink: `/dashboard/schedule?date=${format(new Date(), 'ddMMyyyy')}`
                 });
             }
+        } else if (schedulesToday && schedulesToday.length > 0) {
+            // There are schedules today - determine what the stages are at the moment
+            // Two states - in progress, complete
+            const scheduledCount = schedulesToday.reduce((count, schedule) => schedule.status === DeliveryStatus.Scheduled ? count + 1 : count, 0);
+            const completedCount = schedulesToday.reduce((count, schedule) => schedule.status === DeliveryStatus.Completed ? count + 1 : count, 0);
+            const inProgressCount = schedulesToday.reduce((count, schedule) => schedule.status === DeliveryStatus.InProgress ? count + 1 : count, 0);
+
+            if (scheduledCount > 0) {
+                // There are schedules in progress
+                notifications.push({
+                    severity: 2, // Yellow
+                    title: "Schedules Pending",
+                    description: `${scheduledCount} schedules currently awaiting confirmation.`,
+                    onClickLink: "/dashboard/schedule"
+                });
+            }
+
+            if (inProgressCount > 0) {
+                // There are completed schedules
+                notifications.push({
+                    severity: 1, // Green
+                    title: "Schedules In Progress",
+                    description: `${inProgressCount} schedules currently in progress.`,
+                    onClickLink: "/dashboard/schedule"
+                });
+            }
+
         }
     }
 
@@ -108,10 +136,6 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
         // Fetch schedules for tomorrow
         const schedulesTomorrow = await db.schedules.fetch.byDate(new Date(new Date().getTime() + 24 * 60 * 60 * 1000));
         console.log(schedulesTomorrow);
-
-        // Assume storeDepot.dispatch_time is in 'HH:mm' format and storeDepot.days_active is an array of active days
-        const deadlineTime = parseISO(`${format(new Date(), 'yyyy-MM-dd')}T${storeDepot.dispatch_time}:00`);
-        const currentTime = new Date();
 
         // Mapping of date-fns weekday format to your days_active array format
         type DayOfWeek = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
@@ -186,7 +210,3 @@ const noDepot: Notification = {
     description: "Click here to create a depot for your store",
     onClickLink: "/dashboard/store"
 }
-
-// Severity 2 = yellow
-
-// Severity 1 = green
