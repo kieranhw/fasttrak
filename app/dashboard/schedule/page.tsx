@@ -1,8 +1,8 @@
 'use client'
 
 import { SetStateAction, useEffect, useState } from "react";
-import { columns } from "./components/columns"
-import { DataTable } from "./components/data-table"
+import { columns } from "./components/data-table/columns"
+import { DataTable } from "./components/data-table/data-table"
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { createClient } from "@/lib/supabase/client";
 
@@ -211,22 +211,15 @@ export default function ScheduleDeliveries() {
     setIsScheduleLoading(true);
     setIsScheduling(true);
 
+    // Fetch vehicles and packages
     let vehicles = profile.selected_vehicles;
-
-    // fetch packages 
-    // TODO add to local profile object to prevent re-fetching
     let packages = await db.packages.fetch.pending();
-
     let deliverySchedule: DeliverySchedule[] = [];
-    console.log("Scheduling for date:", date)
 
+    // Create schedules if vehicles and packages are available
     if (vehicles && packages) {
       const schedule = await createSchedules(vehicles, packages, date, profile);
-
-      if (schedule && schedule.length > 0) {
-        deliverySchedule = schedule as DeliverySchedule[];
-      }
-      console.log("Delivery Schedule output" + deliverySchedule)
+      if (schedule && schedule.length > 0) deliverySchedule = schedule as DeliverySchedule[];
     }
 
     // TODO: Optimisation required

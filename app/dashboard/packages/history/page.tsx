@@ -16,7 +16,6 @@ export default function ManagePackage() {
 
   useEffect(() => {
     async function fetchData() {
-      // TODO: Fetch delivered packages only
       const packages = await db.packages.fetch.history();
       if (packages) {
         setData(packages);
