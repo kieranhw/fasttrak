@@ -437,7 +437,7 @@ function renderNotificationsCard() {
           <div className="h-[230px] no-scrollbar overflow-y-auto">
             <Table>
               {notifications && notifications.length === 0 &&
-                <TableCaption>There are no notifications.</TableCaption>
+                <TableCaption className="mt-8">You have no notifications.</TableCaption>
               }
               <TableBody>
                 {notifications && notifications.map((notification, index) => (

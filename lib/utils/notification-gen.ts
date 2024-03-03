@@ -135,12 +135,10 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
     if (store && storeDepot) {
         // Fetch schedules for tomorrow
         const schedulesTomorrow = await db.schedules.fetch.byDate(new Date(new Date().getTime() + 24 * 60 * 60 * 1000));
-        console.log(schedulesTomorrow);
 
-        // Mapping of date-fns weekday format to your days_active array format
+        // Mapping of date-fns weekday format to days_active array format
         type DayOfWeek = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
 
-        // Define your day map with the DayOfWeek type
         const dayMap: Record<DayOfWeek, string> = {
             'Monday': 'MO',
             'Tuesday': 'TU',
@@ -151,18 +149,12 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
             'Sunday': 'SU',
         };
 
-        // Use type assertion to tell TypeScript that currentDayOfWeek will always be a DayOfWeek
-        const currentDayOfWeek = format(new Date(), 'EEEE') as DayOfWeek;
-
-        // Convert current day to your days_active format ("MO", "TU", "WE", ...)
-        const currentDayAbbreviation = dayMap[currentDayOfWeek];
-
-        // Now, isActiveToday check should work without type errors
-        const isActiveToday = storeDepot.days_active.includes(currentDayAbbreviation);
+        // Use type assertion to tell TypeScript that tomorrowDayOfWeek will always be a DayOfWeek
+        const tomorrowDayOfWeek = format(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), 'EEEE') as DayOfWeek;
+        const isActiveTomorrow = storeDepot.days_active.includes(dayMap[tomorrowDayOfWeek]);
 
         // Check if there's meant to be a delivery today and if it's before or after the dispatch time
-        if (isActiveToday && schedulesTomorrow && schedulesTomorrow.length === 0) {
-            // TODO: Add time 
+        if (isActiveTomorrow && schedulesTomorrow && schedulesTomorrow.length === 0) {
             const time = storeDepot.dispatch_time;
 
             // Before schedule time, still within dispatch window

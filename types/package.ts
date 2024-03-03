@@ -1,7 +1,17 @@
 import { UUID } from "crypto"
 
-export type PriorityType = "Express" | "Standard";
-export type PackageStatus = "Pending" | "In-Transit" | "Delivered";
+export enum PriorityType {
+    Standard = "Standard",
+    Express = "Express",
+}
+
+export enum PackageStatus {
+    Pending = "Pending",
+    InTransit = "In-Transit",
+    Delivered = "Delivered"
+
+}
+
 export enum CurrentState {
     Pending = "Pending",
     Scheduled = "Scheduled",
