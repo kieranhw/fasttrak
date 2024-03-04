@@ -14,9 +14,9 @@ const fetchStoreForUser = async (): Promise<{ data: Store | null, error: Postgre
         return { data: null, error: userError };
     }
 
-    if (!userProfile || !userProfile.store_id) {
+    if (!userProfile) {
         console.error("User profile not found");
-        return { data: null, error: null };
+        return { data: null, error: userError };
     }
 
     const { data: storeData, error: storeError } = await supabase
@@ -28,9 +28,10 @@ const fetchStoreForUser = async (): Promise<{ data: Store | null, error: Postgre
     if (storeError) {
         console.error("Error fetching store: ", storeError);
         return { data: null, error: storeError };
+    } else {
+        return { data: storeData, error: null };
     }
 
-    return { data: storeData ?? null, error: null };
 };
 
 const createStore = async (store: Store): Promise<{ data: Store | null, error: PostgrestError | null }> => {
@@ -58,13 +59,13 @@ const updateStoreById = async (id: UUID, updatedStore: Store): Promise<{ data: S
 export const stores = {
     fetch: {
         forUser: fetchStoreForUser,
-   
+
     },
     create: createStore,
     update: {
         byId: updateStoreById,
-        
+
     }
-    
+
 
 };
