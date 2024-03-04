@@ -42,23 +42,43 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
     handleScheduleDelivery,
 }) => {
 
-
     const [numPendingPackages, setNumPendingPackages] = useState<Number | null>(null);
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [selectedVehicles, setSelectedVehicles] = useState<Vehicle[]>([]);
     const [isScheduling, setIsScheduling] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [userHasDepot, setUserHasDepot] = useState<boolean>(false);
+    const [userHasStore, setUserHasStore] = useState<boolean>(false);
 
     const fetchData = async () => {
         setIsLoading(true);
 
-        const vehicles = await db.vehicles.fetch.all()
-        const packages = await db.packages.fetch.pending()
+        const store = await db.stores.fetch.forUser();
 
-        if (vehicles && packages) {
-            setVehicles(vehicles);
-            setNumPendingPackages(packages.length);
-            setSelectedVehicles(vehicles);
+        if (store.error) {
+            setVehicles([]);
+            setNumPendingPackages(0);
+            setUserHasStore(false);
+        } else if (store.data) {
+            const depot = await db.depots.fetch.forUser();
+
+            // If user has depot, fetch the vehicles and packages
+            if (depot.data) {
+                setUserHasDepot(true);
+                const vehicles = await db.vehicles.fetch.all()
+                const packages = await db.packages.fetch.pending()
+
+                // If the vehicles and packages are available, set the states
+                if (vehicles && packages) {
+                    setVehicles(vehicles);
+                    setNumPendingPackages(packages.length);
+                    setSelectedVehicles(vehicles);
+                }
+            } else if (depot.error) {
+                setVehicles([]);
+                setNumPendingPackages(0);
+                setUserHasDepot(false);
+            }
         }
 
         setIsLoading(false);
@@ -170,15 +190,31 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
                 </div>
             </div>
 
-            {isLoading == false && selectedVehicles.length === 0 && vehicles.length > 0 && numPendingPackages !== null && Number(numPendingPackages) > 0 &&
-                <div className="w-full flex gap-2 items-center text-sm text-red-500"><MdError />Unable to schedule, no vehicles selected</div>
+            {/* Error messages */}
+            {userHasDepot && !isLoading &&
+                <>
+                    {isLoading == false && selectedVehicles.length === 0 && vehicles.length > 0 && numPendingPackages !== null && Number(numPendingPackages) > 0 &&
+                        <div className="w-full flex gap-2 items-center text-sm text-red-500"><MdError />Unable to schedule, no vehicles selected</div>
+                    }
+                    {isLoading == false && vehicles.length === 0 && numPendingPackages !== null && Number(numPendingPackages) > 0 &&
+                        <div className="w-full flex gap-2 items-center text-sm text-red-500"><MdError />Unable to schedule, no vehicles available</div>
+                    }
+                    {isLoading == false && numPendingPackages === 0 &&
+                        <div className="w-full flex gap-2 items-center text-sm text-red-500"><MdError />Unable to schedule, no packages pending</div>
+                    }
+                    {isLoading == false && numPendingPackages === 0 &&
+                        <div className="w-full flex gap-2 items-center text-sm text-red-500"><MdError />Unable to schedule, no packages pending</div>
+                    }
+                </>
             }
-            {isLoading == false && vehicles.length === 0 && numPendingPackages !== null && Number(numPendingPackages) > 0 &&
-                <div className="w-full flex gap-2 items-center text-sm text-red-500"><MdError />Unable to schedule, no vehicles available</div>
+            {!userHasStore && !isLoading &&
+                <div className="w-full flex gap-2 items-center text-sm text-red-500"><MdError />No store found, please create or join one first.</div>
+
             }
-            {isLoading == false && numPendingPackages === 0 &&
-                <div className="w-full flex gap-2 items-center text-sm text-red-500"><MdError />Unable to schedule, no packages pending</div>
+            {!userHasDepot && !isLoading && userHasStore &&
+                <div className="w-full flex gap-2 items-center text-sm text-red-500"><MdError />No depot found, please create one and try again.</div>
             }
+
 
             {/* Divider */}
             <div className="w-full border-t" />
@@ -188,11 +224,14 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
                 <Label className="my-auto justify-center line-clamp-1">Selected Vehicles</Label>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="selectTrigger">
+                        <Button variant="selectTrigger" disabled={selectedVehicles.length == 0}>
                             {vehicles.length > 0 &&
                                 <div className="line-clamp-1 font-normal">{selectedVehicles.length} Selected</div>
                             }
-                            {vehicles.length === 0 &&
+                            {!isLoading && vehicles.length == 0 &&
+                                <div className="line-clamp-1 font-normal">None available</div>
+                            }
+                            {isLoading &&
                                 <div className="inline-flex gap-2 font-normal items-center"><Loader2 size={18} className="animate-spin" /> Loading...</div>
                             }
                         </Button>

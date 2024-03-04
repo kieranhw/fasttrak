@@ -179,6 +179,15 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
         });
     }
 
+    if (!storeDepot) {
+        notifications.push({
+            severity: 3, // Red
+            title: "No Depot",
+            description: "Click here to create a depot for your store.",
+            onClickLink: "/dashboard/store"
+        });
+    }
+
     if (notifications) {
         // Sort notifications from highest severity to lowest
         notifications.sort((a, b) => b.severity - a.severity);
@@ -186,6 +195,8 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
     } else {
         return { data: [], error: { message: "No notifications found", details: "", hint: "", code: "" } };
     }
+
+    
 }
 
 // Severity 3 = red
