@@ -12,7 +12,7 @@ const fetchPackages = async () => {
     const { data: store, error } = await db.stores.fetch.forUser();
 
     if (!store) {
-        console.error("User not atatched to store");
+        console.error("User not attached to store");
         return;
     } if (error) {
         console.error("Error fetching store: ", error);
