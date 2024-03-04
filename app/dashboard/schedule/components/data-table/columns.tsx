@@ -1,6 +1,6 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
+import { ColumnDef, RowSelectionState } from "@tanstack/react-table"
 import { Package } from '@/types/package'
 
 import { MoreHorizontal } from "lucide-react"
@@ -36,6 +36,9 @@ import {
     HoverCardContent,
     HoverCardTrigger,
 } from "@/components/ui/hover-card"
+import { ConfirmDeliveryTable } from "../confirm-delivery-table/confirm-delivery-table"
+import { ConfirmTableColumns } from "../confirm-delivery-table/columns"
+import { updatePackages } from "@/lib/scheduling/update-packages"
 
 export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => void): ColumnDef<DeliverySchedule>[] => [
     {
@@ -171,9 +174,10 @@ export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => 
         id: "actions",
         cell: ({ row }) => {
             const schedule = row.original
-            const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
-            const [inProgressAlertOpen, setInProgressAlertOpen] = useState(false)
-            const [completeAlertOpen, setCompleteAlertOpen] = useState(false)
+            const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
+            const [inProgressAlertOpen, setInProgressAlertOpen] = useState(false);
+            const [completeAlertOpen, setCompleteAlertOpen] = useState(false);
+            const [rowSelection, setRowSelection] = useState({})
 
             async function handleUpdateStatus(id: UUID, status: DeliveryStatus) {
 
@@ -190,6 +194,33 @@ export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => 
 
             }
 
+
+
+            async function completeDeliveries(schedule: DeliverySchedule, rowSelection: RowSelectionState): Promise<void> {
+                // Mark selected rows as delivered
+                // Mark all other rows as failed to deliver
+
+                const packageIds = schedule.package_order.map(pkg => pkg.package_id);
+                const selectedRowIndices = Object.keys(rowSelection).filter((key) => rowSelection[key] === true);
+
+                const deliveredPackageIds = packageIds.filter((_, index) => selectedRowIndices.includes(index.toString()));
+                const failedPackageIds = packageIds.filter((_, index) => !selectedRowIndices.includes(index.toString()));
+
+                // Convert package IDs to Package objects from the original schedule.package_order
+                const deliveredPackages = schedule.package_order.filter(pkg => deliveredPackageIds.includes(pkg.package_id));
+                const failedPackages = schedule.package_order.filter(pkg => failedPackageIds.includes(pkg.package_id));
+
+                console.log("Before update")
+
+                const newSchedule = await updatePackages(schedule, deliveredPackages, failedPackages);
+
+                console.log("Before refresh")
+                if (newSchedule) {
+                    refreshSchedule(newSchedule);
+                    console.log("after refresh")
+
+                }
+            }
 
             return (
                 <>
@@ -247,19 +278,23 @@ export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => 
                                     <AlertDialogHeader>
                                         <AlertDialogTitle>Delivery Complete</AlertDialogTitle>
                                         <AlertDialogDescription>
-                                            Are you sure? This update cannot be undone.
+                                            Select delivered packages to confirm delivery.
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
+                                    <ConfirmDeliveryTable columns={ConfirmTableColumns()} data={schedule.package_order} rowSelection={rowSelection} setRowSelection={setRowSelection} />
+
                                     <AlertDialogFooter>
                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                                         <AlertDialogAction
-                                            onClick={() => handleUpdateStatus(schedule.schedule_id!, DeliveryStatus.Completed)}
+                                            onClick={() => completeDeliveries(schedule, rowSelection)}
                                         >
                                             Continue
                                         </AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
+
+
 
                             <DropdownMenuSeparator />
                             <Link href={`/dashboard/schedule/${schedule.schedule_id}`}>

@@ -7,16 +7,14 @@ export enum PriorityType {
 
 export enum PackageStatus {
     Pending = "Pending",
-    InTransit = "In-Transit",
+    Return = "Return", // Returning to sender
     Delivered = "Delivered"
-
 }
 
 export enum CurrentState {
     Pending = "Pending",
     Scheduled = "Scheduled",
     InTransit = "In-Transit",
-    Return = "Return",
     Delivered = "Delivered"
 }
 
@@ -31,8 +29,8 @@ export type Package = {
     recipient_phone: string
     sender_name: string
     sender_address: string
-    sender_address_lat?: number
-    sender_address_lng?: number
+    sender_address_lat: number
+    sender_address_lng: number
     sender_phone: string
     status: PackageStatus
     current_state: CurrentState

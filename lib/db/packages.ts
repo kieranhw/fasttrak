@@ -51,7 +51,7 @@ const fetchPackagesByPending = async () => {
         let { data: packages, error } = await supabase
             .from('packages')
             .select('*')
-            .eq('status', 'Pending')
+            .eq('current_state', 'Pending')
             .order('created_at', { ascending: false })
             .eq('store_id', store.store_id);
         if (error) {
@@ -98,7 +98,7 @@ const fetchPackagesInventory = async () => {
             .from('packages')
             .select('*')
             .eq('store_id', store.store_id)
-            .eq('current_state', CurrentState.Pending || CurrentState.InTransit || CurrentState.Scheduled || CurrentState.Return);
+            .eq('current_state', CurrentState.Pending || CurrentState.InTransit || CurrentState.Scheduled);
         if (error) {
             console.error("Error fetching packages: ", error);
             return;

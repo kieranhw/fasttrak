@@ -27,8 +27,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
 
     // Find the round robin solution using the metrics
     let randomSolution = await roundRobinAllocation(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
-    let randomMetrics: VRP = await initialiseMetrics(randomSolution);
-    randomSolution = randomMetrics.solution;
+    randomSolution.initMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
 
     // Add leftover packages to priority queue
     const solutionNodes = [] as Node[];
@@ -55,7 +54,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     //KMeans[0] = KMeansMetrics.solution;
     console.log("KMeans SOLUTION: " + KMeans[0].routes.forEach(route => {
         console.log(route)
-    }));
+    }));    
 
 
     // K Means solution
