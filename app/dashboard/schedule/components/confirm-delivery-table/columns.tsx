@@ -48,7 +48,7 @@ export const ConfirmTableColumns = (): ColumnDef<Package>[] => [
                         table.getIsAllPageRowsSelected() ||
                         (table.getIsSomePageRowsSelected() && "indeterminate")
                     }
-                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    onCheckedChange={value => table.getCoreRowModel().rows.forEach(row => row.toggleSelected(!!value))}
                     aria-label="Select all"
                 />
             </div>
