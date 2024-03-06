@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
 import { Depot } from '@/types/depot';
+import { JoinStoreForm } from './components/join-store-form';
 
 export default function Store() {
   const [store, setStore] = useState<Store | null>();
@@ -113,10 +114,10 @@ export default function Store() {
 
 
       {store && !loading &&
-        <StoreForm store={store} onStoreUpdate={handleStoreUpdate} refreshStore={refreshStore}/>
+        <StoreForm store={store} onStoreUpdate={handleStoreUpdate} refreshStore={refreshStore} />
       }
       {loading &&
-        <StoreForm store={null} onStoreUpdate={handleStoreUpdate} refreshStore={refreshStore}/>
+        <StoreForm store={null} onStoreUpdate={handleStoreUpdate} refreshStore={refreshStore} />
       }
 
       {!store && !loading &&
@@ -131,9 +132,11 @@ export default function Store() {
               <TabsTrigger value="join">Join Existing</TabsTrigger>
             </TabsList>
             <TabsContent value="new">
-              <CreateStoreForm refreshStore={refreshStore} refreshDepot={refreshDepot}/>
+              <CreateStoreForm refreshStore={refreshStore} refreshDepot={refreshDepot} />
             </TabsContent>
-            <TabsContent value="join"></TabsContent>
+            <TabsContent value="join">
+              <JoinStoreForm refreshStore={refreshStore} refreshDepot={refreshDepot} />
+            </TabsContent>
           </Tabs>
         </div>
       }

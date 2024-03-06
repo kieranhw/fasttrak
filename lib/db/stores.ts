@@ -44,6 +44,28 @@ const createStore = async (store: Store): Promise<{ data: Store | null, error: P
     return { data: data ?? null, error };
 }
 
+const joinStoreForUser = async (inviteCode: string): Promise<{ data: Store | null, error: PostgrestError | null }> => {
+    // See if store exists with invite code
+    const { data: store, error } = await supabase
+        .from('stores')
+        .select('*')
+        .eq('invite_code', inviteCode)
+        .single();
+
+    // If store exists, update user profile with store_id
+    if (store) {
+        const { data: updatedProfile, error: updateError } = await db.profiles.update.store(store.store_id);
+        if (updateError) {
+            return { data: null, error: updateError };
+        }
+
+        return { data: store, error: null };
+    } else {
+        // No store, return error
+        return { data: null, error };
+    }
+}
+
 const updateStoreById = async (id: UUID, updatedStore: Store): Promise<{ data: Store | null, error: PostgrestError | null }> => {
     const { data, error } = await supabase
         .from('stores')
@@ -65,7 +87,6 @@ export const stores = {
     update: {
         byId: updateStoreById,
 
-    }
-
-
+    },
+    join: joinStoreForUser,
 };

@@ -171,12 +171,14 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
     const vehicles = await db.vehicles.fetch.all();
 
     if (vehicles === null || vehicles.length === 0) {
-        notifications.push({
-            severity: 3, // Red
-            title: "No Vehicles",
-            description: "Click here to add a vehicle.",
-            onClickLink: "/dashboard/vehicles"
-        });
+        if (store) {
+            notifications.push({
+                severity: 3, // Red
+                title: "No Vehicles",
+                description: "Click here to add a vehicle.",
+                onClickLink: "/dashboard/vehicles"
+            });
+        }
     }
 
     if (!storeDepot) {
@@ -196,7 +198,7 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
         return { data: [], error: { message: "No notifications found", details: "", hint: "", code: "" } };
     }
 
-    
+
 }
 
 // Severity 3 = red

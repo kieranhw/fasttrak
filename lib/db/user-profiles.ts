@@ -31,8 +31,8 @@ const updateUserStore = async (storeId: string): Promise<{ data: UserProfile | n
         const userId = user.data.user?.id;
 
         if (!userId) {
-            console.error("User not found");
-            return { data: null, error: null };
+            // Return error
+            return { data: null, error: { message: "User not found" } as PostgrestError };
         }
 
         const { data, error } = await supabase
