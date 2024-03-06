@@ -60,6 +60,7 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
             setNumPendingPackages(0);
             setUserHasStore(false);
         } else if (store.data) {
+            setUserHasStore(true);
             const depot = await db.depots.fetch.forUser();
 
             // If user has depot, fetch the vehicles and packages
@@ -202,9 +203,6 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
                     {isLoading == false && numPendingPackages === 0 &&
                         <div className="w-full flex gap-2 items-center text-sm text-red-500"><MdError />Unable to schedule, no packages pending</div>
                     }
-                    {isLoading == false && numPendingPackages === 0 &&
-                        <div className="w-full flex gap-2 items-center text-sm text-red-500"><MdError />Unable to schedule, no packages pending</div>
-                    }
                 </>
             }
             {!userHasStore && !isLoading &&
@@ -224,7 +222,7 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
                 <Label className="my-auto justify-center line-clamp-1">Selected Vehicles</Label>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="selectTrigger" disabled={selectedVehicles.length == 0}>
+                        <Button variant="selectTrigger" disabled={vehicles.length == 0}>
                             {vehicles.length > 0 &&
                                 <div className="line-clamp-1 font-normal">{selectedVehicles.length} Selected</div>
                             }
