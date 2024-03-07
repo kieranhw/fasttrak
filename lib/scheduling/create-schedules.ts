@@ -102,7 +102,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
             route_number: schedules.length + 1,
             start_time: date,
             status: DeliveryStatus.Scheduled,
-            num_packages: route.nodes.length - 2, // minus 2 to exclude depot nodes
+            num_packages: route.nodes.length - 1, // Subtract 1 to account for depot marker
             estimated_duration_mins: route.actualTimeMins, 
             actual_duration_mins: 0,
             distance_miles: route.actualDistanceMiles.toFixed(2) as unknown as number,
