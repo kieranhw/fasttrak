@@ -27,6 +27,15 @@ export default function Store() {
       const { data: store, error: storeError } = await db.stores.fetch.forUser();
       if (store) {
         setStore(store);
+
+        // Fetch depot
+        const { data: depot, error: depotError } = await db.depots.fetch.forStore(store);
+        if (depot && depot[0]) {
+          setDepot(depot[0]);
+        } else {
+          console.error("Unable to retrieve store depot.", depotError);
+          setDepot(null);
+        }
       } else {
         console.error("Unable to retrieve user store.", storeError);
         setStore(null);
