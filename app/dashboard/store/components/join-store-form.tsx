@@ -49,7 +49,7 @@ const joinStoreSchema = z.object({
         })
         .regex(/^IC[a-zA-Z0-9]{10}$/, {
             message: "Invite code must start with 'IC' followed by 10 alphanumeric characters.",
-        }),        
+        })        
 });
 
 // This can come from your database or API.
@@ -70,31 +70,27 @@ export const JoinStoreForm: React.FC<StoreFormProps> = ({ refreshStore, refreshD
     })
 
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     async function onSubmit(data: StoreFormValues) {
         setIsSubmitting(true);
         const inviteCode = data.passcode;
-        console.log("submit clicked")
 
         try {
             const { data: joinedStore, error } = await db.stores.join(inviteCode);
 
-            if (error) {
-                console.log("Error occurred while creating store:", error);
-                // Handle the error case here
-            } else if (joinedStore && joinedStore.store_id) {
-                // Here you have the created store with the UUID
-                // Wait 2 sec
-                await new Promise(r => setTimeout(r, 2000));
-
+            if (joinedStore && joinedStore.store_id) {
+                // Wait 1 sec
+                await new Promise(r => setTimeout(r, 1000));
+                setError(null);
                 refreshStore();
-                refreshDepot(); // Clear previous states if page not refreshed
+                refreshDepot();
             } else {
-                // Handle the case where the store was not returned
-                console.log("Store was not joined.");
-            }
-        } catch (error) {
-            console.error("An unexpected error occurred:", error);
+                setError("Invite code not recognised.");
+            } 
+            
+        } catch (error) {                
+            setError("An unexpected error occurred.");
         }
 
         setIsSubmitting(false);
@@ -117,7 +113,7 @@ export const JoinStoreForm: React.FC<StoreFormProps> = ({ refreshStore, refreshD
                                 <FormDescription>
                                     This code is available from the owner's store page.
                                 </FormDescription>
-                                <FormMessage />
+                                <FormMessage>{error}</FormMessage>
                             </FormItem>
                         )}
                     />
