@@ -26,6 +26,7 @@ import { MdError, MdInfoOutline } from 'react-icons/md';
 import { db } from '@/lib/db/db';
 import { HiLightningBolt } from 'react-icons/hi';
 import { FaLeaf, FaTruck } from 'react-icons/fa';
+import { Switch } from '@/components/ui/switch';
 
 
 interface ScheduleDialogProps {
@@ -45,6 +46,7 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
     const [numPendingPackages, setNumPendingPackages] = useState<Number | null>(null);
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [selectedVehicles, setSelectedVehicles] = useState<Vehicle[]>([]);
+    const [minimiseVehicles, setMinimiseVehicles] = useState<boolean>(false);
     const [isScheduling, setIsScheduling] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [userHasDepot, setUserHasDepot] = useState<boolean>(false);
@@ -137,6 +139,7 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
 
         const scheduleProfile: ScheduleProfile = {
             selected_vehicles: selectedVehicles,
+            auto_selection: minimiseVehicles,
             optimisation_profile: formFields.optimisationProfile as OptimisationProfile,
             time_window: parseInt(formFields.timeWindow),
             delivery_time: parseInt(formFields.deliveryTime),
@@ -217,7 +220,7 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
             {/* Divider */}
             <div className="w-full border-t" />
 
-            {/* Form */}
+            {/* Form */}            
             <div className="flex justify-between gap-4">
                 <Label className="my-auto justify-center line-clamp-1">Selected Vehicles</Label>
                 <DropdownMenu>
@@ -234,7 +237,6 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
                             }
                         </Button>
                     </DropdownMenuTrigger>
-
                     <DropdownMenuContent className="w-[180px] max-h-[200px] overflow-y-scroll">
                         {vehicles.map((vehicle) => {
                             return (
@@ -249,15 +251,17 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
                                 </DropdownMenuCheckboxItem>
                             )
                         })}
-
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
 
+            <div className="flex justify-between ">
+                <Label htmlFor="min-vehicles" className="my-auto justify-center line-clamp-1">Auto Minimise Vehicles</Label>
+                <Switch id="min-vehicles" checked={minimiseVehicles} onCheckedChange={setMinimiseVehicles} />
+            </div>
+
             <div className="flex justify-between gap-4">
-
                 <Label className="my-auto justify-center line-clamp-1 flex gap-1">Optimisation Profile</Label>
-
                 <Select value={formFields.optimisationProfile}
                     onValueChange={(e) => setFormFields({ ...formFields, optimisationProfile: e.valueOf() })}>
                     <SelectTrigger className="w-[180px]">

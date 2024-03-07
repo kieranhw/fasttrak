@@ -21,7 +21,7 @@ export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
     if (test == true) {
         const distanceMultiplier = 1.5;
         const avgSpeed = 20;
-        solution.initMetrics(avgSpeed, distanceMultiplier);
+        solution.loadMetrics(avgSpeed, distanceMultiplier);
         return {solution, distanceMultiplier ,avgSpeed};
     }
 
@@ -101,7 +101,7 @@ export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
     const avgSpeed = totalActualDistance / totalActualTime;
     const distanceMultiplier = totalActualDistance / totalEucDistance;
 
-    solution.initMetrics(avgSpeed, distanceMultiplier);
+    solution.loadMetrics(avgSpeed, distanceMultiplier);
 
     return {solution, distanceMultiplier, avgSpeed}; 
 }

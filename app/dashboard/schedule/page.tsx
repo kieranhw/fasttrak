@@ -41,6 +41,7 @@ import { MdRefresh } from "react-icons/md"
 import { useRouter, useSearchParams } from "next/navigation";
 import { ScheduleDialogContent } from "./components/create-schedule-dialog";
 import { ScheduleProfile } from "@/types/schedule-profile";
+import { CurrentState, PackageStatus } from "@/types/package";
 
 export default function ScheduleDeliveries() {
   // Dialog
@@ -265,7 +266,7 @@ export default function ScheduleDeliveries() {
           console.log("Successfully scheduled")
           const { error } = await supabase
             .from('packages')
-            .update({ status: 'Scheduled' })
+            .update({ status: PackageStatus.Pending, current_state: CurrentState.InTransit})
             .in('package_id', packageOrderIds)
           if (error) {
             alert(error.message)
@@ -283,7 +284,6 @@ export default function ScheduleDeliveries() {
       for (const schedule in deliverySchedules) {
         let packageOrderIds = [];
 
-
         for (const pkg in deliverySchedules[schedule].package_order) {
           packageOrderIds.push(deliverySchedules[schedule].package_order[pkg].package_id)
         }
@@ -291,7 +291,7 @@ export default function ScheduleDeliveries() {
         // update scheduledPackageIds status to scheduled
         const { error } = await supabase
           .from('packages')
-          .update({ status: 'Pending' })
+          .update({ status: PackageStatus.Pending, current_state: CurrentState.Pending})
           .in('package_id', packageOrderIds)
         if (error) {
           alert(error.message)

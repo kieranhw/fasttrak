@@ -181,7 +181,7 @@ export class VRPSolution {
         this.routes.push(route);
     }
 
-    initMetrics(speed: number, distanceMultiplier: number): void {
+    loadMetrics(speed: number, distanceMultiplier: number): void {
         // set metrics in routes
         this.routes.forEach(route => {
             route.avgSpeed = speed;
@@ -206,7 +206,18 @@ export class VRPSolution {
     }
 
     get actualDistance(): number {
+        this.updateRouteMeasurements();
         return this.routes.reduce((sum, route) => sum + route.actualDistanceMiles, 0);
+    }
+
+    get totalVolume(): number {
+        this.updateRouteMeasurements();
+        return this.routes.reduce((sum, route) => sum + route.currentVolume, 0);
+    }
+
+    get totalWeight(): number {
+        this.updateRouteMeasurements();
+        return this.routes.reduce((sum, route) => sum + route.currentWeight, 0);
     }
 
     // Clone including metrics

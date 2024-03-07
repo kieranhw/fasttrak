@@ -9,6 +9,7 @@ export enum OptimisationProfile {
 
 export type ScheduleProfile = {
     selected_vehicles: Vehicle[],
+    auto_selection: boolean,
     optimisation_profile: OptimisationProfile,
     time_window: number, // time window in hours
     delivery_time: number, // est time to deliver each parcel in minutes

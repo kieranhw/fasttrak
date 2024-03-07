@@ -115,7 +115,7 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
                     severity: 2, // Yellow
                     title: "Schedules Pending",
                     description: `${scheduledCount} schedules currently awaiting confirmation.`,
-                    onClickLink: "/dashboard/schedule"
+                    onClickLink: `/dashboard/schedule?date=${format(new Date(), 'ddMMyyyy')}`
                 });
             }
 
@@ -124,8 +124,8 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
                 notifications.push({
                     severity: 1, // Green
                     title: "Schedules In Progress",
-                    description: `${inProgressCount} schedules currently in progress.`,
-                    onClickLink: "/dashboard/schedule"
+                    description: `${inProgressCount} schedules awaiting completion.`,
+                    onClickLink: `/dashboard/schedule?date=${format(new Date(), 'ddMMyyyy')}`
                 });
             }
 

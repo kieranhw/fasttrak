@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
-import { Package, CurrentState } from "@/types/package";
+import { Package, CurrentState, PackageStatus } from "@/types/package";
 import { UUID } from "crypto";
 import { db } from "./db";
 import { DeliveryStatus } from "@/types/delivery-schedule";
@@ -33,10 +33,8 @@ const fetchPackages = async () => {
     }
 }
 
-// Fetch all packages for a user where "status" is "Pending" (i.e. not scheduled for delivery)
+// Fetch all packages for a user where current state is "Pending" (i.e. not scheduled for delivery)
 const fetchPackagesByPending = async () => {
-    // Fetch store for user
-
     // Fetch store for user
     const { data: store, error } = await db.stores.fetch.forUser();
 
@@ -47,11 +45,10 @@ const fetchPackagesByPending = async () => {
         console.error("Error fetching store: ", error);
         return;
     } else {
-
         let { data: packages, error } = await supabase
             .from('packages')
             .select('*')
-            .eq('current_state', 'Pending')
+            .eq('current_state', CurrentState.Pending)
             .order('created_at', { ascending: false })
             .eq('store_id', store.store_id);
         if (error) {
@@ -165,17 +162,25 @@ const removePackageById = async (id: UUID) => {
 }
 
 // Update package statuses by IDs
-const updatePackageStatusByIds = async (ids: UUID[], status: DeliveryStatus) => {
+const updatePackageStatusByIds = async (ids: UUID[], scheduleStatus: DeliveryStatus) => {
     if (!ids) {
         return;
     }
 
-    if (status === DeliveryStatus.Completed) {
+    // Manage package state, careful not to update status as it may overwrite a return delivery status
+    let packageState = CurrentState.Pending;
+
+    if (scheduleStatus === DeliveryStatus.Scheduled) {
+        packageState = CurrentState.Scheduled;
+    } else if (scheduleStatus === DeliveryStatus.InProgress) {
+        packageState = CurrentState.InTransit;
+    } else if (scheduleStatus === DeliveryStatus.Completed) {
         // Remove personal information from packages and set status to delivered
         const { error } = await supabase
             .from('packages')
             .update({
-                status: "Delivered",
+                status: PackageStatus.Delivered,
+                current_state: CurrentState.Delivered,
                 recipient_name: null,
                 recipient_phone: null,
                 sender_name: null,
@@ -186,18 +191,19 @@ const updatePackageStatusByIds = async (ids: UUID[], status: DeliveryStatus) => 
             console.error("Error updating package status: ", error);
             return
         }
-    } else {
-        const { error } = await supabase
-            .from('packages')
-            .update({ status: status })
-            .in('package_id', ids)
-        if (error) {
-            console.error("Error updating package status: ", error);
-            return
-        } else {
-            return
-        }
     }
+
+    const { error } = await supabase
+        .from('packages')
+        .update({ status: scheduleStatus, current_state: packageState })
+        .in('package_id', ids)
+    if (error) {
+        console.error("Error updating package status: ", error);
+        return
+    } else {
+        return
+    }
+
 }
 
 
