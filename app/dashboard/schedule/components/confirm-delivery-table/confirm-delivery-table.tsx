@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import {
     ColumnDef,
@@ -64,10 +64,6 @@ export function ConfirmDeliveryTable<TData, TValue>({
             },
         },
     })
-
-
-    // Calculate the number of empty rows to fill the table
-    const emptyRows = Math.max(0, table.initialState.pagination.pageSize - table.getRowModel().rows.length);
 
     return (
         <>

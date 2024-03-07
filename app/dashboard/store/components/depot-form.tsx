@@ -1,11 +1,9 @@
 "use client"
 
-import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useFieldArray, useForm } from "react-hook-form"
 import { z } from "zod"
 
-import { cn } from "@/lib/utils/utils"
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -24,18 +22,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
-import { FaCopy } from "react-icons/fa"
-import { IoMdRefresh } from "react-icons/io";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { db } from "@/lib/db/db"
-import { Store } from "@/types/store"
-import { PostgrestError } from "@supabase/supabase-js"
 import { useEffect, useState } from "react"
-import { generateIC } from "@/lib/utils/generate-ids"
 import { geocodeAddress as geocoder } from "@/lib/google-maps/geocoder"
-import { sanitizeFloat } from "@/lib/utils/validation"
 import { Depot } from "@/types/depot"
 import { Loader2 } from "lucide-react"
 import { MdEdit } from "react-icons/md"
@@ -288,6 +278,14 @@ export const CreateDepotForm: React.FC<CreateDepotFormProps> = ({ depot, onDepot
         setValue("depot_lat", "");
         setValue("depot_lng", "");
     }
+
+    useEffect(() => {
+        // Assign a value to the dispatch time if it's empty, fixes the bug that assigns an
+        // empty string to the dispatch time for some unknown reason
+        if (watchedFields.dispatch_time === "") {
+            setValue("dispatch_time", depot?.dispatch_time ?? "")
+        }
+    }, [watchedFields.dispatch_time]);
 
     return (
         <Form {...form}>

@@ -179,6 +179,7 @@ export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => 
             const [completeAlertOpen, setCompleteAlertOpen] = useState(false);
             const [rowSelection, setRowSelection] = useState({})
 
+
             async function handleUpdateStatus(id: UUID, status: DeliveryStatus) {
 
                 // Update schedule status
@@ -221,7 +222,7 @@ export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => 
 
                 }
             }
-
+            
             return (
                 <>
                     <DropdownMenu>
