@@ -80,7 +80,6 @@ const fetchPackagesByIds = async (ids: UUID[]) => {
 
 // Fetch packages for store ID which are not delivered
 const fetchPackagesInventory = async () => {
-
     // Get store ID
     const { data: store, error } = await db.stores.fetch.forUser();
 
@@ -100,6 +99,16 @@ const fetchPackagesInventory = async () => {
             console.error("Error fetching packages: ", error);
             return;
         } else {
+            // Sort from date_added in descending order
+            packages?.sort((a, b) => {
+                if (a.created_at < b.created_at) {
+                    return 1;
+                } else if (a.created_at > b.created_at) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            });
             return (packages as Package[]);
         }
     }
