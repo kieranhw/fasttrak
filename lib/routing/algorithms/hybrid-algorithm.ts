@@ -29,50 +29,6 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     let randomSolution = await roundRobinAllocation(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
     randomSolution.loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
 
-    // Estimate maximum vehicles required from the initial solution
-    const totalWeightNeeded = initSolution.totalWeight;
-    const totalVolumeNeeded = initSolution.totalVolume;
-    const routes = initSolution.routes;
-
-    const routesDescendingVolume = routes.sort((a, b) => b.currentVolume - a.currentVolume);
-    let maximumVehiclesRequired: Vehicle[] = [];
-
-    let currentWeight = 0;
-    let currentVolume = 0;
-    let currentTimeMins = 0;
-    
-
-    // Find maximum number of vehicles needed for space
-    for (const route in routesDescendingVolume) {
-        // Find the number of vehicles required based on the total volume and weight, sum up the current time
-        if (currentWeight < totalWeightNeeded || currentVolume < totalVolumeNeeded) {
-            currentWeight += routesDescendingVolume[route].currentWeight
-            currentVolume += routesDescendingVolume[route].currentVolume
-            currentTimeMins += routesDescendingVolume[route].actualTimeMins
-            maximumVehiclesRequired.push(routesDescendingVolume[route].vehicle);
-            
-            // Remove the route from the list
-            routesDescendingVolume.splice(parseInt(route), 1);
-        }
-    }
-
-    let currentTimeWindowMins = (profile.time_window * maximumVehiclesRequired.length) * 60;
-    // Find maximum number of vehicles needed for time (i.e. add any extra)
-    for (const route in routesDescendingVolume) {
-        // If current time of the routes are exceeding the time window, add more vehicles
-        if (currentTimeMins > currentTimeWindowMins) {
-            maximumVehiclesRequired.push(routesDescendingVolume[route].vehicle);
-            currentTimeWindowMins += (profile.time_window * 60); // Account for new vehicle's time window
-        }    
-    }
-
-    console.log("Estimated vehicles needed: " + maximumVehiclesRequired.length);
-
-    if (profile.auto_selection == true) {
-        vehicles = maximumVehiclesRequired;
-    }
-
-
     // Add leftover packages to priority queue
     const solutionNodes = [] as Node[]; // Holds all nodes in the solution
     const graphNodes = graph.nodes; // Holds all nodes in the graph
@@ -86,6 +42,55 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
         if (!solutionNodes.includes(node)) remainingPackages.enqueue(node);
     });
 
+
+    // Auto max vehicle count selection
+    if (profile.auto_selection == true) {
+
+        // Estimate maximum vehicles required from the initial solution
+        const totalWeightCapacityNeeded = graph.nodes.reduce((acc, node) => acc + (node.pkg?.weight ?? 0), 0);
+        const totalVolumeCapacityNeeded = graph.nodes.reduce((acc, node) => acc + (node.pkg?.volume ?? 0), 0);
+
+        // Create a clone of the vehicles array
+        const startingVehicles = vehicles.slice();
+        let maximumVehiclesRequired: Vehicle[] = [];
+
+        // Find maximum number of vehicles needed to load all the packages
+        let weightAvailable = 0;
+        let volumeAvailable = 0;
+
+        // Find maximum number of vehicles needed to load all the packages
+        for (const vehicle in startingVehicles) {
+            // Find the number of vehicles required based on the total volume and weight, sum up the current time
+            if (weightAvailable < totalWeightCapacityNeeded || volumeAvailable < totalVolumeCapacityNeeded) {
+                weightAvailable += startingVehicles[vehicle].max_load
+                volumeAvailable += startingVehicles[vehicle].max_volume
+                maximumVehiclesRequired.push(startingVehicles[vehicle]);
+                // Remove vehicle from startingVehicles
+                startingVehicles.splice(parseInt(vehicle), 1);
+            }
+        }
+
+        const EFFICIENCY_INCREASE = 0.5 // The typical difference in efficiency between the random solution and the final solution
+
+        let currentTimeWindowMins = (profile.time_window * maximumVehiclesRequired.length) * 60; // Current time window available
+        const averageTimePerPackage = (randomSolution.actualTime * EFFICIENCY_INCREASE) / randomSolution.numberOfPackages;
+        const estimatedTotalTime = averageTimePerPackage * graph.nodes.length - 1; // Estimated (worst case) time to deliver all packages
+
+        // Find maximum number of vehicles needed to route the packages within the time window
+        for (const vehicle in startingVehicles) {
+            // If current time of the routes are exceeding the time window, add more vehicles
+            if (estimatedTotalTime > currentTimeWindowMins) {
+                maximumVehiclesRequired.push(startingVehicles[vehicle]);
+                startingVehicles.splice(parseInt(vehicle), 1);
+                currentTimeWindowMins += (profile.time_window * 60); // Account for new vehicle's time window
+            }
+        }
+
+        console.log("Estimated vehicles needed: " + maximumVehiclesRequired.length);
+
+        vehicles = maximumVehiclesRequired;
+    }
+
     // Run KMeans clustering to get an initial solution
     let KMeans = await geospatialClustering(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
     KMeans[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
@@ -93,7 +98,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     //KMeans[0] = KMeansMetrics.solution;
     console.log("KMeans SOLUTION: " + KMeans[0].routes.forEach(route => {
         console.log(route)
-    }));    
+    }));
 
 
     // K Means solution
@@ -104,7 +109,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     //const ga = new GeneticAlgorithm(randomSolution, graph, remainingPackages, profile); // Run GA with random solution
 
     // Define the number of generations and other GA parameters as necessary
-    const numGenerations = 10000;
+    const numGenerations = 1000000;
 
     // Evolve the solution
     const optimizedSolution = ga.evolve(numGenerations);
@@ -115,14 +120,14 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     console.log("Efficiency scores")
     console.log("Random solution overall: ", + calculateEfficiencyScores(randomSolution).overallEfficiency);
     console.log("K Means Overall: " + calculateEfficiencyScores(KMeans[0]).overallEfficiency);
-    console.log("Parcels/unit distance: ", + calculateEfficiencyScores(KMeans[0]).PUD);
-    console.log("Parcels/unit time ", + calculateEfficiencyScores(KMeans[0]).PUT);
-    console.log("volume utilisation: ", + calculateEfficiencyScores(KMeans[0]).VU);
+    //console.log("Parcels/unit distance: ", + calculateEfficiencyScores(KMeans[0]).PUD);
+    //console.log("Parcels/unit time ", + calculateEfficiencyScores(KMeans[0]).PUT);
+    //console.log("volume utilisation: ", + calculateEfficiencyScores(KMeans[0]).VU);
 
-    console.log("Optimised total eff ", + calculateEfficiencyScores(optimizedSolution).overallEfficiency);
-    console.log("Parcels/unit distance: ", + calculateEfficiencyScores(optimizedSolution).PUD);
-    console.log("Parcels/unit time ", + calculateEfficiencyScores(optimizedSolution).PUT);
-    console.log("volume utilisation: ", + calculateEfficiencyScores(optimizedSolution).VU);
+    console.log("Optimised overall ", + calculateEfficiencyScores(optimizedSolution).overallEfficiency);
+    //console.log("Parcels/unit distance: ", + calculateEfficiencyScores(optimizedSolution).PUD);
+    //console.log("Parcels/unit time ", + calculateEfficiencyScores(optimizedSolution).PUT);
+    //console.log("volume utilisation: ", + calculateEfficiencyScores(optimizedSolution).VU);
 
 
     return optimizedSolution;

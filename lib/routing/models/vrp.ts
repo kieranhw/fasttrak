@@ -205,10 +205,6 @@ export class VRPSolution {
         return this.routes.reduce((sum, route) => sum + route.eucDistanceMiles, 0);
     }
 
-    get actualDistance(): number {
-        this.updateRouteMeasurements();
-        return this.routes.reduce((sum, route) => sum + route.actualDistanceMiles, 0);
-    }
 
     get totalVolume(): number {
         this.updateRouteMeasurements();
@@ -218,6 +214,20 @@ export class VRPSolution {
     get totalWeight(): number {
         this.updateRouteMeasurements();
         return this.routes.reduce((sum, route) => sum + route.currentWeight, 0);
+    }
+
+    get actualTime(): number {
+        this.updateRouteMeasurements();
+        return this.routes.reduce((sum, route) => sum + route.actualTimeMins, 0);
+    }
+
+    get actualDistance(): number {
+        this.updateRouteMeasurements();
+        return this.routes.reduce((sum, route) => sum + route.actualDistanceMiles, 0);
+    }
+
+    get numberOfPackages(): number {
+        return this.routes.reduce((sum, route) => sum + route.nodes.length - 1, 0);
     }
 
     // Clone including metrics

@@ -32,7 +32,7 @@ export default function ManagePackage() {
       <div className="flex flex-col justify-between">
         <h1 className="text-foreground font-bold text-3xl">Inventory</h1>
         <p className="text-md text-muted-foreground">
-          Manage all of the packages in your inventory.
+          Manage all of the packages which are not yet delivered.
         </p>
       </div>
       <PackagesTable columns={columns(refreshData)} data={data} refreshData={refreshData} />

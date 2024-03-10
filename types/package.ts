@@ -43,7 +43,7 @@ export type Package = {
     delivery_notes: string
     date_added: Date
     //date_modified?: Date
-    //date_delivered?: Date
+    date_delivered?: Date
     //date_dispatched?: Date
 }
   

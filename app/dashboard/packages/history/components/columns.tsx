@@ -78,15 +78,11 @@ export const columns = (refreshData: () => void): ColumnDef<Package>[] => [
         header: "Status",
     },
     {
-        accessorKey: "created_at",
-        header: "Date Added",
+        accessorKey: "date_delivered",
+        header: "Delivery Date",
         cell: ({ row }) => {
-            const timezone = row.getValue("created_at")?.toString()
-
-            const extractedDate = timezone?.substring(0, 10)
-            const formattedDate = new Date(extractedDate!).toLocaleDateString()
-
-            return formattedDate;
+            const date = row.getValue("date_delivered")?.toString()
+            return date ? new Date(date).toLocaleDateString() : ""
         }
     },
     {

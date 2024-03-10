@@ -23,7 +23,9 @@ export async function updatePackages(schedule: DeliverySchedule, deliveredPackag
                 sender_name: null,
                 sender_phone: null,
                 current_state: CurrentState.Delivered,
-                status: PackageStatus.Delivered
+                status: PackageStatus.Delivered,
+                // In format YYYY-MM-DD
+                date_delivered: new Date().toISOString().split('T')[0]
             })
             .in('package_id', deliveredPackageIds);
         if (deliveredError) {
