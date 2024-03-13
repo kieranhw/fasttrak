@@ -38,7 +38,8 @@ export async function createGraphAndSolutionFromScheduleArray(schedules: Deliver
         optimisation_profile: OptimisationProfile.Eco,
         time_window: 8,
         delivery_time: 3,
-        selected_vehicles: schedules.map(schedule => schedule.vehicle)
+        selected_vehicles: schedules.map(schedule => schedule.vehicle),
+        auto_selection: true
     }
 
     // Create VehicleRoutes and VRPSolution from schedules
@@ -87,7 +88,8 @@ export async function createGraphAndSolutionFromSchedule(schedule: DeliverySched
         optimisation_profile: OptimisationProfile.Eco,
         time_window: 8,
         delivery_time: 3,
-        selected_vehicles: [schedule.vehicle]
+        selected_vehicles: [schedule.vehicle],
+        auto_selection: true
     }
 
     // Create VehicleRoute and VRPSolution from schedule
