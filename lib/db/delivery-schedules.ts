@@ -43,6 +43,36 @@ export const fetchSchedulesByDate = async (date: Date): Promise<DeliverySchedule
     }
 };
 
+// Returns all schedules from date1 to date2, stored in the database as yyyy-MM-DD
+export const fetchSchedulesByDateRange = async (date1: String, date2: String): Promise<{ data: DeliverySchedule[] | null, error: PostgrestError | null }> => {
+    try {
+        const store = await fetchStoreAndHandleError();
+
+        const { data: schedules, error } = await supabase
+            .from('delivery_schedules')
+            .select('*')
+            .gte('delivery_date', date1)
+            .lte('delivery_date', date2)
+            .eq('store_id', store.store_id);
+
+        if (error) throw new Error(`Error fetching schedules: ${error.message}`);
+        if (!schedules) return { data: null, error: null };
+
+        // Process each schedule to fetch additional information like package order and vehicle details
+        for (const schedule of schedules) {
+            schedule.package_order = await fetchPackagesForSchedule(schedule.package_order);
+            schedule.vehicle = await db.vehicles.fetch.byId(schedule.vehicle_id);
+        }
+
+        return { data: schedules, error: null };
+    } catch (error) {
+        console.error("Error in fetchSchedulesByDateRange:", error);
+        return { data: null, error: { message: (error as Error).message, details: '', hint: '', code: '' }}
+    };
+};
+
+
+
 // Helper function to fetch packages for a schedule
 const fetchPackagesForSchedule = async (packageIds: UUID[]): Promise<Package[]> => {
     const packages = await db.packages.fetch.byIds(packageIds);
@@ -114,6 +144,7 @@ export const schedules = {
     fetch: {
         byId: fetchScheduleById,
         byDate: fetchSchedulesByDate,
+        byDateRange: fetchSchedulesByDateRange,
     },
     update: {
         status: updateScheduleStatus,

@@ -1,5 +1,7 @@
 'use client'
 
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
+
 import {
   Card,
   CardContent,
@@ -18,6 +20,149 @@ import {
 } from "@/components/ui/select"
 import { IoAnalytics } from "react-icons/io5";
 import { BsQuestionCircleFill } from "react-icons/bs";
+
+const data = [
+  {
+    name: "1",
+    total: Math.floor(Math.random() * 10) + 10,
+  },
+  {
+    name: "2",
+    total: Math.floor(Math.random() * 10) + 10,
+  },
+  {
+    name: "Mar",
+    total: Math.floor(Math.random() * 10) + 10,
+  },
+  {
+    name: "Apr",
+    total: Math.floor(Math.random() * 10) + 10,
+  },
+  {
+    name: "May",
+    total: Math.floor(Math.random() * 10) + 10,
+  },
+  {
+    name: "Jun",
+    total: Math.floor(Math.random() * 10) + 10,
+  },
+  {
+    name: "Jul",
+    total: Math.floor(Math.random() * 10) + 10,
+  },
+  {
+    name: "Aug",
+    total: Math.floor(Math.random() * 10) + 10,
+  },
+  {
+    name: "Sep",
+    total: Math.floor(Math.random() * 10) + 10,
+  },
+  {
+    name: "Oct",
+    total: Math.floor(Math.random() * 10) + 10,
+  },
+  {
+    name: "Nov",
+    total: Math.floor(Math.random() * 10) + 10,
+  },
+  {
+    name: "Dec",
+    total: Math.floor(Math.random() * 10) + 10,
+  },
+
+]
+
+const deliveries = [
+  {
+    name: "1",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "2",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "1",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "1",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "1",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "1",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "1",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "1",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "1",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "2",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "1",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "1",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "1",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "1",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "1",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "1",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+  {
+    name: "1",
+    standard: Math.floor(Math.random() * 10) + 1,
+    express: Math.floor(Math.random() * 10) + 1,
+  },
+
+]
+
+
 
 import {
   Calculator,
@@ -75,11 +220,14 @@ import Image from "next/image";
 import { db } from "@/lib/db/db";
 import { DashboardInfo } from "@/types/misc";
 import { Skeleton } from "@/components/ui/skeleton"
-import { set } from "date-fns";
+import { format, add, set } from 'date-fns';
 import { FaWarehouse } from "react-icons/fa";
 import { IoMdNotifications } from "react-icons/io";
 import { Notification } from "@/types/misc";
 import { getNotifications } from "@/lib/utils/notification-gen";
+import { supabase } from "@/lib/supabase/client";
+import { Package, PriorityType } from "@/types/package";
+import { DeliverySchedule } from "@/types/delivery-schedule";
 
 
 function renderInfoCard() {
@@ -171,7 +319,7 @@ function renderInfoCard() {
                       </p>
                       <BsQuestionCircleFill className="text-muted-foreground h-3 my-0 hover:text-primary transition" />
                     </TooltipTrigger>
-                    <TooltipContent className="w-3/4">
+                    <TooltipContent className="w-1/2">
                       <p>Delivery efficiency is calculated as:</p>
                       <Image priority src="/images/eff-equation.png" width={698} height={160} alt="Image demonstrating the FastTrak dashboard" className="w-full h-full" />
                     </TooltipContent>
@@ -206,21 +354,6 @@ function renderInfoCard() {
               </div>
               <div className="items-start w-1/2 justify-center flex flex-col text-start pl-8">
                 <div className="text-3xl font-bold">{info?.delivery_efficiency || 0}</div>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger className="cursor-default flex gap-1 items-center w-full">
-                      <p className="text-xs text-muted-foreground">
-                        Delivery Efficiency
-                      </p>
-                      <BsQuestionCircleFill className="text-muted-foreground h-3 my-0 hover:text-primary transition" />
-                    </TooltipTrigger>
-                    <TooltipContent className="w-3/4">
-                      <p>Delivery efficiency is calculated as:</p>
-                      <Image priority src="/images/eff-equation.png" width={698} height={160} alt="Image demonstrating the FastTrak dashboard" className="w-full h-full" />
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
               </div>
             </div>
           </div>
@@ -276,47 +409,60 @@ function renderShortcutsCard() {
           <CommandList className="no-scrollbar">
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup heading="Create New" className="mx-4">
-              <CommandItem>
-                <span>Register a new vehicle</span>
+              <CommandItem className="hover:cursor-pointer">
+                <Link href={`/dashboard/vehicles`}>
+                  <span>Register a new vehicle</span>
+                </Link>
               </CommandItem>
-              <CommandItem>
-                <span>Add a new package</span>
+              <CommandItem className="hover:cursor-pointer">
+                <Link href={`/dashboard/packages/add`}>
+                  <span>Add a new package</span>
+                </Link>
               </CommandItem>
             </CommandGroup>
             <CommandSeparator />
             <CommandGroup heading="Delivery Scheduling" className="mx-4">
-              <CommandItem>
-                <span>Schedule a delivery for today</span>
+              <CommandItem className="hover:cursor-pointer">
+                <Link href={`/dashboard/schedule?date=${format(new Date(), 'ddMMyyyy')}`}>
+                  <span>Schedule a delivery for today</span>
+                </Link>
               </CommandItem>
-              <CommandItem>
-                <span>Schedule a delivery for tomorrow</span>
-              </CommandItem>
-              <CommandItem>
-                <span>View delivery analytics</span>
+              <CommandItem className="hover:cursor-pointer">
+                <Link href={`/dashboard/schedule?date=${format(add(new Date(), { days: 1 }), 'ddMMyyyy')
+                  }`}>
+                  <span>Schedule a delivery for tomorrow</span>
+                </Link>
               </CommandItem>
             </CommandGroup>
             <CommandSeparator />
             <CommandGroup heading="Data Management" className="mx-4">
-              <CommandItem>
-                <span>View package inventory</span>
+              <CommandItem className="hover:cursor-pointer">
+                <Link href={`/dashboard/packages/inventory`}>
+                  <span>View package inventory</span>
+                </Link>
               </CommandItem>
-              <CommandItem>
-                <span>View package delivery history</span>
+              <CommandItem className="hover:cursor-pointer">
+                <Link href={`/dashboard/packages/history`}>
+                  <span>View package delivery history</span>
+                </Link>
               </CommandItem>
-              <CommandItem>
-                <span>View vehicle fleet</span>
+              <CommandItem className="hover:cursor-pointer">
+                <Link href={`/dashboard/vehicles`}>
+                  <span>View vehicle fleet</span>
+                </Link>
               </CommandItem>
             </CommandGroup>
             <CommandSeparator />
             <CommandGroup heading="Settings" className="mx-4">
-              <CommandItem>
-                <span>Edit store information</span>
+              <CommandItem className="hover:cursor-pointer">
+                <Link href={`/dashboard/store`}>
+                  <span>Edit store information</span>
+                </Link>
               </CommandItem>
-              <CommandItem>
-                <span>Edit depot information</span>
-              </CommandItem>
-              <CommandItem>
-                <span>Edit user profile</span>
+              <CommandItem className="hover:cursor-pointer">
+                <Link href={`/dashboard/store`}>
+                  <span>Edit depot information</span>
+                </Link>
               </CommandItem>
             </CommandGroup>
           </CommandList>
@@ -334,7 +480,7 @@ function renderNotificationsCard() {
       // Initial cache attempt
       const cachedNotifications = localStorage.getItem('notifications');
       //if (cachedNotifications) {
-        //setNotifications(JSON.parse(cachedNotifications));
+      //setNotifications(JSON.parse(cachedNotifications));
       //}
 
       // Always fetch updates
@@ -346,11 +492,11 @@ function renderNotificationsCard() {
         } else {
           // Handle the case where fetching fails but cached data is available
           if (!cachedNotifications) {
-            setNotifications([]); // No cache and fetch failed, set to empty
+            setNotifications([]); // No cache and fetch express, set to empty
           }
         }
       } catch (error) {
-        console.error("Fetching notifications failed:", error);
+        console.error("Fetching notifications express:", error);
         // Fallback to empty if no cache and fetch fails
         if (!cachedNotifications) setNotifications([]);
       }
@@ -452,8 +598,160 @@ function renderNotificationsCard() {
   }
 }
 
+function renderAnalyticsCard2() {
+  return (
+    <Card className="">
+      <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
+        <div className="flex items-center justify-between w-full">
+          <CardTitle className="text-lg font-medium">
+            Analytics
+          </CardTitle>
+          <MdSwitchAccessShortcut size={20} />
+        </div>
+        <CardDescription>
+          Choose an action to begin
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="mt-6">
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart width={730} height={250} data={data}
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Legend />
+            <Line type="monotone" dataKey="package" stroke="#8884d8" activeDot={{ r: 8 }} />
+          </LineChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  )
+}
+
+function renderAnalyticsCard1(packageCountMap: PackageCountMap) {
+  const dataForChart = Object.entries(packageCountMap).map(([date, counts]) => ({
+    date,
+    standard: counts.standard,
+    express: counts.express,
+  })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  return (
+    <Card className="">
+      <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
+        <div className="flex items-center justify-between w-full">
+          <CardTitle className="text-lg font-medium">
+            Packages Scheduled
+          </CardTitle>
+          <MdSwitchAccessShortcut size={20} />
+        </div>
+        <CardDescription>
+          Number of packages scheduled
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="mt-6">
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={dataForChart}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Legend />
+            <Bar dataKey="standard" stackId="a" fill="#8884d8" />
+            <Bar dataKey="express" stackId="a" fill="#82ca9d" />
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  )
+}
+
+enum Selection {
+  Last7 = 'last-7',
+  Last30 = 'last-30',
+  Last90 = 'last-90',
+  Last6Month = 'last-6-month',
+}
+
+type PackageCounts = {
+  standard: number;
+  express: number;
+};
+
+type PackageCountMap = {
+  [date: string]: PackageCounts;
+};
+
+
 export default function Dashboard() {
 
+
+  const [selection, setSelection] = useState<Selection>(Selection.Last7);
+  const [packageCountMap, setPackageCountMap] = useState<PackageCountMap>({});
+
+  const fetchPackageCountMap = async (startDate: string, endDate: string): Promise<PackageCountMap> => {
+    const { data: schedules, error } = await db.schedules.fetch.byDateRange(startDate, endDate);
+
+    let packageCountMap: PackageCountMap = {};
+
+    if (error) {
+      console.error('Error fetching schedules:', error);
+      return packageCountMap;
+    }
+
+    if (!schedules) {
+      return packageCountMap;
+    }
+
+    schedules.forEach(schedule => {
+      const dateStr = format(new Date(schedule.delivery_date), 'dd/MM/yy');
+      packageCountMap[dateStr] = packageCountMap[dateStr] || { standard: 0, express: 0 };
+
+      // Sample logic for determining if a package is standard or express
+      schedule.package_order.forEach(pkg => {
+        if (pkg.priority === PriorityType.Express) {
+          packageCountMap[dateStr].express++;
+        } else {
+          packageCountMap[dateStr].standard++;
+        }
+      });
+    });
+
+    // Ensure all dates in the range are included, even if no packages are scheduled
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    let currentDate = start;
+    while (currentDate <= end) {
+      const formattedDate = format(currentDate, 'dd/MM/yy');
+      packageCountMap[formattedDate] = packageCountMap[formattedDate] || { standard: 0, express: 0 };
+      currentDate = add(currentDate, { days: 1 });
+    }
+
+    return packageCountMap;
+  };
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const endDate = new Date();
+      const startDate = add(endDate, { days: -7 }); // Adjust according to the selected range
+
+      const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+      const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+
+      const packageCountMap = await fetchPackageCountMap(formattedStartDate, formattedEndDate);
+
+      if (packageCountMap) {
+        // Sort by date
+        const sortedPackageCountMap: PackageCountMap = {};
+        Object.keys(packageCountMap).sort().forEach(date => {
+          sortedPackageCountMap[date] = packageCountMap[date];
+        });
+        setPackageCountMap(sortedPackageCountMap);
+      } else {
+        console.error('Error fetching package count map');
+      }
+    };
+
+    fetchData();
+  }, [selection]);
 
   return (
     <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4">
@@ -472,19 +770,28 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-4">
           {renderInfoCard()}
           {renderNotificationsCard()}
-          {renderShortcutsCard()}
+          <div className="block md:hidden xl:block col-span-2">
+            {renderShortcutsCard()}
+          </div>
         </div>
 
 
-        <div className="mt-2">
+        <div className="mt-4">
           <h1 className="text-foreground font-bold text-2xl">Analytics</h1>
           <div className="flex justify-between">
             <p className="text-md text-muted-foreground">
-              A short overview of your system's performance.
+              An overview of your system's performance.
             </p>
             <div className="flex items-center gap-2 justify-end text-sm text-muted-foreground hover:underline hover:cursor-pointer my-2">
               <IoAnalytics size={16} />View detailed analytics
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 mt-4 gap-4">
+            {renderAnalyticsCard1(packageCountMap)}
+
+            {renderAnalyticsCard2()}
+
           </div>
         </div>
       </div>
