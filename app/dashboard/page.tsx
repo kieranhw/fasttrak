@@ -24,6 +24,7 @@ import { BsQuestionCircleFill } from "react-icons/bs";
 import {
   Calculator,
   CreditCard,
+  Loader2,
   Settings,
   Smile,
   User,
@@ -460,6 +461,7 @@ function renderAnalyticsCard2(selection: Selection) {
   type ScheduleStatsMap = { [date: string]: ScheduleStatistics; };
 
   const [scheduleStats, setScheduleStats] = useState<ScheduleStatsMap>({});
+  const [isLoading, setIsLoading] = useState<Boolean>(true);
 
   const dataForChart = Object.entries(scheduleStats).map(([date, counts]) => ({
     date: date,
@@ -507,6 +509,7 @@ function renderAnalyticsCard2(selection: Selection) {
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       const endDate = new Date();
       const startDate = add(endDate, { days: -7 }); // Adjust according to the selected range
 
@@ -525,6 +528,7 @@ function renderAnalyticsCard2(selection: Selection) {
       } else {
         console.error('Error fetching package count map');
       }
+      setIsLoading(false);
     };
 
     fetchData();
@@ -545,19 +549,26 @@ function renderAnalyticsCard2(selection: Selection) {
         </CardDescription>
       </CardHeader>
       <CardContent className="mt-6 p-0">
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart width={730} height={250} data={dataForChart} 
-            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" tickFormatter={(value) => value.slice(0, 5)} tickMargin={5}/>
-            <YAxis yAxisId="left" />
-            <YAxis yAxisId="right" orientation="right" />
-            <Legend verticalAlign="bottom" />
-            <Tooltip wrapperClassName="border-divider rounded-md text-sm shadow-md" />
-            <Line yAxisId="left" name="Miles" type="monotone" dataKey="milesDriven" stroke="#8884d8" />
-            <Line yAxisId="right" name="Hours" type="monotone" dataKey="timeDrivenHours" stroke="#82ca9d" />
-          </LineChart>
-        </ResponsiveContainer>
+        {!isLoading &&
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart width={730} height={250} data={dataForChart}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" tickFormatter={(value) => value.slice(0, 5)} tickMargin={5} />
+              <YAxis yAxisId="left" />
+              <YAxis yAxisId="right" orientation="right" />
+              <Legend verticalAlign="bottom" />
+              <Tooltip wrapperClassName="border-divider rounded-md text-sm shadow-md" />
+              <Line yAxisId="left" name="Miles" type="monotone" dataKey="milesDriven" stroke="#8884d8" />
+              <Line yAxisId="right" name="Hours" type="monotone" dataKey="timeDrivenHours" stroke="#82ca9d" />
+            </LineChart>
+          </ResponsiveContainer>
+        }
+        {isLoading &&
+          <div className="h-72 w-full flex items-center justify-center">
+            <div className="flex gap-2 items-center justify-center text-sm text-muted-foreground"><Loader2 size={18} className="animate-spin" />Loading...</div>
+          </div>
+        }
       </CardContent>
     </Card>
   )
@@ -568,6 +579,7 @@ function renderAnalyticsCard1(selection: Selection) {
   type PackageCountMap = { [date: string]: PackageCounts; };
 
   const [packageCountMap, setPackageCountMap] = useState<PackageCountMap>({});
+  const [isLoading, setIsLoading] = useState<Boolean>(true);
 
   const dataForChart = Object.entries(packageCountMap).map(([date, counts]) => ({
     date: date,
@@ -619,6 +631,7 @@ function renderAnalyticsCard1(selection: Selection) {
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       const endDate = new Date();
       const startDate = add(endDate, { days: -7 }); // Adjust according to the selected range
 
@@ -637,13 +650,14 @@ function renderAnalyticsCard1(selection: Selection) {
       } else {
         console.error('Error fetching package count map');
       }
+      setIsLoading(false);
     };
 
     fetchData();
   }, [selection]);
 
 
-  if (dataForChart.some(data => data.standard > 0 || data.express > 0)) return (
+  return (
     <Card className="">
       <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
         <div className="flex items-center justify-between w-full">
@@ -657,17 +671,24 @@ function renderAnalyticsCard1(selection: Selection) {
         </CardDescription>
       </CardHeader>
       <CardContent className="mt-6 pl-0">
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={dataForChart}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" tickFormatter={(value) => value.slice(0, 5)} tickMargin={5} />
-            <YAxis />
-            <Legend />
-            <Tooltip wrapperClassName="border-divider rounded-md text-sm shadow-md" />
-            <Bar name="Standard" dataKey="standard" stackId="a" fill="#8884d8" />
-            <Bar name="Express" dataKey="express" stackId="a" fill="#82ca9d" />
-          </BarChart>
-        </ResponsiveContainer>
+        {!isLoading &&
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={dataForChart}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" tickFormatter={(value) => value.slice(0, 5)} tickMargin={5} />
+              <YAxis />
+              <Legend />
+              <Tooltip wrapperClassName="border-divider rounded-md text-sm shadow-md" />
+              <Bar name="Standard" dataKey="standard" stackId="a" fill="#8884d8" />
+              <Bar name="Express" dataKey="express" stackId="a" fill="#82ca9d" />
+            </BarChart>
+          </ResponsiveContainer>
+        }
+        {isLoading &&
+          <div className="h-72 w-full flex items-center justify-center">
+            <div className="flex gap-2 items-center justify-center text-sm text-muted-foreground"><Loader2 size={18} className="animate-spin" />Loading...</div>
+          </div>
+        }
       </CardContent>
     </Card>
   )
