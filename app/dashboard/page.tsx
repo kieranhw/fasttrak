@@ -1,6 +1,6 @@
 'use client'
 
-import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, Tooltip, Legend, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
 import {
   Card,
@@ -20,149 +20,6 @@ import {
 } from "@/components/ui/select"
 import { IoAnalytics } from "react-icons/io5";
 import { BsQuestionCircleFill } from "react-icons/bs";
-
-const data = [
-  {
-    name: "1",
-    total: Math.floor(Math.random() * 10) + 10,
-  },
-  {
-    name: "2",
-    total: Math.floor(Math.random() * 10) + 10,
-  },
-  {
-    name: "Mar",
-    total: Math.floor(Math.random() * 10) + 10,
-  },
-  {
-    name: "Apr",
-    total: Math.floor(Math.random() * 10) + 10,
-  },
-  {
-    name: "May",
-    total: Math.floor(Math.random() * 10) + 10,
-  },
-  {
-    name: "Jun",
-    total: Math.floor(Math.random() * 10) + 10,
-  },
-  {
-    name: "Jul",
-    total: Math.floor(Math.random() * 10) + 10,
-  },
-  {
-    name: "Aug",
-    total: Math.floor(Math.random() * 10) + 10,
-  },
-  {
-    name: "Sep",
-    total: Math.floor(Math.random() * 10) + 10,
-  },
-  {
-    name: "Oct",
-    total: Math.floor(Math.random() * 10) + 10,
-  },
-  {
-    name: "Nov",
-    total: Math.floor(Math.random() * 10) + 10,
-  },
-  {
-    name: "Dec",
-    total: Math.floor(Math.random() * 10) + 10,
-  },
-
-]
-
-const deliveries = [
-  {
-    name: "1",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "2",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "1",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "1",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "1",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "1",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "1",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "1",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "1",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "2",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "1",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "1",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "1",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "1",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "1",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "1",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-  {
-    name: "1",
-    standard: Math.floor(Math.random() * 10) + 1,
-    express: Math.floor(Math.random() * 10) + 1,
-  },
-
-]
-
-
 
 import {
   Calculator,
@@ -211,7 +68,7 @@ import Link from "next/link";
 import NotificationItem from "@/components/ui/notification-item";
 import { Calendar } from "@/components/ui/calendar"
 import {
-  Tooltip,
+  Tooltip as TooltipUI,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
@@ -312,7 +169,7 @@ function renderInfoCard() {
                 <div className="text-3xl font-bold">{info?.delivery_efficiency || 0}</div>
 
                 <TooltipProvider>
-                  <Tooltip>
+                  <TooltipUI>
                     <TooltipTrigger className="cursor-default flex gap-1 items-center w-full">
                       <p className="text-xs text-muted-foreground">
                         Delivery Efficiency
@@ -323,7 +180,7 @@ function renderInfoCard() {
                       <p>Delivery efficiency is calculated as:</p>
                       <Image priority src="/images/eff-equation.png" width={698} height={160} alt="Image demonstrating the FastTrak dashboard" className="w-full h-full" />
                     </TooltipContent>
-                  </Tooltip>
+                  </TooltipUI>
                 </TooltipProvider>
               </div>
             </div>
@@ -598,28 +455,107 @@ function renderNotificationsCard() {
   }
 }
 
-function renderAnalyticsCard2() {
+function renderAnalyticsCard2(selection: Selection) {
+  type ScheduleStatistics = { milesDriven: number; timeDrivenHours: number; };
+  type ScheduleStatsMap = { [date: string]: ScheduleStatistics; };
+
+  const [scheduleStats, setScheduleStats] = useState<ScheduleStatsMap>({});
+
+  const dataForChart = Object.entries(scheduleStats).map(([date, counts]) => ({
+    date: date,
+    milesDriven: counts.milesDriven.toFixed(2),
+    timeDrivenHours: counts.timeDrivenHours.toFixed(2),
+  })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  const fetchSchedules = async (startDate: string, endDate: string): Promise<ScheduleStatsMap> => {
+    const { data: schedules, error } = await db.schedules.fetch.byDateRange(startDate, endDate);
+
+    let scheduleStatsMap: ScheduleStatsMap = {};
+
+    if (error) {
+      console.error('Error fetching schedules:', error);
+      return scheduleStatsMap;
+    }
+
+    if (!schedules) {
+      return scheduleStatsMap;
+    }
+
+    schedules.forEach(schedule => {
+      const dateStr = format(new Date(schedule.delivery_date), 'dd/MM/yy');
+      scheduleStatsMap[dateStr] = scheduleStatsMap[dateStr] || { milesDriven: 0, timeDrivenHours: 0 };
+
+      // Sample logic for determining if a package is standard or express
+      schedule.package_order.forEach(pkg => {
+        scheduleStatsMap[dateStr].milesDriven += schedule.actual_distance_miles;
+        scheduleStatsMap[dateStr].timeDrivenHours += schedule.actual_duration_mins / 60;
+      });
+    });
+
+    // Ensure all dates in the range are included, even if no packages are scheduled
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    let currentDate = start;
+    while (currentDate <= end) {
+      const formattedDate = format(currentDate, 'dd/MM/yy');
+      scheduleStatsMap[formattedDate] = scheduleStatsMap[formattedDate] || { milesDriven: 0, timeDrivenHours: 0 };
+      currentDate = add(currentDate, { days: 1 });
+    }
+
+    return scheduleStatsMap;
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const endDate = new Date();
+      const startDate = add(endDate, { days: -7 }); // Adjust according to the selected range
+
+      const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+      const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+
+      const packageCountMap = await fetchSchedules(formattedStartDate, formattedEndDate);
+
+      if (packageCountMap) {
+        // Sort by date
+        const sortedPackageCountMap: ScheduleStatsMap = {};
+        Object.keys(packageCountMap).sort().forEach(date => {
+          sortedPackageCountMap[date] = packageCountMap[date];
+        });
+        setScheduleStats(sortedPackageCountMap);
+      } else {
+        console.error('Error fetching package count map');
+      }
+    };
+
+    fetchData();
+  }, [selection]);
+
+
   return (
     <Card className="">
       <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
         <div className="flex items-center justify-between w-full">
           <CardTitle className="text-lg font-medium">
-            Analytics
+            Driving Statistics
           </CardTitle>
           <MdSwitchAccessShortcut size={20} />
         </div>
         <CardDescription>
-          Choose an action to begin
+          Total miles and hours driven across all schedules
         </CardDescription>
       </CardHeader>
-      <CardContent className="mt-6">
+      <CardContent className="mt-6 p-0">
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart width={730} height={250} data={data}
+          <LineChart width={730} height={250} data={dataForChart} 
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Legend />
-            <Line type="monotone" dataKey="package" stroke="#8884d8" activeDot={{ r: 8 }} />
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" tickFormatter={(value) => value.slice(0, 5)} tickMargin={5}/>
+            <YAxis yAxisId="left" />
+            <YAxis yAxisId="right" orientation="right" />
+            <Legend verticalAlign="bottom" />
+            <Tooltip wrapperClassName="border-divider rounded-md text-sm shadow-md" />
+            <Line yAxisId="left" name="Miles" type="monotone" dataKey="milesDriven" stroke="#8884d8" />
+            <Line yAxisId="right" name="Hours" type="monotone" dataKey="timeDrivenHours" stroke="#82ca9d" />
           </LineChart>
         </ResponsiveContainer>
       </CardContent>
@@ -627,64 +563,17 @@ function renderAnalyticsCard2() {
   )
 }
 
-function renderAnalyticsCard1(packageCountMap: PackageCountMap) {
+function renderAnalyticsCard1(selection: Selection) {
+  type PackageCounts = { standard: number; express: number; };
+  type PackageCountMap = { [date: string]: PackageCounts; };
+
+  const [packageCountMap, setPackageCountMap] = useState<PackageCountMap>({});
+
   const dataForChart = Object.entries(packageCountMap).map(([date, counts]) => ({
-    date,
+    date: date,
     standard: counts.standard,
     express: counts.express,
   })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-  return (
-    <Card className="">
-      <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
-        <div className="flex items-center justify-between w-full">
-          <CardTitle className="text-lg font-medium">
-            Packages Scheduled
-          </CardTitle>
-          <MdSwitchAccessShortcut size={20} />
-        </div>
-        <CardDescription>
-          Number of packages scheduled
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="mt-6">
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={dataForChart}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Legend />
-            <Bar dataKey="standard" stackId="a" fill="#8884d8" />
-            <Bar dataKey="express" stackId="a" fill="#82ca9d" />
-          </BarChart>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
-  )
-}
-
-enum Selection {
-  Last7 = 'last-7',
-  Last30 = 'last-30',
-  Last90 = 'last-90',
-  Last6Month = 'last-6-month',
-}
-
-type PackageCounts = {
-  standard: number;
-  express: number;
-};
-
-type PackageCountMap = {
-  [date: string]: PackageCounts;
-};
-
-
-export default function Dashboard() {
-
-
-  const [selection, setSelection] = useState<Selection>(Selection.Last7);
-  const [packageCountMap, setPackageCountMap] = useState<PackageCountMap>({});
 
   const fetchPackageCountMap = async (startDate: string, endDate: string): Promise<PackageCountMap> => {
     const { data: schedules, error } = await db.schedules.fetch.byDateRange(startDate, endDate);
@@ -753,6 +642,54 @@ export default function Dashboard() {
     fetchData();
   }, [selection]);
 
+
+  if (dataForChart.some(data => data.standard > 0 || data.express > 0)) return (
+    <Card className="">
+      <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
+        <div className="flex items-center justify-between w-full">
+          <CardTitle className="text-lg font-medium">
+            Packages Scheduled
+          </CardTitle>
+          <MdSwitchAccessShortcut size={20} />
+        </div>
+        <CardDescription>
+          Number of packages scheduled by delivery priority
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="mt-6 pl-0">
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={dataForChart}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" tickFormatter={(value) => value.slice(0, 5)} tickMargin={5} />
+            <YAxis />
+            <Legend />
+            <Tooltip wrapperClassName="border-divider rounded-md text-sm shadow-md" />
+            <Bar name="Standard" dataKey="standard" stackId="a" fill="#8884d8" />
+            <Bar name="Express" dataKey="express" stackId="a" fill="#82ca9d" />
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  )
+}
+
+
+enum Selection {
+  Last7 = 'last-7',
+  Last30 = 'last-30',
+  Last90 = 'last-90',
+  Last6Month = 'last-6-month',
+}
+
+
+
+
+export default function Dashboard() {
+
+
+  const [selection, setSelection] = useState<Selection>(Selection.Last7);
+
+
   return (
     <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4">
 
@@ -787,10 +724,9 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 mt-4 gap-4">
-            {renderAnalyticsCard1(packageCountMap)}
-
-            {renderAnalyticsCard2()}
+          <div className="grid grid-cols-1 xl:grid-cols-2 mt-4 gap-4">
+            {renderAnalyticsCard1(selection)}
+            {renderAnalyticsCard2(selection)}
 
           </div>
         </div>
