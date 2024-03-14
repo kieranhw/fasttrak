@@ -24,7 +24,8 @@ export type DeliverySchedule = {
     num_packages: number;
     estimated_duration_mins: number;
     actual_duration_mins: number;
-    distance_miles: number;
+    euclidean_distance_miles: number;
+    actual_distance_miles: number;
     load_weight: number;
     load_volume: number;
     created_at: Date;

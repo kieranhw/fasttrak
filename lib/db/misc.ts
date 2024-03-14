@@ -29,8 +29,8 @@ const fetchDashboardInfo = async (): Promise<{ data: DashboardInfo | null, error
     // Count number of schedules created by taking length of schedules array, then sum to get the number of packages scheduled
     const schedulesCount = schedules.length;
     const scheduledPackagesCount = schedules.reduce((acc, schedule) => acc + schedule.package_order.length, 0);
-    const milesDriven = schedules.reduce((acc, schedule) => acc + schedule.distance_miles, 0);
-    const timeTakenMins = schedules.reduce((acc, schedule) => acc + schedule.estimated_duration_mins, 0); // TODO: Convert to actual time
+    const milesDriven = schedules.reduce((acc, schedule) => acc + schedule.actual_distance_miles, 0);
+    const timeTakenMins = schedules.reduce((acc, schedule) => acc + schedule.actual_duration_mins, 0);
     const timeTakenHours = timeTakenMins / 60;
     
     const deliveryEfficiency = (scheduledPackagesCount / milesDriven * timeTakenHours) as unknown as number;

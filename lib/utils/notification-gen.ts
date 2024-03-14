@@ -1,9 +1,10 @@
 import { Notification } from "@/types/misc";
 import { db } from "../db/db";
-import { el } from "date-fns/locale";
+import { de, el } from "date-fns/locale";
 import { PostgrestError } from "@supabase/supabase-js";
 import { format, isToday, parseISO, compareAsc } from 'date-fns';
-import { DeliveryStatus } from "@/types/delivery-schedule";
+import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
+import { supabase } from "../supabase/client";
 
 export const getNotifications = async (): Promise<{ data: Notification[], error: PostgrestError | null }> => {
     // Notifications: 
@@ -113,8 +114,8 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
                 // There are schedules in progress
                 notifications.push({
                     severity: 2, // Yellow
-                    title: "Schedules Pending",
-                    description: `${scheduledCount} schedules currently awaiting confirmation.`,
+                    title: "Today's Schedule Pending",
+                    description: `${scheduledCount} schedule${scheduledCount > 1 ? 's' : ''} currently awaiting confirmation.`,
                     onClickLink: `/dashboard/schedule?date=${format(new Date(), 'ddMMyyyy')}`
                 });
             }
@@ -123,8 +124,8 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
                 // There are completed schedules
                 notifications.push({
                     severity: 1, // Green
-                    title: "Schedules In Progress",
-                    description: `${inProgressCount} schedules awaiting completion.`,
+                    title: "Today's Schedule In Progress",
+                    description: `${inProgressCount} schedule${inProgressCount > 1 ? 's' : ''} awaiting completion.`,
                     onClickLink: `/dashboard/schedule?date=${format(new Date(), 'ddMMyyyy')}`
                 });
             }
@@ -189,6 +190,59 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
             onClickLink: "/dashboard/store"
         });
     }
+
+    // Get schedules which are pending confirmation or completion from supabase and add red alert 
+    // These schedules should be for any date before today
+    const schedules = await supabase
+        .from('delivery_schedules')
+        .select('*')
+        .eq('store_id', store?.store_id)
+        .in('status', [DeliveryStatus.Scheduled, DeliveryStatus.InProgress])
+        .lt('delivery_date', format(new Date(), 'yyyy-MM-dd'))
+
+    if (!schedules.error && schedules.data) {
+        const deliverySchedules: DeliverySchedule[] = schedules.data as unknown as DeliverySchedule[];
+
+        // Group schedules into delivery dates
+        const groupedSchedules: DeliverySchedule[][] = [];
+
+        // Iterate delivery schedules and group them by delivery date
+        for (const schedule of deliverySchedules) {
+            const date = schedule.delivery_date;
+            const index = groupedSchedules.findIndex(group => group[0].delivery_date === date);
+            if (index > -1) {
+                groupedSchedules[index].push(schedule);
+            } else {
+                groupedSchedules.push([schedule]);
+            }
+        }
+
+
+        for (const scheduleGroup of groupedSchedules) {
+            const scheduledCount = scheduleGroup.filter(schedule => schedule.status === DeliveryStatus.Scheduled).length;
+            const inProgressCount = scheduleGroup.filter(schedule => schedule.status === DeliveryStatus.InProgress).length;
+            const date = format(parseISO(scheduleGroup[0].delivery_date.toString()), 'dd/MM/yy');
+            const urlDate = format(parseISO(scheduleGroup[0].delivery_date.toString()), 'ddMMyyyy');
+
+            if (scheduledCount > 0) {
+                notifications.push({
+                    severity: 3, // Red
+                    title: "Overdue Confirmation",
+                    description: `${scheduledCount} ${scheduledCount === 1 ? 'schedule' : 'schedules'} for ${date} ${scheduledCount === 1 ? 'is' : 'are'} awaiting confirmation.`,
+                    onClickLink: `/dashboard/schedule?date=${urlDate}`
+                });
+            }
+            if (inProgressCount > 0) {
+                notifications.push({
+                    severity: 3, // Red
+                    title: "Overdue Completion",
+                    description: `${inProgressCount} ${inProgressCount === 1 ? 'schedule' : 'schedules'} for ${date} ${inProgressCount === 1 ? 'is' : 'are'} awaiting completion.`,
+                    onClickLink: `/dashboard/schedule?date=${urlDate}`
+                });
+            }
+        }
+    }
+
 
     if (notifications) {
         // Sort notifications from highest severity to lowest

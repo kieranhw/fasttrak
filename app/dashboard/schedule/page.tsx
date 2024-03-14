@@ -245,6 +245,8 @@ export default function ScheduleDeliveries() {
           .from('delivery_schedules')
           .insert({
             vehicle_id: deliverySchedule[schedule].vehicle_id,
+            depot_lat: deliverySchedule[schedule].depot_lat,
+            depot_lng: deliverySchedule[schedule].depot_lng,
             store_id: store.store_id,
             package_order: packageOrderIds,
             delivery_date: deliverySchedule[schedule].delivery_date,
@@ -253,11 +255,11 @@ export default function ScheduleDeliveries() {
             status: deliverySchedule[schedule].status,
             num_packages: deliverySchedule[schedule].num_packages,
             estimated_duration_mins: deliverySchedule[schedule].estimated_duration_mins,
-            distance_miles: deliverySchedule[schedule].distance_miles,
+            actual_duration_mins: deliverySchedule[schedule].actual_duration_mins,
+            euclidean_distance_miles: deliverySchedule[schedule].euclidean_distance_miles,
+            actual_distance_miles: deliverySchedule[schedule].actual_distance_miles,
             load_weight: deliverySchedule[schedule].load_weight,
             load_volume: deliverySchedule[schedule].load_volume,
-            depot_lat: deliverySchedule[schedule].depot_lat,
-            depot_lng: deliverySchedule[schedule].depot_lng,
           })
         if (error) {
           alert(error.message)
@@ -266,7 +268,7 @@ export default function ScheduleDeliveries() {
           console.log("Successfully scheduled")
           const { error } = await supabase
             .from('packages')
-            .update({ status: PackageStatus.Pending, current_state: CurrentState.InTransit})
+            .update({ status: PackageStatus.Pending, current_state: CurrentState.InTransit })
             .in('package_id', packageOrderIds)
           if (error) {
             alert(error.message)
@@ -291,7 +293,7 @@ export default function ScheduleDeliveries() {
         // update scheduledPackageIds status to scheduled
         const { error } = await supabase
           .from('packages')
-          .update({ status: PackageStatus.Pending, current_state: CurrentState.Pending})
+          .update({ status: PackageStatus.Pending, current_state: CurrentState.Pending })
           .in('package_id', packageOrderIds)
         if (error) {
           alert(error.message)
@@ -529,7 +531,7 @@ export default function ScheduleDeliveries() {
                         <p className="text-3xl font-semibold">
                           {
                             Math.round(deliverySchedules.reduce((acc, schedule) => {
-                              return acc + schedule.distance_miles
+                              return acc + schedule.actual_distance_miles
                             }, 0) * 100) / 100
                           }
                         </p>
@@ -558,7 +560,7 @@ export default function ScheduleDeliveries() {
                             Math.round(deliverySchedules.reduce((acc, schedule) => {
                               return acc + schedule.num_packages
                             }, 0) / deliverySchedules.reduce((acc, schedule) => {
-                              return acc + schedule.estimated_duration_mins
+                              return acc + schedule.actual_duration_mins
                             }, 0) * 60 * 100) / 100
                           }
                         </p>
@@ -572,11 +574,11 @@ export default function ScheduleDeliveries() {
                         <p className="text-3xl font-semibold">
                           {
                             Math.floor(deliverySchedules.reduce((acc, schedule) => {
-                              return acc + schedule.estimated_duration_mins
+                              return acc + schedule.actual_duration_mins
                             }, 0) / deliverySchedules.length / 60)
                           }h {
                             Math.round(deliverySchedules.reduce((acc, schedule) => {
-                              return acc + schedule.estimated_duration_mins
+                              return acc + schedule.actual_duration_mins
                             }, 0) / deliverySchedules.length % 60)
                           }m
                         </p>
@@ -589,13 +591,13 @@ export default function ScheduleDeliveries() {
                         <p className="text-3xl font-semibold">
                           {
                             Math.floor(deliverySchedules.reduce((acc, schedule) => {
-                              return acc + schedule.estimated_duration_mins
+                              return acc + schedule.actual_duration_mins
                             }, 0) / deliverySchedules.reduce((acc, schedule) => {
                               return acc + schedule.num_packages
                             }, 0) / 60)
                           }h {
                             Math.round(deliverySchedules.reduce((acc, schedule) => {
-                              return acc + schedule.estimated_duration_mins
+                              return acc + schedule.actual_duration_mins
                             }, 0) / deliverySchedules.reduce((acc, schedule) => {
                               return acc + schedule.num_packages
                             }, 0) % 60)
@@ -610,7 +612,7 @@ export default function ScheduleDeliveries() {
                         <p className="text-3xl font-semibold">
                           {
                             Math.round(deliverySchedules.reduce((acc, schedule) => {
-                              return acc + schedule.distance_miles
+                              return acc + schedule.actual_distance_miles
                             }, 0) / deliverySchedules.length * 100) / 100
                           }
                         </p>
@@ -624,7 +626,7 @@ export default function ScheduleDeliveries() {
                         <p className="text-3xl font-semibold">
                           {
                             Math.round(deliverySchedules.reduce((acc, schedule) => {
-                              return acc + schedule.distance_miles
+                              return acc + schedule.actual_distance_miles
                             }, 0) / deliverySchedules.reduce((acc, schedule) => {
                               return acc + schedule.num_packages
                             }, 0) * 100) / 100

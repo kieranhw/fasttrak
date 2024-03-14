@@ -90,6 +90,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
     // Initialize an empty array to hold delivery schedules for each vehicle
     let schedules: DeliverySchedule[] = [];
 
+    // Map vehicle routes to delivery schedules
     for (const route of vrpSolution.routes) {
         let schedule: DeliverySchedule = {
             vehicle_id: route.vehicle.vehicle_id,
@@ -103,9 +104,10 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
             start_time: date,
             status: DeliveryStatus.Scheduled,
             num_packages: route.nodes.length - 1, // Subtract 1 to account for depot marker
-            estimated_duration_mins: route.actualTimeMins, 
-            actual_duration_mins: 0,
-            distance_miles: route.actualDistanceMiles.toFixed(2) as unknown as number,
+            estimated_duration_mins: route.eucTimeMins, 
+            actual_duration_mins: route.actualTimeMins,
+            euclidean_distance_miles: route.eucDistanceMiles.toFixed(2) as unknown as number,
+            actual_distance_miles: route.actualDistanceMiles.toFixed(2) as unknown as number,
             load_weight: route.currentWeight,
             load_volume: route.currentVolume,
             created_at: new Date()

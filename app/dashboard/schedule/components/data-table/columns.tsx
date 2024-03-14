@@ -102,15 +102,15 @@ export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => 
         }
     },
     {
-        accessorKey: "distance_miles",
+        accessorKey: "actual_distance_miles",
         header: () => (
             <div className="text-left">
                 Travel
             </div>
         ),
         cell: ({ row }) => {
-            const distance = row.getValue("distance_miles")?.toString()
-            const time = row.original.estimated_duration_mins?.toString()
+            const distance = row.getValue("actual_distance_miles")?.toString()
+            const time = row.original.actual_duration_mins?.toString()
 
             // convert minutes to hours and minutes (e.g. 90 minutes = 1h 30)
             const hours = Math.floor(parseInt(time!) / 60);
