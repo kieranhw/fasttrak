@@ -86,7 +86,8 @@ import { getNotifications } from "@/lib/utils/notification-gen";
 import { supabase } from "@/lib/supabase/client";
 import { Package, PriorityType } from "@/types/package";
 import { DeliverySchedule } from "@/types/delivery-schedule";
-
+import { TbPackageExport } from "react-icons/tb";
+import { FaTruckFast } from "react-icons/fa6";
 
 function renderInfoCard() {
   const [info, setInfo] = useState<DashboardInfo | undefined | null>(undefined);
@@ -542,7 +543,7 @@ function renderAnalyticsCard2(selection: Selection) {
           <CardTitle className="text-lg font-medium">
             Driving Statistics
           </CardTitle>
-          <MdSwitchAccessShortcut size={20} />
+          <FaTruckFast size={20} />
         </div>
         <CardDescription>
           Total miles and hours driven across all schedules
@@ -664,7 +665,7 @@ function renderAnalyticsCard1(selection: Selection) {
           <CardTitle className="text-lg font-medium">
             Packages Scheduled
           </CardTitle>
-          <MdSwitchAccessShortcut size={20} />
+          <TbPackageExport size={20} />
         </div>
         <CardDescription>
           Number of packages scheduled by delivery priority
