@@ -17,6 +17,15 @@ export default function Vehicles() {
             const vehicles = await db.vehicles.fetch.all();
             if (vehicles) {
                 setData(vehicles);
+                
+                // Sort vehicles by status = available, then by registration
+                vehicles.sort((a, b) => {
+                    if (a.status === "Available" && b.status !== "Available") return -1;
+                    if (a.status !== "Available" && b.status === "Available") return 1;
+                    if (a.registration < b.registration) return -1;
+                    if (a.registration > b.registration) return 1;
+                    return 0;
+                });
             }
         }
         fetchData();

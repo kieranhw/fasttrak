@@ -34,6 +34,7 @@ import { z } from "zod"
 import { UUID } from "crypto"
 import { db } from "@/lib/db/db"
 import { VehicleDialogContent } from "./vehicle-dialog-content"
+import { toast } from "@/components/ui/use-toast"
 
 export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
     {
@@ -102,7 +103,6 @@ export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
 
                 if (res) {
                     console.log("Vehicle removed successfully.")
-                    // TODO: CANCEL ALL DELIVERIES SCHEDULED FOR VEHICLE
                 } else {
                     console.warn("Failed to remove vehicle.");
                 }
@@ -110,6 +110,26 @@ export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
                 refreshData();
                 setRemoveDialogOpen(false);
             }
+
+            async function onUpdateAvailability() {
+                const vehicle = row.original;
+                const status = vehicle.status === "Available" ? "Unavailable" : "Available";
+
+                const res = await db.vehicles.update.byId(vehicle.vehicle_id, { status: status });
+
+                if (res.error) {
+                    toast({
+                        title: "Unable to update vehicle availability, please try again later.",
+                    });
+                } else {
+                    toast({
+                        title: "Success!",
+                        description: "Your vehicle availability has been updated.",
+                    });
+                    refreshData();
+                }
+            }
+
 
 
             return (
@@ -123,8 +143,9 @@ export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Vehicle</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>View Record</DropdownMenuItem>
-
+                        <DropdownMenuItem onClick={onUpdateAvailability}>
+                            Make {vehicle.status === "Available" ? "Unavailable" : "Available"}
+                        </DropdownMenuItem>
                         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                             <DialogTrigger asChild>
                                 <Button variant="ghost" className="w-full justify-start relative h-8 font-normal text-black bg-card flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
