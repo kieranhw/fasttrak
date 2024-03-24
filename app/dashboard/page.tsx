@@ -14,7 +14,9 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
@@ -88,6 +90,22 @@ import { Package, PriorityType } from "@/types/package";
 import { DeliverySchedule } from "@/types/delivery-schedule";
 import { TbPackageExport } from "react-icons/tb";
 import { FaTruckFast } from "react-icons/fa6";
+
+// Calculate days based on the selected range
+const subtractDaysBy = (selection: Selection) => {
+  switch (selection) {
+    case Selection.Last7:
+      return -7;
+    case Selection.Last30:
+      return -30;
+    case Selection.Last90:
+      return -90;
+    case Selection.Last180:
+      return -180;
+    default:
+      return -7;
+  }
+}
 
 function renderInfoCard() {
   const [info, setInfo] = useState<DashboardInfo | undefined | null>(undefined);
@@ -246,7 +264,6 @@ function renderInfoCard() {
     </Card>
   )
 }
-
 
 function renderShortcutsCard() {
   return (
@@ -512,7 +529,7 @@ function renderAnalyticsCard2(selection: Selection) {
     const fetchData = async () => {
       setIsLoading(true);
       const endDate = new Date();
-      const startDate = add(endDate, { days: -7 }); // Adjust according to the selected range
+      const startDate = add(endDate, { days: subtractDaysBy(selection) });
 
       const formattedStartDate = format(startDate, 'yyyy-MM-dd');
       const formattedEndDate = format(endDate, 'yyyy-MM-dd');
@@ -629,12 +646,12 @@ function renderAnalyticsCard1(selection: Selection) {
     return packageCountMap;
   };
 
-
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       const endDate = new Date();
-      const startDate = add(endDate, { days: -7 }); // Adjust according to the selected range
+
+      const startDate = add(endDate, { days: subtractDaysBy(selection) });
 
       const formattedStartDate = format(startDate, 'yyyy-MM-dd');
       const formattedEndDate = format(endDate, 'yyyy-MM-dd');
@@ -695,22 +712,25 @@ function renderAnalyticsCard1(selection: Selection) {
   )
 }
 
-
 enum Selection {
   Last7 = 'last-7',
   Last30 = 'last-30',
   Last90 = 'last-90',
-  Last6Month = 'last-6-month',
+  Last180 = 'last-180',
 }
 
 
-
-
 export default function Dashboard() {
-
-
   const [selection, setSelection] = useState<Selection>(Selection.Last7);
 
+  useEffect(() => {
+    console.log('Selection:', selection);
+  }, [selection]);
+
+  // Define the event handler for the select component
+  const handleSelectChange = (newValue: Selection) => {
+    setSelection(newValue);
+  };
 
   return (
     <div className="flex flex-col w-full justify-start gap-2 mx-auto p-4">
@@ -741,9 +761,20 @@ export default function Dashboard() {
             <p className="text-md text-muted-foreground">
               An overview of your system's performance.
             </p>
-            <div className="flex items-center gap-2 justify-end text-sm text-muted-foreground hover:underline hover:cursor-pointer my-2">
-              <IoAnalytics size={16} />View detailed analytics
-            </div>
+            <Select value={selection} onValueChange={(value) => handleSelectChange(value as Selection)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter date" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Date Range</SelectLabel>
+                  <SelectItem value={Selection.Last7}>Last 7 days</SelectItem>
+                  <SelectItem value={Selection.Last30}>Last 30 days</SelectItem>
+                  <SelectItem value={Selection.Last90}>Last 3 months</SelectItem>
+                  <SelectItem value={Selection.Last180}>Last 6 Months</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-2 mt-4 gap-4">
