@@ -7,7 +7,7 @@ import { VRPSolution } from "../routing/models/vrp";
  * - SE (Space Utilization Efficiency): Assessment of vehicle capacity usage, combining volume and weight utilization.
  * - TWE (Time Window Efficiency): Number of packages delivered within total driving time
  * - Overall Efficiency Score: Averages the normalized values of TE, EE, and SE for a comprehensive performance metric.
- *
+ * - A higher score indicates better efficiency.
  * @param {VRPSolution} vrpSolution The VRP solution object containing vehicle routes and delivery nodes.
  * @returns An object containing the calculated TE, EE, SE, and overall efficiency score.
  */
