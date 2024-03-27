@@ -573,8 +573,8 @@ function renderAnalyticsCard2(selection: Selection) {
               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" tickFormatter={(value) => value.slice(0, 5)} tickMargin={5} />
-              <YAxis yAxisId="left" />
-              <YAxis yAxisId="right" orientation="right" />
+              <YAxis dataKey="milesDriven" yAxisId="left" />
+              <YAxis dataKey="timeDrivenHours" yAxisId="right" orientation="right" />
               <Legend verticalAlign="bottom" />
               <Tooltip wrapperClassName="border-divider rounded-md text-sm shadow-md" />
               <Line yAxisId="left" name="Miles" type="monotone" dataKey="milesDriven" stroke="#8884d8" />
@@ -685,7 +685,7 @@ function renderAnalyticsCard1(selection: Selection) {
           <TbPackageExport size={20} />
         </div>
         <CardDescription>
-          Number of packages scheduled by delivery priority
+          Number of packages scheduled for delivery
         </CardDescription>
       </CardHeader>
       <CardContent className="mt-6 pl-0">
@@ -759,8 +759,9 @@ export default function Dashboard() {
           <h1 className="text-foreground font-bold text-2xl">Analytics</h1>
           <div className="flex justify-between">
             <p className="text-md text-muted-foreground">
-              An overview of your system's performance.
+              An overview of your system's performance this week.
             </p>
+            {/**  
             <Select value={selection} onValueChange={(value) => handleSelectChange(value as Selection)}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Filter date" />
@@ -775,6 +776,7 @@ export default function Dashboard() {
                 </SelectGroup>
               </SelectContent>
             </Select>
+            */}
           </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-2 mt-4 gap-4">
