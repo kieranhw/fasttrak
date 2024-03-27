@@ -10,11 +10,12 @@ import axios from 'axios';
 import { ScheduleProfile } from "@/types/schedule-profile";
 import { db } from "../db/db";
 import { hybridAlgorithm } from "../routing/algorithms/hybrid-algorithm";
+import { ScheduleReport } from "@/types/schedule-report";
 
 // API Gateway endpoint URL
 const apiGatewayEndpoint = 'https://e266yv3o3eojn6auayc5za77c40pmdhb.lambda-url.eu-north-1.on.aws/';
 
-export async function createSchedules(vehiclesData: Vehicle[], packagesData: Package[], date: Date, profile: ScheduleProfile) {
+export async function createSchedules(vehiclesData: Vehicle[], packagesData: Package[], date: Date, profile: ScheduleProfile): Promise<{ schedules: DeliverySchedule[], report: ScheduleReport } | undefined>{
     console.log("Scheduling packages...");
     if (packagesData.length === 0) {
         console.log("No packages to schedule.");
@@ -51,6 +52,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
     };
 
     let vrpSolution = new VRPSolution();
+    let scheduleReport: ScheduleReport | undefined = undefined;
 
 
     // Make a POST request
@@ -81,10 +83,10 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
         //const res = await geospatialClustering(graph, vehiclesData, profile)
         //vrpSolution = res[0];
         
-        vrpSolution = await hybridAlgorithm(graph, vehiclesData, profile);
-        console.log("scheduling locally")
 
-        console.log(vrpSolution)
+        const response = await hybridAlgorithm(graph, vehiclesData, profile);
+        vrpSolution = response.finalSolution;
+        scheduleReport = response.scheduleReport;
     }
 
     // Initialize an empty array to hold delivery schedules for each vehicle
@@ -116,8 +118,12 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
         schedules.push(schedule);
     }
 
-    console.log("Schedules: ", schedules);
-    return schedules;
+    if (schedules && schedules.length > 0 && scheduleReport) { 
+        return { schedules: schedules, report: scheduleReport};
+    } else {
+        return
+    }
+
 }
 
 // Estimate duration based on distance and time to deliver each package

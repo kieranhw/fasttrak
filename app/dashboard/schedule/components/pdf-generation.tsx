@@ -136,10 +136,10 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
                             {/* Schedule Profile */}
                             <View style={styles.section}>
                                 <Text style={styles.title}>Schedule Profile</Text>
-                                <Text>Auto-Minimise (Y/N): {props.schedules[0].auto_minimise ? "Y" : "N"}</Text>
-                                <Text>Optimisation Profile: {props.schedules[0].optimisation_profile}</Text>
-                                <Text>Time Window: {props.schedules[0].time_window_hours} hours</Text>
-                                <Text>Estimated Time Per Delivery: {props.schedules[0].est_delivery_time} minutes</Text>
+                                <Text>Auto-Minimise (Y/N): {props.schedules[0].schedule_report?.auto_minimise ? "Y" : "N"}</Text>
+                                <Text>Optimisation Profile: {props.schedules[0].schedule_report?.optimisation_profile}</Text>
+                                <Text>Time Window: {props.schedules[0].schedule_report?.time_window_hours} hours</Text>
+                                <Text>Estimated Time Per Delivery: {props.schedules[0].schedule_report?.est_delivery_time} minutes</Text>
                             </View>
 
                             <View style={styles.section}>
@@ -205,10 +205,10 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
                             {/* Schedule Profile */}
                             <View style={styles.section}>
                                 <Text style={styles.title}>Schedule Profile</Text>
-                                <Text>Auto-Minimise (Y/N): {props.schedules[0].auto_minimise ? "Y" : "N"}</Text>
-                                <Text>Optimisation Profile: {props.schedules[0].optimisation_profile}</Text>
-                                <Text>Time Window: {props.schedules[0].time_window_hours} hours</Text>
-                                <Text>Estimated Time Per Delivery: {props.schedules[0].est_delivery_time} minutes</Text>
+                                <Text>Auto-Minimise (Y/N): {props.schedules[0].schedule_report?.auto_minimise ? "Y" : "N"}</Text>
+                                <Text>Optimisation Profile: {props.schedules[0].schedule_report?.optimisation_profile}</Text>
+                                <Text>Time Window: {props.schedules[0].schedule_report?.time_window_hours} hours</Text>
+                                <Text>Estimated Time Per Delivery: {props.schedules[0].schedule_report?.est_delivery_time} minutes</Text>
                             </View>
 
                             <View style={styles.section}>

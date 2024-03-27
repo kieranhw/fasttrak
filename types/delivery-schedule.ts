@@ -1,6 +1,7 @@
 import { UUID } from "crypto";
 import { Package } from "./package";
 import { Vehicle } from "./vehicle";
+import { ScheduleReport } from "./schedule-report";
 
 export enum DeliveryStatus {
     Scheduled = "Scheduled",
@@ -29,9 +30,5 @@ export type DeliverySchedule = {
     load_weight: number;
     load_volume: number;
     created_at: Date;
-    // Report data
-    auto_minimise?: boolean;
-    optimisation_profile?: string;
-    time_window_hours?: number;
-    est_delivery_time?: number;
+    schedule_report?: ScheduleReport;
 };

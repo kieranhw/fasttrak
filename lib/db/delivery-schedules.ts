@@ -33,10 +33,11 @@ export const fetchSchedulesByDate = async (date: Date): Promise<DeliverySchedule
 
         for (const schedule of schedules) {
             schedule.package_order = await fetchPackagesForSchedule(schedule.package_order);
+            schedule.schedule_report = await fetchScheduleReportForSchedule(schedule.schedule_report);
             schedule.vehicle = await db.vehicles.fetch.byId(schedule.vehicle_id);
         }
 
-        return schedules;
+        return schedules as DeliverySchedule[];
     } catch (error) {
         console.error("Error in fetchSchedulesByDate:", error);
         return null;
@@ -61,13 +62,14 @@ export const fetchSchedulesByDateRange = async (date1: String, date2: String): P
         // Process each schedule to fetch additional information like package order and vehicle details
         for (const schedule of schedules) {
             schedule.package_order = await fetchPackagesForSchedule(schedule.package_order);
+            schedule.schedule_report = await fetchScheduleReportForSchedule(schedule.schedule_report);
             schedule.vehicle = await db.vehicles.fetch.byId(schedule.vehicle_id);
         }
 
         return { data: schedules, error: null };
     } catch (error) {
         console.error("Error in fetchSchedulesByDateRange:", error);
-        return { data: null, error: { message: (error as Error).message, details: '', hint: '', code: '' }}
+        return { data: null, error: { message: (error as Error).message, details: '', hint: '', code: '' } }
     };
 };
 
@@ -82,6 +84,19 @@ const fetchPackagesForSchedule = async (packageIds: UUID[]): Promise<Package[]> 
     return packageIds.map(id => packages.find(pkg => pkg.package_id === id) as Package);
 };
 
+const fetchScheduleReportForSchedule = async (reportId: UUID): Promise<any> => {
+    const scheduleReport = await supabase
+        .from('schedule_reports')
+        .select('*')
+        .eq('report_id', reportId)
+
+    if (scheduleReport && scheduleReport.data) {
+        return scheduleReport.data[0];
+    } else {
+        return null;
+    }
+}
+
 // Fetch schedule by ID
 export const fetchScheduleById = async (scheduleId: UUID): Promise<DeliverySchedule | null> => {
     try {
@@ -95,6 +110,7 @@ export const fetchScheduleById = async (scheduleId: UUID): Promise<DeliverySched
         if (!schedule) return null;
 
         schedule.package_order = await fetchPackagesForSchedule(schedule.package_order);
+        schedule.schedule_report = await fetchScheduleReportForSchedule(schedule.schedule_report);
         schedule.vehicle = await db.vehicles.fetch.byId(schedule.vehicle_id);
 
         return schedule;
