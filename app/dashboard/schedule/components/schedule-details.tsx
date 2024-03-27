@@ -128,8 +128,8 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
     const [solution, setSolution] = useState<any>(null);
 
     // Schedule progress states
-    const [inProgress, setInProgress] = useState(false);
-    const [scheduleComplete, setScheduleComplete] = useState(false);
+    const [inProgress, setInProgress] = useState(false); // Check if any schedules are in progress to disable delete button
+    const [scheduleComplete, setScheduleComplete] = useState(false); // Check if all schedules are completed to enable report button
 
     useEffect(() => {
         async function fetchData() {
@@ -201,6 +201,11 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
         } else {
             refreshData();
         }
+
+        // If all schedules are completed, set scheduleComplete to true
+        if (props.schedules.every(schedule => schedule.status === DeliveryStatus.Completed)) {
+            setScheduleComplete(true);
+        }
     }
 
     async function buildGraph(schedules: DeliverySchedule[]) {
@@ -264,6 +269,11 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                         actual_distance_miles: deliverySchedule[schedule].actual_distance_miles,
                         load_weight: deliverySchedule[schedule].load_weight,
                         load_volume: deliverySchedule[schedule].load_volume,
+                        // Report data
+                        auto_minimise: profile.auto_selection,
+                        optimisation_profile: profile.optimisation_profile,
+                        time_window_hours: profile.time_window,
+                        est_delivery_time: profile.delivery_time
                     })
                 if (error) {
                     alert(error.message)
@@ -279,6 +289,15 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                     }
                 }
             }
+            // Try upload schedules to database
+            const { error } = await supabase
+                .from('schedule_report')
+                .insert({
+                    schedule_ids: deliverySchedule.map(schedule => schedule.schedule_id),
+
+                })
+
+
         }
         refreshData();
         setIsScheduleLoading(false);
@@ -319,7 +338,6 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
     // Function to push url to analysis mode
     async function handleAnalysis() {
         const formattedDate = date ? format(date, 'ddMMyyyy') : '';
-
         router.push(`schedule/?date=${formattedDate}&mode=analysis`);
     }
 
@@ -408,19 +426,19 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                                         disabled={!(scheduleComplete == true && isScheduledToday == true) || isScheduleLoading == true}
                                         onClick={handleAnalysis}
                                     >
-                                        Analysis
+                                        Report
                                     </Button>
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent>
                                 {scheduleComplete == true && isScheduledToday == true &&
-                                    <p>Export schedule analysis</p>
+                                    <p>View schedule report</p>
                                 }
                                 {scheduleComplete == false &&
                                     <p>Deliveries must be completed first</p>
                                 }
                                 {isScheduledToday == false &&
-                                    <p>No schedule to analyse</p>
+                                    <p>No schedule to report</p>
                                 }
                             </TooltipContent>
                         </Tooltip>
