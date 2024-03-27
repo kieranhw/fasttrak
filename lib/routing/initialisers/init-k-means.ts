@@ -29,7 +29,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
     const solution = new VRPSolution();
     const availableVehicles = [...vehicles];
 
-    const timeWindow = profile.time_window-0.25;
+    const timeWindow = profile.time_window-1; // Subtract 30 minutes from time window to account for travel time
     const deliveryTime = profile.delivery_time;
 
     // Step 1: Sort packages into priority queue
@@ -52,6 +52,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
     for (const queue of clusterPriorityQueues) {
         console.log(queue.getData().length);
     }
+    console.log("Leftover after clustering: " + mainQueue.getData().length);
 
     // Step 4: Allocate priority queue clusters to vehicles
     // For each cluster, allocate packages from the respective priority queue to the vehicle until the first constraint is met
@@ -200,7 +201,10 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
         route.updateMeasurements(deliveryTime);
     }
 
+    console.log("remaining packages" + mainQueue.getData().length);
+
     return [solution, mainQueue];
+
 }
 
 // Type declarations

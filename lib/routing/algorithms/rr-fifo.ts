@@ -23,7 +23,7 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
     const solution = new VRPSolution();
     const availableVehicles = [...vehicles];
 
-    const timeWindow = profile.time_window-1;
+    const timeWindow = profile.time_window-0.25;
     const deliveryTime = profile.delivery_time;
 
     // Sort packages by date added (FIFO) and filter out depot node
@@ -59,9 +59,11 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
             const route = solution.routes[vehicleIndex] || new VehicleRoute(availableVehicles[vehicleIndex], graph.depot as Node, profile);
             const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgGroup[0], distanceMultiplier);
             const timeRequired = calculateTraversalMins(travelCost, avgSpeed) + deliveryTime;
+            console.log(route.canAddGroup(pkgGroup, timeRequired, timeWindow))
+            solution.loadMetrics(avgSpeed, distanceMultiplier);
 
             // Half fill the vehicles, to prevent early overloading
-            if (route.canAddGroup(pkgGroup, timeRequired, timeWindow) && route.currentVolume + pkgGroup[0].pkg!.volume <= route.vehicle.max_volume/2 && route.currentWeight + pkgGroup[0].pkg!.weight <= route.vehicle.max_load/2) {
+            if (route.canAddGroup(pkgGroup, timeRequired, timeWindow)) {
                 for (const pkgNode of pkgGroup) {
                     const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode, distanceMultiplier);
                     const timeRequired = calculateTraversalMins(travelCost, avgSpeed) + deliveryTime;
@@ -76,6 +78,7 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
                 vehiclesChecked++;
             }
         }
+
         // If all vehicles checked and no fit
         if (vehiclesChecked === availableVehicles.length) {
     
@@ -90,11 +93,13 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
                 // Package not allocated
             }
         }
+
     }
 
     // Close routes back to depot
     for (const route of solution.routes) {
         route.closeRoute(graph.depot as Node);
+        route.updateMeasurements(profile.delivery_time);
     }
 
     return solution;

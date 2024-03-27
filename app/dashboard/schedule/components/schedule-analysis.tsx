@@ -64,7 +64,7 @@ export const ScheduleAnalysis: React.FC<ScheduleAnalysisProps> = (props) => {
     // Date Handling
     const router = useRouter();
     const searchParams = useSearchParams()
-
+    
 
     useEffect(() => {
         async function fetchData() {
@@ -85,6 +85,7 @@ export const ScheduleAnalysis: React.FC<ScheduleAnalysisProps> = (props) => {
                 if (schedules && schedules.length > 0) {
                     // If schedules exist, set them
                     props.setSchedules(schedules);
+                    console.log(schedules)
                     setIsReportLoading(false);
                 } else {
                     // If no schedules exist, redirect to schedule page

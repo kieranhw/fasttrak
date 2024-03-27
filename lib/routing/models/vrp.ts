@@ -71,12 +71,11 @@ export class VehicleRoute {
         let groupWeight = 0;
         let groupVolume = 0;
 
+        this.updateMeasurements(this.scheduleProfile.delivery_time);
         let timeWindowMins = (timeWindowHours * 60);
 
         // All packages have same address so cost is the same
         const actualDistanceToDepot = calculateDistance(pkgGroup[0], this.depotNode, this.distanceMultiplier);
-
-        // calculate time required to travel from last node to depot
         const timeToDepot = calculateTraversalMins(actualDistanceToDepot, this.avgSpeed);
 
         // Total up the weight and volume of the group

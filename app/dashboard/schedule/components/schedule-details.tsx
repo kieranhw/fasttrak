@@ -42,6 +42,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ScheduleDialogContent } from "./create-schedule-dialog";
 import { ScheduleProfile } from "@/types/schedule-profile";
 import { CurrentState, PackageStatus } from "@/types/package";
+import { ScheduleInitialiser, ScheduleOptimiser, ScheduleReport } from "@/types/schedule-report";
+import { error } from "console";
 
 interface ScheduleDetailsProps {
     mode: string
@@ -225,84 +227,102 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
         let vehicles = profile.selected_vehicles;
         let packages = await db.packages.fetch.pending();
         let deliverySchedule: DeliverySchedule[] = [];
+        let scheduleReport: ScheduleReport | undefined = undefined;
 
         // Create schedules if vehicles and packages are available
         if (vehicles && packages) {
-            const schedule = await createSchedules(vehicles, packages, date, profile);
-            if (schedule && schedule.length > 0) deliverySchedule = schedule as DeliverySchedule[];
+            const response = await createSchedules(vehicles, packages, date, profile);
+            if (response && response.schedules && response.schedules.length > 0) deliverySchedule = response.schedules as DeliverySchedule[];
+            if (response && response.report) scheduleReport = response.report;
         }
 
         // TODO: Optimisation required
-        if (deliverySchedule && deliverySchedule.length > 0) {
-            for (const schedule in deliverySchedule) {
-                let packageOrderIds = [];
+        if (deliverySchedule && deliverySchedule.length > 0 && scheduleReport) {
+            const report = await supabase
+                .from('schedule_reports')
+                .insert({
+                    initialiser: scheduleReport.initialiser,
+                    optimiser: scheduleReport.optimiser,
+                    iterations: scheduleReport.iterations,
+                    distance_multiplier: scheduleReport.distance_multiplier,
+                    average_speed: scheduleReport.average_speed,
+                    vehicles_available: scheduleReport.vehicles_available.map(vehicle => vehicle.vehicle_id),
+                    vehicles_used: scheduleReport.vehicles_used.map(schedule => schedule.vehicle_id),
+                    total_packages_count: scheduleReport.total_packages_count,
+                    scheduled_packages_count: scheduleReport.scheduled_packages_count,
+                    auto_minimise: scheduleReport.auto_minimise,
+                    optimisation_profile: scheduleReport.optimisation_profile,
+                    time_window_hours: scheduleReport.time_window_hours,
+                    est_delivery_time: scheduleReport.est_delivery_time,
+                })
+                .select();
+            if (report.error) {
+                console.log(report.error)
+            } else {
+                for (const schedule in deliverySchedule) {
+                    let packageOrderIds = [];
 
-                for (const pkg in deliverySchedule[schedule].package_order) {
-                    if (deliverySchedule[schedule].package_order[pkg]) {
-                        packageOrderIds.push(deliverySchedule[schedule].package_order[pkg].package_id)
+                    for (const pkg in deliverySchedule[schedule].package_order) {
+                        if (deliverySchedule[schedule].package_order[pkg]) {
+                            packageOrderIds.push(deliverySchedule[schedule].package_order[pkg].package_id)
+                        }
                     }
-                }
 
-                const { data: store, error: storeError } = await db.stores.fetch.forUser();
-                if (!store || storeError) {
-                    console.error("Unable to retrieve user store.");
-                    return [] as DeliverySchedule[];
-                }
+                    const { data: store, error: storeError } = await db.stores.fetch.forUser();
+                    if (!store || storeError) {
+                        console.error("Unable to retrieve user store.");
+                        return [] as DeliverySchedule[];
+                    }
 
-                // Try upload schedules to database
-                const { error } = await supabase
-                    .from('delivery_schedules')
-                    .insert({
-                        vehicle_id: deliverySchedule[schedule].vehicle_id,
-                        depot_lat: deliverySchedule[schedule].depot_lat,
-                        depot_lng: deliverySchedule[schedule].depot_lng,
-                        store_id: store.store_id,
-                        package_order: packageOrderIds,
-                        delivery_date: deliverySchedule[schedule].delivery_date,
-                        route_number: deliverySchedule[schedule].route_number,
-                        start_time: deliverySchedule[schedule].start_time,
-                        status: deliverySchedule[schedule].status,
-                        num_packages: deliverySchedule[schedule].num_packages,
-                        estimated_duration_mins: deliverySchedule[schedule].estimated_duration_mins,
-                        actual_duration_mins: deliverySchedule[schedule].actual_duration_mins,
-                        euclidean_distance_miles: deliverySchedule[schedule].euclidean_distance_miles,
-                        actual_distance_miles: deliverySchedule[schedule].actual_distance_miles,
-                        load_weight: deliverySchedule[schedule].load_weight,
-                        load_volume: deliverySchedule[schedule].load_volume,
-                        // Report data
-                        auto_minimise: profile.auto_selection,
-                        optimisation_profile: profile.optimisation_profile,
-                        time_window_hours: profile.time_window,
-                        est_delivery_time: profile.delivery_time
-                    })
-                if (error) {
-                    alert(error.message)
-                } else {
-                    // If successfully scheduled, update scheduledPackageIds status to scheduled
-                    console.log("Successfully scheduled")
+                    const reportId = report.data[0].report_id
+
+                    // Try upload schedules to database
                     const { error } = await supabase
-                        .from('packages')
-                        .update({ status: PackageStatus.Pending, current_state: CurrentState.InTransit })
-                        .in('package_id', packageOrderIds)
+                        .from('delivery_schedules')
+                        .insert({
+                            vehicle_id: deliverySchedule[schedule].vehicle_id,
+                            depot_lat: deliverySchedule[schedule].depot_lat,
+                            depot_lng: deliverySchedule[schedule].depot_lng,
+                            store_id: store.store_id,
+                            package_order: packageOrderIds,
+                            delivery_date: deliverySchedule[schedule].delivery_date,
+                            route_number: deliverySchedule[schedule].route_number,
+                            start_time: deliverySchedule[schedule].start_time,
+                            status: deliverySchedule[schedule].status,
+                            num_packages: deliverySchedule[schedule].num_packages,
+                            estimated_duration_mins: deliverySchedule[schedule].estimated_duration_mins,
+                            actual_duration_mins: deliverySchedule[schedule].actual_duration_mins,
+                            euclidean_distance_miles: deliverySchedule[schedule].euclidean_distance_miles,
+                            actual_distance_miles: deliverySchedule[schedule].actual_distance_miles,
+                            load_weight: deliverySchedule[schedule].load_weight,
+                            load_volume: deliverySchedule[schedule].load_volume,
+                            schedule_report: reportId
+                        })
                     if (error) {
                         alert(error.message)
+                    } else {
+                        // If successfully scheduled, update scheduledPackageIds status to scheduled
+                        console.log("Successfully scheduled")
+                        const { error } = await supabase
+                            .from('packages')
+                            .update({ status: PackageStatus.Pending, current_state: CurrentState.InTransit })
+                            .in('package_id', packageOrderIds)
+                        if (error) {
+                            alert(error.message)
+                        }
                     }
+
+
+
                 }
             }
-            // Try upload schedules to database
-            const { error } = await supabase
-                .from('schedule_report')
-                .insert({
-                    schedule_ids: deliverySchedule.map(schedule => schedule.schedule_id),
-
-                })
-
-
         }
         refreshData();
         setIsScheduleLoading(false);
         setIsScheduling(false);
     }
+
+
 
     async function handleDeleteSchedule() {
         if (props.schedules && props.schedules.length > 0) {
