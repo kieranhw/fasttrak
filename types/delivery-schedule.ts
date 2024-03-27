@@ -30,8 +30,8 @@ export type DeliverySchedule = {
     load_volume: number;
     created_at: Date;
     // Report data
-    auto_minimise: boolean;
-    optimisation_profile: string;
-    time_window_hours: number;
-    est_delivery_time: number;
+    auto_minimise?: boolean;
+    optimisation_profile?: string;
+    time_window_hours?: number;
+    est_delivery_time?: number;
 };
