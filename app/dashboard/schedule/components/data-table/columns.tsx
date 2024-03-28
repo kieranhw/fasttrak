@@ -39,6 +39,7 @@ import {
 import { ConfirmDeliveryTable } from "../confirm-delivery-table/confirm-delivery-table"
 import { ConfirmTableColumns } from "../confirm-delivery-table/columns"
 import { updatePackages } from "@/lib/scheduling/update-packages"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => void): ColumnDef<DeliverySchedule>[] => [
     {
@@ -265,8 +266,8 @@ export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => 
                             </AlertDialog>
 
                             {/* TODO: Show dialog to select any packages which were failed to be delivered */}
-                            <AlertDialog open={completeAlertOpen} onOpenChange={setCompleteAlertOpen}>
-                                <AlertDialogTrigger asChild>
+                            <Dialog open={completeAlertOpen} onOpenChange={setCompleteAlertOpen}>
+                                <DialogTrigger asChild>
                                     <Button
                                         disabled={schedule.status == DeliveryStatus.Scheduled || schedule.status == DeliveryStatus.Completed || schedule.status == DeliveryStatus.Cancelled}
                                         variant="ghost"
@@ -274,26 +275,26 @@ export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => 
                                     >
                                         Delivery Complete
                                     </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Delivery Complete</AlertDialogTitle>
-                                        <AlertDialogDescription>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Delivery Complete</DialogTitle>
+                                        <DialogDescription>
                                             Select delivered packages to confirm delivery.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
+                                        </DialogDescription>
+                                    </DialogHeader>
                                     <ConfirmDeliveryTable columns={ConfirmTableColumns()} data={schedule.package_order} rowSelection={rowSelection} setRowSelection={setRowSelection} />
 
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction
+                                    <DialogFooter>
+                                        <DialogClose>Cancel</DialogClose>
+                                        <Button
                                             onClick={() => completeDeliveries(schedule, rowSelection)}
                                         >
                                             Continue
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
 
 
 

@@ -8,7 +8,7 @@ import { Package } from "@/types/package";
 import { PriorityQueue } from "../../scheduling/priority-queue";
 import { roundRobinAllocation } from './rr-fifo';
 import { Node } from '../models/graph';
-import { calculateEfficiencyScores } from '@/lib/data/calculate-efficiency';
+import { calculateEfficiencyScores } from '@/lib/utils/calculate-efficiency';
 import { calculateRealTimes, initialiseMetrics as computeMetrics } from '../../google-maps/directions';
 import { randomVRPSolution } from '../initialisers/init-random';
 import { geospatialClustering as KMeansClustering } from './k-means';

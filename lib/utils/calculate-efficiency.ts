@@ -11,7 +11,7 @@ import { VRPSolution } from "../routing/models/vrp";
  * @param {VRPSolution} vrpSolution The VRP solution object containing vehicle routes and delivery nodes.
  * @returns An object containing the calculated TE, EE, SE, and overall efficiency score.
  */
-export function calculateEfficiencyScores(vrpSolution: VRPSolution): { PUD: number, PUT: number, VU: number, WU: number, overallEfficiency: number } {
+export function calculateEfficiencyScores(vrpSolution: VRPSolution): { DE: number, TE: number, VU: number, WU: number, overallEfficiency: number } {
     let totalDrivingTime = 0; // Total time for all routes
     let totalMilesDriven = 0; // Total distance for all routes
     let totalPackagesDelivered = 0; // Total packages delivered across all routes
@@ -33,10 +33,10 @@ export function calculateEfficiencyScores(vrpSolution: VRPSolution): { PUD: numb
     });
 
     // Parcels delivered per unit distance (PUD)
-    const PUD = totalPackagesDelivered / totalMilesDriven;
+    const DE = totalPackagesDelivered / totalMilesDriven;
 
     // Parcels delivered per unit time (PUT)
-    const PUT = totalPackagesDelivered / totalDrivingTime;
+    const TE = totalPackagesDelivered / totalDrivingTime;
 
     // Volume Utilization (VU)
     const VU = volumeUtilised / volumeCapacity;
@@ -46,11 +46,11 @@ export function calculateEfficiencyScores(vrpSolution: VRPSolution): { PUD: numb
 
     // Calculate overall efficiency score as an average of the normalized values
     // Assuming equal importance for simplicity
-    const overallEfficiency = (PUD + PUT + VU + WU) / 4;
+    const overallEfficiency = (DE + TE + VU + WU) / 4;
 
     return {
-        PUD,
-        PUT,
+        DE,
+        TE,
         VU,
         WU,
         overallEfficiency
