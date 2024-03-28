@@ -254,6 +254,13 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                     optimisation_profile: scheduleReport.optimisation_profile,
                     time_window_hours: scheduleReport.time_window_hours,
                     est_delivery_time: scheduleReport.est_delivery_time,
+                    total_distance_miles: scheduleReport.total_distance_miles,
+                    total_duration_hours: scheduleReport.total_duration_hours,
+                    other_solutions: scheduleReport.other_solutions,
+                    TE: scheduleReport.TE,
+                    DE: scheduleReport.DE,
+                    WU: scheduleReport.WU,
+                    VU: scheduleReport.VU
                 })
                 .select();
             if (report.error) {
@@ -289,7 +296,7 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                             route_number: deliverySchedule[schedule].route_number,
                             start_time: deliverySchedule[schedule].start_time,
                             status: deliverySchedule[schedule].status,
-                            num_packages: deliverySchedule[schedule].num_packages,
+                            num_packages: packageOrderIds.length,
                             estimated_duration_mins: deliverySchedule[schedule].estimated_duration_mins,
                             actual_duration_mins: deliverySchedule[schedule].actual_duration_mins,
                             euclidean_distance_miles: deliverySchedule[schedule].euclidean_distance_miles,
@@ -443,7 +450,7 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                             <TooltipTrigger asChild>
                                 <div>
                                     <Button variant="outline"
-                                        disabled={!(scheduleComplete == true && isScheduledToday == true) || isScheduleLoading == true}
+                                        disabled={!( isScheduledToday == true) || isScheduleLoading == true}
                                         onClick={handleAnalysis}
                                     >
                                         Report

@@ -58,7 +58,6 @@ const styles = StyleSheet.create({
         borderRightWidth: 1,
         padding: 5,
         borderColor: '#000',
-        fontWeight: 'bold',
     },
     tableCol: {
         width: '25%',
@@ -103,9 +102,6 @@ interface ScheduleReportProps {
 
 
 export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
-
-    // TODO: Need schedules, store and depot to generate report from objects
-
     const totalDrivingTimeHours = (props.schedules.reduce((sum, schedule) => sum + schedule.actual_duration_mins, 0) / 60).toFixed(2) as unknown as number;
     const totalDistanceMiles = props.schedules.reduce((sum, schedule) => sum + schedule.actual_distance_miles, 0).toFixed(2) as unknown as number;
     const totalLoadWeight = props.schedules.reduce((sum, schedule) => sum + schedule.load_weight, 0).toFixed(2) as unknown as number;
@@ -114,6 +110,19 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
     const totalMaxVolume = props.schedules.reduce((sum, schedule) => sum + schedule.vehicle.max_volume, 0).toFixed(2) as unknown as number;
     const totalPackages = props.schedules.reduce((sum, schedule) => sum + schedule.num_packages, 0);
     const totalVehicles = props.schedules.reduce((sum, schedule) => schedule.vehicle ? sum + 1 : sum, 0);
+
+    // All generated solutions for comparison
+    const allSolutions = props.schedules[0].schedule_report?.other_solutions;
+
+    // Find Solutions
+    const randomOnlySolution = allSolutions?.filter(solution => solution.initialiser === "Random" && solution.optimiser === "None")[0];
+    const kMeansOnlySolution = allSolutions?.filter(solution => solution.initialiser === "KMeans" && solution.optimiser === "None")[0];
+    const randomGASolution = allSolutions?.filter(solution => solution.initialiser === "Random" && solution.optimiser === "Genetic Algorithm")[0];
+    const kMeansGASolution = allSolutions?.filter(solution => solution.initialiser === "KMeans" && solution.optimiser === "Genetic Algorithm")[0];
+
+    // Create array of solutions which are not undefined
+    const otherScheduleReports = [randomOnlySolution, kMeansOnlySolution, randomGASolution, kMeansGASolution].filter(solution => solution);
+    const bestScheduleReport = props.schedules[0].schedule_report;
 
     return (
         <>
@@ -132,7 +141,7 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
                                 <Text>Vehicles: {totalVehicles}</Text>
                                 <Text>Packages: {totalPackages}</Text>
                                 <Text>Standard Priority: {props.schedules.reduce((total, schedule) => total + schedule.package_order.filter(order => order.priority === PriorityType.Standard).length, 0)}</Text>
-                                <Text>Standard Priority: {props.schedules.reduce((total, schedule) => total + schedule.package_order.filter(order => order.priority === PriorityType.Express).length, 0)}</Text>
+                                <Text>Express Priority: {props.schedules.reduce((total, schedule) => total + schedule.package_order.filter(order => order.priority === PriorityType.Express).length, 0)}</Text>
                             </View>
 
                             {/* Schedule Profile */}
@@ -207,11 +216,12 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
 
                             <View style={styles.section}>
                                 <Text style={styles.subtitle}>Efficiency Metrics</Text>
-                                <Text style={{ marginBottom: 10 }}>Performance measurements for each aspect of the system.
+                                <Text style={{ marginBottom: 10 }}>Higher efficiency scores indicate better performance. A utilisation score 
+                                    of 100 indicates that the vehicle is being used to its full capacity.
                                 </Text>
                                 <Text><Text style={styles.subtitle}>Time Efficiency (TE) =</Text> Number of Packages / Time (minutes) * 100</Text>
                                 <Text><Text style={styles.subtitle}>Distance Efficiency (DE) =</Text> Number of Packages / Distance (miles) * 100</Text>
-                                <Text><Text style={styles.subtitle}>Load Utilisation (LU) =</Text> Total Weight (kg) / Load Capacity (kg) * 100 </Text>
+                                <Text><Text style={styles.subtitle}>Weight Utilisation (WU) =</Text> Total Weight (kg) / Load Capacity (kg) * 100 </Text>
                                 <Text style={{ marginBottom: 10 }}><Text style={styles.subtitle}>Volume Utilisation (VU) =</Text> Total Volume (m³) / Volume Capacity (m³) * 100</Text>
 
                                 <View style={styles.table}>
@@ -220,7 +230,7 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
                                         <Text style={styles.tableColHeader}>Vehicle</Text>
                                         <Text style={styles.tableColHeader}>TE</Text>
                                         <Text style={styles.tableColHeader}>DE</Text>
-                                        <Text style={styles.tableColHeader}>LU</Text>
+                                        <Text style={styles.tableColHeader}>WU</Text>
                                         <Text style={styles.tableColHeader}>VU</Text>
                                     </View>
                                     {/* Rows */}
@@ -237,14 +247,91 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
                                         )
                                     )}
                                     <View style={styles.tableRow}>
-                                        <Text style={[styles.tableCol, {width: '33%'}]}>Total</Text>
-                                        <Text style={styles.tableCol}>{(totalPackages / (totalDrivingTimeHours*60)*100).toFixed(2)}</Text>
+                                        <Text style={[styles.tableCol, { width: '33%' }]}>Total</Text>
+                                        <Text style={styles.tableCol}>{(totalPackages / (totalDrivingTimeHours * 60) * 100).toFixed(2)}</Text>
                                         <Text style={styles.tableCol}>{(totalPackages / totalDistanceMiles * 100).toFixed(2)}</Text>
                                         <Text style={styles.tableCol}>{(totalLoadWeight / totalMaxWeight * 100).toFixed(2)}</Text>
                                         <Text style={styles.tableCol}>{(totalLoadVolume / totalMaxVolume * 100).toFixed(2)}</Text>
                                     </View>
                                 </View>
                             </View>
+                        </Page>
+                        <Page size="A4" style={styles.page}>
+                            <Text style={styles.title}>Algorithm Information</Text>
+                            <Text style={{ marginBottom: 10 }} >The solution with the greatest total efficiency value has been automatically selected:</Text>
+                            <Text>Initialiser: {bestScheduleReport?.initialiser}</Text>
+                            <Text>Optimiser: {bestScheduleReport?.optimiser}</Text>
+                            {bestScheduleReport?.iterations && bestScheduleReport?.optimiser !== "Genetic Algorithm" &&
+                                <Text>Iterations: {bestScheduleReport?.iterations}</Text>
+                            }
+                            {bestScheduleReport?.iterations && bestScheduleReport?.optimiser === "Genetic Algorithm" &&
+                                <Text>Generations: {bestScheduleReport?.iterations}</Text>
+                            }
+                            <Text style={[styles.subtitle, { marginTop: 10 }]}>Network State</Text>
+                            <Text>Vehicles available: {bestScheduleReport?.vehicles_available.length}</Text>
+                            <Text>Vehicles used: {bestScheduleReport?.vehicles_used.length}</Text>
+                            <Text>Packages pending: {bestScheduleReport?.total_packages_count}</Text>
+                            <Text>Packages scheduled: {bestScheduleReport?.scheduled_packages_count}</Text>
+                            <Text>Total Time Window: {bestScheduleReport?.time_window_hours! * props.schedules.length} hours</Text>
+
+
+                            <Text style={[styles.subtitle, { marginTop: 10 }]}>Solution Comparison - Total Delivery Network</Text>
+                            <Text style={{ marginBottom: 10 }}>Comparison of all generated solutions for the same set of vehicles and pending packages.</Text>
+                            <View style={styles.table}>
+                                <View style={[styles.tableRow, styles.tableRowHeader]}>
+                                    <Text style={styles.tableColHeader}>Initialisation</Text>
+                                    <Text style={styles.tableColHeader}>Optimisation</Text>
+                                    <Text style={styles.tableColHeader}>Packages</Text>
+                                    <Text style={styles.tableColHeader}>Time (hours)</Text>
+                                    <Text style={styles.tableColHeader}>Distance (miles)</Text>
+                                    <Text style={styles.tableColThin}>TE</Text>
+                                    <Text style={styles.tableColThin}>DE</Text>
+                                    <Text style={styles.tableColThin}>WU</Text>
+                                    <Text style={styles.tableColThin}>VU</Text>
+                                </View>
+
+                                {/* Rows */}
+                                {otherScheduleReports.map((report, index) =>
+                                    report && (
+                                        <View key={index} style={styles.tableRow}>
+                                            <Text style={styles.tableCol}>{report.initialiser}</Text>
+                                            <Text style={styles.tableCol}>
+                                                {report.optimiser.split(' ').map((word, index, array) => (
+                                                    <Text key={index}>
+                                                        {word}{index < array.length - 1 ? '\n' : ''}
+                                                    </Text>
+                                                ))}
+                                            </Text>
+                                            <Text style={styles.tableCol}>{report.scheduled_packages_count}</Text>
+                                            <Text style={styles.tableCol}>{report.total_duration_hours.toFixed(2)}</Text>
+                                            <Text style={styles.tableCol}>{report.total_distance_miles.toFixed(2)}</Text>
+                                            <Text style={styles.tableColThin}>{report.TE.toFixed(2)}</Text>
+                                            <Text style={styles.tableColThin}>{report.DE.toFixed(2)}</Text>
+                                            <Text style={styles.tableColThin}>{report.WU.toFixed(2)}</Text>
+                                            <Text style={styles.tableColThin}>{report.VU.toFixed(2)}</Text>
+                                        </View>
+                                    )
+                                )}
+                                {/* Best Solution */}
+                                <View style={[styles.tableRow, { fontFamily: 'Helvetica-Bold' }]}>
+                                    <Text style={styles.tableCol}>{bestScheduleReport?.initialiser}</Text>
+                                    <Text style={styles.tableCol}>
+                                        {bestScheduleReport?.optimiser.split(' ').map((word, index, array) => (
+                                            <Text key={index}>
+                                                {word}{index < array.length - 1 ? '\n' : ''}
+                                            </Text>
+                                        ))}
+                                    </Text>
+                                    <Text style={styles.tableCol}>{bestScheduleReport?.scheduled_packages_count}</Text>
+                                    <Text style={styles.tableCol}>{bestScheduleReport?.total_duration_hours.toFixed(2)}</Text>
+                                    <Text style={styles.tableCol}>{bestScheduleReport?.total_distance_miles.toFixed(2)}</Text>
+                                    <Text style={styles.tableColThin}>{bestScheduleReport?.TE.toFixed(2)}</Text>
+                                    <Text style={styles.tableColThin}>{bestScheduleReport?.DE.toFixed(2)}</Text>
+                                    <Text style={styles.tableColThin}>{bestScheduleReport?.WU.toFixed(2)}</Text>
+                                    <Text style={styles.tableColThin}>{bestScheduleReport?.VU.toFixed(2)}</Text>
+                                </View>
+                            </View>
+
                         </Page>
 
                     </Document>

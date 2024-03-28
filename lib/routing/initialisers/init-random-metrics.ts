@@ -18,24 +18,19 @@ import { ScheduleProfile } from "@/types/schedule-profile";
  * @param timeWindow Number of hours to deliver packages
  * @returns VRPSolution, results in the minimum required number of vehicles to service all packages
  */
-export async function initRandom(graph: Graph, vehicles: Vehicle[], profile: ScheduleProfile, distanceMultiplier: number, avgSpeed: number): Promise<[VRPSolution, Node[]]> {
-
+export async function initRandomMetrics(graph: Graph, vehicles: Vehicle[], profile: ScheduleProfile): Promise<VRPSolution> {
     const solution = new VRPSolution();
     const availableVehicles = [...vehicles];
-    const remainingPackages = [];
 
-
-    const timeWindow = profile.time_window - 0.25;
+    const timeWindow = profile.time_window;
     const deliveryTime = profile.delivery_time;
 
     // Sort packages by date added (FIFO) and filter out depot node
-    let sortedPackages = graph.nodes
+    const sortedPackages = graph.nodes
         .filter(node => !node.isDepot)
         .sort((a, b) =>
             (new Date(a.pkg?.date_added || 0).getTime()) - (new Date(b.pkg?.date_added || 0).getTime())
         );
-
-
 
     // Group packages by recipient address
     const addressToPackagesMap: Record<string, Node[]> = {};
@@ -59,15 +54,13 @@ export async function initRandom(graph: Graph, vehicles: Vehicle[], profile: Sch
         let vehiclesChecked = 0;
         while (vehiclesChecked < availableVehicles.length) {
             const route = solution.routes[vehicleIndex] || new VehicleRoute(availableVehicles[vehicleIndex], graph.depot as Node, profile);
-            const actualDistance = calculateDistance(route.nodes[route.nodes.length - 1], pkgGroup[0], distanceMultiplier);
-            const timeRequired = calculateTraversalMins(actualDistance, avgSpeed) + deliveryTime;
-            solution.loadMetrics(avgSpeed, distanceMultiplier);
+            const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgGroup[0]);
+            const timeRequired = calculateTraversalMins(travelCost) + deliveryTime;
 
-            // Half fill the vehicles, to prevent early overloading
             if (route.canAddGroup(pkgGroup, timeRequired, timeWindow)) {
                 for (const pkgNode of pkgGroup) {
-                    const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode, distanceMultiplier);
-                    const timeRequired = calculateTraversalMins(travelCost, avgSpeed) + deliveryTime;
+                    const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode);
+                    const timeRequired = calculateTraversalMins(travelCost) + deliveryTime;
                     route.addNode(pkgNode, timeRequired);
                 }
                 if (!solution.routes[vehicleIndex]) {
@@ -79,7 +72,6 @@ export async function initRandom(graph: Graph, vehicles: Vehicle[], profile: Sch
                 vehiclesChecked++;
             }
         }
-
         // If all vehicles checked and no fit
         if (vehiclesChecked === availableVehicles.length) {
             if (pkgGroup.length > 1) {
@@ -90,40 +82,18 @@ export async function initRandom(graph: Graph, vehicles: Vehicle[], profile: Sch
                 groupedPackages.push(firstHalf);
                 groupedPackages.push(secondHalf);
             } else {
-                remainingPackages.push(pkgGroup[0]);
+                // Add to remaining packages array
             }
         }
-    }
-
-    // Search through the routes and find any packages that are duplicated
-    // If a package is duplicated, remove the later occurrence
-    for (const route of solution.routes) {
-        const seen = new Set();
-        route.nodes = route.nodes.filter(pkgNode => {
-            if (seen.has(pkgNode.pkg?.package_id)) {
-                return false;
-            } else {
-                seen.add(pkgNode.pkg?.package_id);
-                return true;
-            }
-        });
     }
 
     // Close routes back to depot
     for (const route of solution.routes) {
         route.closeRoute(graph.depot as Node);
-        route.updateMeasurements(profile.delivery_time);
     }
 
 
 
-
-
-
-
-    console.log("RANDOM REMAINING PACKAGES: " + remainingPackages.length)
-    console.log("RANDOM SOLUTION PACKAGES: " + solution.numberOfPackages)
-
-    return [solution, remainingPackages];
+    return solution;
 }
 

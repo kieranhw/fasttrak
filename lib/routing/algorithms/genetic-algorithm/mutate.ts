@@ -1,5 +1,5 @@
-import { VehicleRoute } from "../models/vrp";
-import { Node, calculateDistance } from "../models/graph";
+import { VehicleRoute } from "../../models/vrp";
+import { Node, calculateDistance } from "../../models/graph";
 import { ScheduleProfile } from "@/types/schedule-profile";
 
 export function mutate(clonedRoute: VehicleRoute, depotNode: Node): VehicleRoute {

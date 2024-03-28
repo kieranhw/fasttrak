@@ -2,7 +2,7 @@ import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
 import { roundRobinAllocation } from "../routing/algorithms/rr-fifo";
-import { geospatialClustering } from "../routing/algorithms/k-means";
+import { geospatialClustering } from "../routing/algorithms/k-means/k-means";
 import { Edge, Graph, Node, calculateDistance, createGraph } from "../routing/models/graph";
 import { VRPSolution, VehicleRoute } from "../routing/models/vrp";
 import { UUID } from "crypto";

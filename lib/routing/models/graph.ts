@@ -23,6 +23,7 @@ export class Graph {
     addEdge(edge: Edge): void {
         this.edges.push(edge);
     }
+    
 }
 
 export class Node {

@@ -1,4 +1,4 @@
-import { VRPSolution, VehicleRoute } from "../models/vrp";
+import { VRPSolution, VehicleRoute } from "../../models/vrp";
 import { routeFitness } from "./fitness";
 
 export function crossover(clonedSolution: VRPSolution): VRPSolution {

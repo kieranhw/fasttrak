@@ -12,7 +12,7 @@ import { VRPSolution } from "../routing/models/vrp";
  * @returns An object containing the calculated TE, EE, SE, and overall efficiency score.
  */
 export function calculateEfficiencyScores(vrpSolution: VRPSolution): { DE: number, TE: number, VU: number, WU: number, overallEfficiency: number } {
-    let totalDrivingTime = 0; // Total time for all routes
+    let totalDrivingTimeMins = 0; // Total time for all routes
     let totalMilesDriven = 0; // Total distance for all routes
     let totalPackagesDelivered = 0; // Total packages delivered across all routes
     let volumeUtilised = 0; // Total volume used across all routes
@@ -23,7 +23,7 @@ export function calculateEfficiencyScores(vrpSolution: VRPSolution): { DE: numbe
     vrpSolution.updateRouteMeasurements();
     
     vrpSolution.routes.forEach(route => {
-        totalDrivingTime += route.actualTimeMins;
+        totalDrivingTimeMins += route.actualTimeMins;
         totalMilesDriven += route.actualDistanceMiles;
         totalPackagesDelivered += route.nodes.filter(node => node.pkg !== null).length;
         volumeUtilised += route.currentVolume;
@@ -32,17 +32,17 @@ export function calculateEfficiencyScores(vrpSolution: VRPSolution): { DE: numbe
         weightCapacity += route.vehicle.max_load;
     });
 
-    // Parcels delivered per unit distance (PUD)
-    const DE = totalPackagesDelivered / totalMilesDriven;
+    // Parcels delivered per unit distance
+    const DE = totalPackagesDelivered / totalMilesDriven * 100;
 
-    // Parcels delivered per unit time (PUT)
-    const TE = totalPackagesDelivered / totalDrivingTime;
+    // Parcels delivered per unit time
+    const TE = totalPackagesDelivered / totalDrivingTimeMins * 100;
 
-    // Volume Utilization (VU)
-    const VU = volumeUtilised / volumeCapacity;
+    // Volume Utilization
+    const VU = volumeUtilised / volumeCapacity * 100;
 
-    // Weight Utilization (WU)
-    const WU = weightUtilised / weightCapacity;
+    // Weight Utilization
+    const WU = weightUtilised / weightCapacity * 100;
 
     // Calculate overall efficiency score as an average of the normalized values
     // Assuming equal importance for simplicity

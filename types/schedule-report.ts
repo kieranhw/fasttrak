@@ -25,10 +25,18 @@ export type ScheduleReport = {
     vehicles_used: Vehicle[], // UUID in the database
     total_packages_count: number,
     scheduled_packages_count: number,
+    total_distance_miles: number,
+    total_duration_hours: number,
     // Schedule Profile
     auto_minimise?: boolean;
     optimisation_profile?: string;
     time_window_hours?: number;
     est_delivery_time?: number;
+    other_solutions?: ScheduleReport[];
+    // Efficiency
+    TE: number;
+    DE: number;
+    WU: number;
+    VU: number;
 }
 

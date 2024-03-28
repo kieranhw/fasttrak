@@ -1,10 +1,11 @@
 import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
-import { Graph, Node, Edge, createGraph, calculateDistance } from '../models/graph';
-import { VehicleRoute, VRPSolution } from '../models/vrp';
-import { calculateTraversalMins } from "../../scheduling/create-schedules";
-import { PriorityQueue } from "../../scheduling/priority-queue";
+import { Graph, Node, Edge, createGraph, calculateDistance } from '../../models/graph';
+import { VehicleRoute, VRPSolution } from '../../models/vrp';
+import { calculateTraversalMins } from "../../../scheduling/create-schedules";
+import { PriorityQueue } from "../../../scheduling/priority-queue";
 import { ScheduleProfile } from "@/types/schedule-profile";
+import { calculateCentroidFromNodes, calculateCentroidNodeDistance, findShortestPathForNodes, kMeans } from "./k-means-utils";
 
 /***
  * Geospatial Density Clustering
@@ -26,10 +27,14 @@ import { ScheduleProfile } from "@/types/schedule-profile";
  * @returns VRPSolution, results in the minimum required number of vehicles to service all packages
  */
 export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], profile: ScheduleProfile, distanceMultiplier: number, avgSpeed: number): Promise<[VRPSolution, PriorityQueue]> {
-    const solution = new VRPSolution();
+    const solution = new VRPSolution()
+    solution.loadMetrics(avgSpeed, distanceMultiplier);
     const availableVehicles = [...vehicles];
 
-    const timeWindow = profile.time_window-0.25;
+    console.log(graph.nodes.length + " nodes kmeans")
+
+
+    const timeWindowHours = profile.time_window - 0.25;
     const deliveryTime = profile.delivery_time;
 
     // Step 1: Sort packages into priority queue
@@ -50,6 +55,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
 
     // print length of each queue
     for (const queue of clusterPriorityQueues) {
+        console.log("Cluster queues")
         console.log(queue.getData().length);
     }
 
@@ -79,10 +85,10 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
             if (nextNode) {
                 // Calculate the travel cost and time required to travel from the last node in the route to the next node
                 const actualDistance = calculateDistance(node, nextNode, distanceMultiplier);
-                const travelTime = calculateTraversalMins((actualDistance) + deliveryTime);
+                const travelTime = calculateTraversalMins(actualDistance, avgSpeed) + deliveryTime;
 
                 // Check if the package can be added to the vehicle route
-                if (node.pkg && route.canAddPackage(node.pkg, node, travelTime, timeWindow) && route.currentVolume + node.pkg.volume <= route.vehicle.max_volume-2 && route.currentWeight + node.pkg.weight <= route.vehicle.max_load-2) {
+                if (node.pkg && route.canAddPackage(node.pkg, node, travelTime, timeWindowHours)) {
                     // Remove the package from the cluster queue and add it to the vehicle route
                     route.addNode(node, travelTime);
                     clusterQueue.dequeue();
@@ -130,35 +136,37 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
 
         // Iterate route centroids trying to add a package to each route, if not possible, continue to next route
         for (const { route } of routeCentroids) {
-            if (route.actualTimeMins > timeWindow) {
+            if (route.actualTimeMins > timeWindowHours * 60) {
                 // skip this route if it cannot accommodate a package
                 continue;
             }
 
             // Calculate the travel cost and time required to travel from the last node in the route to the next node
             const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], node, distanceMultiplier);
-            const travelTime = calculateTraversalMins(travelCost) + deliveryTime; // Calculate time required to traverse nodes, plus time to deliver package
+            const travelTime = calculateTraversalMins(travelCost, avgSpeed) + deliveryTime; // Calculate time required to traverse nodes, plus time to deliver package
 
             // If travel cost is more than triple the average time to travel for this route, skip this route
             const averageTimeToTravel = route.actualTimeMins / route.nodes.length;
             if (travelCost < averageTimeToTravel * 3) continue;
 
             // Check if the package can be added to the vehicle route
-            if (node.pkg && route.canAddPackage(node.pkg, node, travelTime, timeWindow) && route.currentVolume + node.pkg.volume <= route.vehicle.max_volume-2 && route.currentWeight + node.pkg.weight <= route.vehicle.max_load-2) {
+            if (node.pkg && route.canAddPackage(node.pkg, node, travelTime, timeWindowHours)) {
                 // Remove the package from the cluster queue and add it to the vehicle route
                 await (route as any).addNode(node, travelTime);
                 mainQueue.dequeue();
                 break;
             }
-
-
+            // Find shortest path
+            const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
+            route.nodes = shortestPath;
+            route.updateMeasurements(deliveryTime);
         }
+
 
         // If the package cannot be added to any route, dequeue the package indefinitely
         backupQueue.enqueue(node);
         mainQueue.dequeue();
     }
-
 
     // Step 4: Allocate leftover packages to vehicles
     // Try to add backup queue to each route, if cant fit in any of the routes, then dequeue indefinitely
@@ -167,29 +175,126 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
         if (!node) break;;
 
         for (const route of solution.routes) {
-            route.updateMeasurements(deliveryTime);
-            if (route.actualTimeMins > timeWindow) {
+            if (route.actualTimeMins > timeWindowHours * 60) {
                 // skip this route if it cannot accommodate a package
                 continue;
             }
 
             // Calculate the travel cost and time required to travel from the last node in the route to the next node
             const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], node);
-            const travelTime = calculateTraversalMins(travelCost) + deliveryTime; // Calculate time required to traverse nodes, plus time to deliver package
+            const travelTime = calculateTraversalMins(travelCost, avgSpeed) + deliveryTime; // Calculate time required to traverse nodes, plus time to deliver package
 
             // Check if the package can be added to the vehicle route
-            if (node.pkg && route.canAddPackage(node.pkg, node, travelTime, timeWindow) && route.currentVolume + node.pkg.volume <= route.vehicle.max_volume-2 && route.currentWeight + node.pkg.weight <= route.vehicle.max_load-2) {
+            if (node.pkg && route.canAddPackage(node.pkg, node, travelTime, timeWindowHours)) {
                 // Remove the package from the cluster queue and add it to the vehicle route
                 (route as any).addNode(node, travelCost, travelTime);
                 backupQueue.dequeue();
                 break;
             }
+
+            // Find shortest path
+            const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
+            route.nodes = shortestPath;
+            route.updateMeasurements(deliveryTime);
         }
 
         // If the package cannot be added to any route, dequeue the package indefinitely
         mainQueue.enqueue(node);
         backupQueue.dequeue();
     }
+
+    // Step 5: Allocate leftover packages to vehicles
+    // Try to add backup queue to each route, if cant fit in any of the routes, then dequeue indefinitely
+    while (!mainQueue.isEmpty()) {
+        const node = backupQueue.peek(); // Peek at the next package in the queue
+        if (!node) break;;
+
+        for (const route of solution.routes) {
+            if (route.actualTimeMins > timeWindowHours * 60) {
+                // skip this route if it cannot accommodate a package
+                continue;
+            }
+
+            // Calculate the travel cost and time required to travel from the last node in the route to the next node
+            const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], node);
+            const travelTime = calculateTraversalMins(travelCost, avgSpeed) + deliveryTime; // Calculate time required to traverse nodes, plus time to deliver package
+
+            // Check if the package can be added to the vehicle route
+            if (node.pkg && route.canAddPackage(node.pkg, node, travelTime, timeWindowHours)) {
+                // Remove the package from the cluster queue and add it to the vehicle route
+                (route as any).addNode(node, travelCost, travelTime);
+                mainQueue.dequeue();
+                break;
+            }
+            route.updateMeasurements(deliveryTime);
+        }
+
+        // If the package cannot be added to any route, dequeue the package indefinitely
+        backupQueue.enqueue(node);
+        mainQueue.dequeue();
+    }
+
+    // Step 4: Allocate leftover packages to vehicles
+    // Try to add backup queue to each route, if cant fit in any of the routes, then dequeue indefinitely
+    while (!backupQueue.isEmpty()) {
+        const node = backupQueue.peek(); // Peek at the next package in the queue
+        if (!node) break;;
+
+        for (const route of solution.routes) {
+            if (route.actualTimeMins > timeWindowHours * 60) {
+                // skip this route if it cannot accommodate a package
+                continue;
+            }
+
+            // Calculate the travel cost and time required to travel from the last node in the route to the next node
+            const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], node);
+            const travelTime = calculateTraversalMins(travelCost, avgSpeed) + deliveryTime; // Calculate time required to traverse nodes, plus time to deliver package
+
+            // Check if the package can be added to the vehicle route
+            if (node.pkg && route.canAddPackage(node.pkg, node, travelTime, timeWindowHours)) {
+                // Remove the package from the cluster queue and add it to the vehicle route
+                (route as any).addNode(node, travelCost, travelTime);
+                backupQueue.dequeue();
+                break;
+            }
+
+            // Find shortest path
+            const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
+            route.nodes = shortestPath;
+            route.updateMeasurements(deliveryTime);
+        }
+
+        // If the package cannot be added to any route, dequeue the package indefinitely
+        mainQueue.enqueue(node);
+        backupQueue.dequeue();
+    }
+
+
+    // Assuming all routes have been tried for initial package allocations
+    let allocationAttempted = false;
+    do {
+        allocationAttempted = false; // Reset flag for each round
+
+        for (const vehicleRoute of solution.routes) {
+            if (mainQueue.isEmpty()) break; // No more packages to allocate
+
+            const node = mainQueue.peek(); // Look at the next package without removing it
+            if (!node) break; // Exit if there's nothing to peek at
+
+            // Assuming `vehicleRoute` has a method `canAddNode` similar to `canAddPackage`
+            // and you've already defined how to calculate travel time to the next node
+            const nextNode = node; // For simplification, assume direct allocation without checking next node
+            const actualDistance = calculateDistance(vehicleRoute.nodes[vehicleRoute.nodes.length - 1], nextNode, distanceMultiplier);
+            const travelTime = calculateTraversalMins(actualDistance, avgSpeed) + deliveryTime;
+
+            // Check if we can add the package to this vehicle's route considering constraints
+            if (node.pkg && vehicleRoute.canAddPackage(node.pkg, node, travelTime, timeWindowHours)) {
+                vehicleRoute.addNode(node, travelTime); // Assuming `addNode` updates route metrics accordingly
+                mainQueue.dequeue(); // Successfully allocated, remove from queue
+                allocationAttempted = true; // Mark that an allocation was successful in this round
+            }
+        }
+    } while (allocationAttempted && !mainQueue.isEmpty());
 
 
     // Close each route and find the shortest path for each
@@ -203,138 +308,4 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
     return [solution, mainQueue];
 }
 
-// Type declarations
-type Coordinate = [number, number];
 
-type ClusterWithNodes = {
-    index: number;
-    nodes: Node[];
-};
-
-function kMeans(queue: PriorityQueue, k: number, maxIterations = 100): PriorityQueue[] {
-    // Create a backup of the original queue data
-    const originalNodes = queue.getData().slice();
-
-    // Dequeue all packages into nodes array
-    const nodes: Node[] = [];
-    while (!queue.isEmpty()) {
-        const node = queue.dequeue();
-        if (node) {
-            nodes.push(node);
-        }
-    }
-
-    // Shuffle nodes for random initial centroid selection
-    for (let i = nodes.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [nodes[i], nodes[j]] = [nodes[j], nodes[i]];
-    }
-
-    // Initial centroids are selected from the first k nodes
-    let centroids = nodes.slice(0, k).map(node => [node.pkg!.recipient_address_lat, node.pkg!.recipient_address_lng]);
-    let clusters: ClusterWithNodes[] = Array.from({ length: k }, (_, index) => ({ index, nodes: [] }));
-    let iterations = 0;
-
-    while (iterations < maxIterations) {
-        // Reset clusters for each iteration
-        clusters.forEach(cluster => cluster.nodes = []);
-
-        // Assign nodes to the nearest centroid
-        nodes.forEach(node => {
-            let minDistance = Number.MAX_VALUE;
-            let closestCentroidIndex = 0;
-
-            centroids.forEach((centroid, index) => {
-                const distance = Math.hypot(centroid[0] - node.pkg!.recipient_address_lat, centroid[1] - node.pkg!.recipient_address_lng);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestCentroidIndex = index;
-                }
-            });
-
-            clusters[closestCentroidIndex].nodes.push(node);
-        });
-
-        // Calculate new centroids from the clusters
-        let newCentroids = clusters.map(cluster => {
-            if (cluster.nodes.length === 0) return [0, 0]; // Handle empty clusters
-            return calculateCentroidFromNodes(cluster.nodes);
-        });
-
-        // Check for convergence
-        let hasConverged = newCentroids.every((centroid, i) => centroids[i] && centroid[0] === centroids[i][0] && centroid[1] === centroids[i][1]);
-        if (hasConverged) break;
-
-        centroids = newCentroids;
-        iterations++;
-    }
-
-    // Check if any of the clusters are empty
-    const emptyClusterExists = clusters.some(cluster => cluster.nodes.length === 0);
-    if (emptyClusterExists) {
-        console.log("Empty cluster found, restarting...");
-
-        // Reinitialize the queue with the original nodes and restart clustering
-        queue = new PriorityQueue();
-        originalNodes.forEach(node => queue.enqueue(node));
-        return kMeans(queue, k, maxIterations);
-    }
-
-    // Convert clusters to priority queues
-    const priorityQueueClusters = clusters.map(cluster => {
-        const clusterQueue = new PriorityQueue();
-        cluster.nodes.forEach(node => clusterQueue.enqueue(node));
-        return clusterQueue;
-    });
-
-    return priorityQueueClusters;
-}
-
-function calculateCentroidFromNodes(nodes: Node[]): Coordinate {
-    const sum = nodes.reduce((acc, node) => {
-        if (!node.pkg) return acc;
-        acc[0] += node.pkg!.recipient_address_lat;
-        acc[1] += node.pkg!.recipient_address_lng;
-        return acc;
-    }, [0, 0]);
-    return [sum[0] / nodes.length, sum[1] / nodes.length];
-}
-
-function calculateCentroidNodeDistance(centroid: Coordinate, node: Node): number {
-    return Math.hypot(centroid[0] - node.pkg!.recipient_address_lat, centroid[1] - node.pkg!.recipient_address_lng);
-}
-
-function findShortestPathForNodes(cluster: Node[], depot: Node): Node[] {
-    const path: Node[] = [];
-    let remainingNodes = [...cluster];
-    let currentNode = depot;
-
-    while (remainingNodes.length > 0) {
-        const nearestNode = findNearestNeighbour(currentNode, remainingNodes);
-        if (nearestNode) {
-            path.push(nearestNode);
-            remainingNodes = remainingNodes.filter(node => node !== nearestNode);
-            currentNode = nearestNode;
-        } else {
-            break; // No more nearest nodes found
-        }
-    }
-
-    return path;
-}
-
-
-function findNearestNeighbour(currentNode: Node, nodes: Node[]): Node | undefined {
-    let nearestNode: Node | undefined;
-    let shortestDistance = Number.MAX_VALUE;
-
-    for (const node of nodes) {
-        const distance = calculateDistance(currentNode, node);
-        if (distance < shortestDistance) {
-            shortestDistance = distance;
-            nearestNode = node;
-        }
-    }
-
-    return nearestNode;
-}

@@ -1,10 +1,10 @@
-import { VRPSolution, VehicleRoute } from "../models/vrp";
-import { PriorityQueue } from "../../scheduling/priority-queue";
-import { selectRandomSegment } from "../models/ga-utils";
-import { Graph, calculateDistance, createGraph } from "../models/graph";
+import { VRPSolution, VehicleRoute } from "../../models/vrp";
+import { PriorityQueue } from "../../../scheduling/priority-queue";
+import { selectRandomSegment } from "../../models/ga-utils";
+import { Graph, calculateDistance, createGraph } from "../../models/graph";
 import { calculateTraversalMins } from "@/lib/scheduling/create-schedules";
 import { FaThList } from "react-icons/fa";
-import { Node } from "../models/graph";
+import { Node } from "../../models/graph";
 import { crossover } from "./crossover";
 import { routeFitness } from "./fitness";
 import { findShortestPathForNodes, mutate } from "./mutate";
@@ -18,9 +18,22 @@ export class GeneticAlgorithm {
     private remainingPackages: PriorityQueue;
     private scheduleProfile: ScheduleProfile
 
-    constructor(initialPopulation: VRPSolution, graph: Graph, remainingPackages: PriorityQueue, scheduleProfile: ScheduleProfile) {
+    constructor(initialPopulation: VRPSolution, graph: Graph, remainingPackages: PriorityQueue | Node[], scheduleProfile: ScheduleProfile) {
         this.deliveryNetwork = graph;
-        this.remainingPackages = remainingPackages;
+
+        // Convert nodes to priority queue
+        let packages = new PriorityQueue();
+        if (remainingPackages instanceof PriorityQueue) {
+            packages = remainingPackages;
+        } else {
+            const queue = new PriorityQueue();
+            for (const node of remainingPackages) {
+                queue.enqueue(node);
+            }
+            packages = queue;
+        }
+        
+        this.remainingPackages = packages;
         this.bestGeneration = initialPopulation.clone();
         this.scheduleProfile = scheduleProfile;
     }
@@ -69,23 +82,21 @@ export class GeneticAlgorithm {
         }
     }
 
-    public evolve(generations: number): VRPSolution {
+    public evolve(GENERATIONS: number): VRPSolution {
         // Test Initial Population
         let fitness = 0;
         for (const route of this.bestGeneration.routes) {
             fitness += routeFitness(route);
         }
         console.log("Initial Population Fitness: ", fitness)
-        console.log("Initial population package count: ", this.bestGeneration.routes.reduce((sum, route) => sum + route.nodes.length, 0))
+        console.log("Initial population package count: ", this.bestGeneration.numberOfPackages)
 
-        for (let i = 0; i < generations; i++) {
+        for (let i = 0; i < GENERATIONS; i++) {
             this.evolveGeneration();
 
-            if (i > generations / 4) {
-                // Artificial Gene Transfer - start adding genes to the pool after 25% of the generations
-                if (Math.random() < 0.1) {
-                    this.bestGeneration = insert(this.bestGeneration, this.remainingPackages, this.scheduleProfile);
-                }
+            if (i > GENERATIONS / 4) {
+                // Artificial Gene Transfer - start attempting to add genes to the pool after 25% of the generations
+                this.bestGeneration = insert(this.bestGeneration, this.remainingPackages, this.scheduleProfile);
             }
         }
 
@@ -99,7 +110,7 @@ export class GeneticAlgorithm {
 
 
         console.log("End Population Fitness: ", endFitness)
-        console.log("End population package count: ", this.bestGeneration.routes.reduce((sum, route) => sum + route.nodes.length, 0))
+        console.log("End population package count: ", this.bestGeneration.numberOfPackages)
         return this.bestGeneration;
     }
 }

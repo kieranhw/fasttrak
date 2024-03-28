@@ -226,7 +226,8 @@ export class VRPSolution {
     }
 
     get numberOfPackages(): number {
-        return this.routes.reduce((sum, route) => sum + route.nodes.length - 1, 0);
+        // Return number of packages that are nodes which are not depots
+        return this.routes.reduce((sum, route) => sum + route.nodes.filter(node => !node.isDepot).length, 0);
     }
 
     // Clone including metrics
