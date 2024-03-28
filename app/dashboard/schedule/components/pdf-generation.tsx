@@ -11,7 +11,8 @@ const styles = StyleSheet.create({
         fontFamily: 'Helvetica',
         flexDirection: 'column',
         backgroundColor: '#fff',
-        padding: 20,
+        padding: 40,
+        paddingVertical: 60,
         fontSize: 12,
     },
     section: {
@@ -105,11 +106,12 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
 
     // TODO: Need schedules, store and depot to generate report from objects
 
-    const totalDrivingTime = props.schedules.reduce((sum, schedule) => sum + schedule.actual_duration_mins, 0).toFixed(2) as unknown as number;
+    const totalDrivingTimeHours = (props.schedules.reduce((sum, schedule) => sum + schedule.actual_duration_mins, 0) / 60).toFixed(2) as unknown as number;
     const totalDistanceMiles = props.schedules.reduce((sum, schedule) => sum + schedule.actual_distance_miles, 0).toFixed(2) as unknown as number;
     const totalLoadWeight = props.schedules.reduce((sum, schedule) => sum + schedule.load_weight, 0).toFixed(2) as unknown as number;
     const totalLoadVolume = props.schedules.reduce((sum, schedule) => sum + schedule.load_volume, 0).toFixed(2) as unknown as number;
-
+    const totalMaxWeight = props.schedules.reduce((sum, schedule) => sum + schedule.vehicle.max_load, 0).toFixed(2) as unknown as number;
+    const totalMaxVolume = props.schedules.reduce((sum, schedule) => sum + schedule.vehicle.max_volume, 0).toFixed(2) as unknown as number;
     const totalPackages = props.schedules.reduce((sum, schedule) => sum + schedule.num_packages, 0);
     const totalVehicles = props.schedules.reduce((sum, schedule) => schedule.vehicle ? sum + 1 : sum, 0);
 
@@ -147,7 +149,7 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
                                 <View style={styles.table}>
                                     <View style={[styles.tableRow, styles.tableRowHeader]}>
                                         <Text style={styles.tableColNum}>#</Text>
-                                        <Text style={styles.tableColHeader}>Registration</Text>
+                                        <Text style={styles.tableColHeader}>Vehicle</Text>
                                         <Text style={styles.tableColThin}>Packages</Text>
                                         <Text style={styles.tableColHeader}>Load Utilisation (kg)</Text>
                                         <Text style={styles.tableColHeader}>Volume (m³)</Text>
@@ -174,69 +176,73 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
                         <Page size="A4" style={styles.page}>
                             {/* Schedule Profile */}
                             <View style={styles.section}>
-                                <Text style={styles.title}>Performance Metrics</Text>
+                                <Text style={styles.title}>Performance</Text>
                                 <View style={styles.grid}>
                                     <View style={styles.gridBox}>
-                                        <Text style={styles.subtitle}>Total Metrics</Text>
+                                        <Text style={styles.subtitle}>Total</Text>
                                         <Text>Packages: {props.schedules.reduce((sum, schedule) => schedule.num_packages ? sum + schedule.num_packages : sum, 0)}</Text>
-                                        <Text>Driving Time: {totalDrivingTime} hours</Text>
+                                        <Text>Driving Time: {totalDrivingTimeHours} hours</Text>
                                         <Text>Distance: {totalDistanceMiles} miles</Text>
                                         <Text>Weight: {totalLoadWeight} kg</Text>
                                         <Text>Volume: {totalLoadVolume} m³</Text>
                                     </View>
                                     <View style={styles.gridBox}>
-                                        <Text style={styles.subtitle}>Average Metric Per Vehicle</Text>
+                                        <Text style={styles.subtitle}>Average Per Vehicle</Text>
                                         <Text>Packages: {(totalPackages / totalVehicles).toFixed(2)}</Text>
-                                        <Text>Driving Time: {(totalDrivingTime / totalVehicles).toFixed(2)} hours</Text>
+                                        <Text>Driving Time: {(totalDrivingTimeHours / totalVehicles).toFixed(2)} hours</Text>
                                         <Text>Distance: {(totalDistanceMiles / totalVehicles).toFixed(2)} miles</Text>
                                         <Text>Weight: {(totalLoadWeight / totalVehicles).toFixed(2)} kg</Text>
                                         <Text>Volume: {(totalLoadVolume / totalVehicles).toFixed(2)} m³</Text>
                                     </View>
                                     <View style={styles.gridBox}>
-                                        <Text style={styles.subtitle}>Average Metric Per Package</Text>
+                                        <Text style={styles.subtitle}>Average Per Package</Text>
                                         <Text>Packages: n/a</Text>
-                                        <Text>Driving Time: {(totalDrivingTime / totalPackages).toFixed(2)} hours</Text>
+                                        <Text>Driving Time: {(totalDrivingTimeHours / totalPackages).toFixed(2)} hours</Text>
                                         <Text>Distance: {(totalDistanceMiles / totalPackages).toFixed(2)} miles</Text>
                                         <Text>Weight: {(totalLoadWeight / totalPackages).toFixed(2)} kg</Text>
                                         <Text>Volume: {(totalLoadVolume / totalPackages).toFixed(2)} m³</Text>
                                     </View>
                                 </View>
                             </View>
-                            {/* Schedule Profile */}
-                            <View style={styles.section}>
-                                <Text style={styles.title}>Schedule Profile</Text>
-                                <Text>Auto-Minimise (Y/N): {props.schedules[0].schedule_report?.auto_minimise ? "Y" : "N"}</Text>
-                                <Text>Optimisation Profile: {props.schedules[0].schedule_report?.optimisation_profile}</Text>
-                                <Text>Time Window: {props.schedules[0].schedule_report?.time_window_hours} hours</Text>
-                                <Text>Estimated Time Per Delivery: {props.schedules[0].schedule_report?.est_delivery_time} minutes</Text>
-                            </View>
 
                             <View style={styles.section}>
-                                <Text style={styles.title}>Route Efficiency</Text>
-                                <Text style={{ marginBottom: 10 }}>Route efficiency (E) is an estimation of how efficiently the routing solution delivers a number of packages. This is theoretical and may 
-                                differ in actual results. The efficiency is calculated as:
+                                <Text style={styles.subtitle}>Efficiency Metrics</Text>
+                                <Text style={{ marginBottom: 10 }}>Performance measurements for each aspect of the system.
                                 </Text>
-                                <Text style={[styles.subtitle, { marginBottom: 10 }]}>Number of Packages / (Driving Time x Distance)</Text>
+                                <Text><Text style={styles.subtitle}>Time Efficiency (TE) =</Text> Number of Packages / Time (minutes) * 100</Text>
+                                <Text><Text style={styles.subtitle}>Distance Efficiency (DE) =</Text> Number of Packages / Distance (miles) * 100</Text>
+                                <Text><Text style={styles.subtitle}>Load Utilisation (LU) =</Text> Total Weight (kg) / Load Capacity (kg) * 100 </Text>
+                                <Text style={{ marginBottom: 10 }}><Text style={styles.subtitle}>Volume Utilisation (VU) =</Text> Total Volume (m³) / Volume Capacity (m³) * 100</Text>
+
                                 <View style={styles.table}>
                                     <View style={[styles.tableRow, styles.tableRowHeader]}>
                                         <Text style={styles.tableColNum}>#</Text>
-                                        <Text style={styles.tableColHeader}>Number of Packages</Text>
-                                        <Text style={styles.tableColHeader}>Driving Time (hours)</Text>
-                                        <Text style={styles.tableColHeader}>Distance (miles)</Text>
-                                        <Text style={styles.tableColHeader}>Efficiency</Text>
+                                        <Text style={styles.tableColHeader}>Vehicle</Text>
+                                        <Text style={styles.tableColHeader}>TE</Text>
+                                        <Text style={styles.tableColHeader}>DE</Text>
+                                        <Text style={styles.tableColHeader}>LU</Text>
+                                        <Text style={styles.tableColHeader}>VU</Text>
                                     </View>
                                     {/* Rows */}
                                     {props.schedules.map((schedule, index) =>
                                         schedule.vehicle && (
                                             <View key={index} style={styles.tableRow}>
                                                 <Text style={styles.tableColNum}>{index + 1}</Text>
-                                                <Text style={styles.tableCol}>{schedule.num_packages}</Text>
-                                                <Text style={styles.tableCol}>{(schedule.actual_duration_mins/60).toFixed(2)}</Text>
-                                                <Text style={styles.tableCol}>{(schedule.actual_distance_miles).toFixed(2)}</Text>
-                                                <Text style={styles.tableCol}>{(schedule.num_packages / (schedule.actual_distance_miles  * schedule.actual_duration_mins/60)).toFixed(2)}</Text>
+                                                <Text style={styles.tableCol}>{schedule.vehicle.registration}</Text>
+                                                <Text style={styles.tableCol}>{(schedule.num_packages / schedule.actual_duration_mins * 100).toFixed(2)}</Text>
+                                                <Text style={styles.tableCol}>{(schedule.num_packages / schedule.actual_distance_miles * 100).toFixed(2)}</Text>
+                                                <Text style={styles.tableCol}>{(schedule.load_weight / schedule.vehicle.max_load * 100).toFixed(2)}</Text>
+                                                <Text style={styles.tableCol}>{(schedule.load_volume / schedule.vehicle.max_volume * 100).toFixed(2)}</Text>
                                             </View>
                                         )
                                     )}
+                                    <View style={styles.tableRow}>
+                                        <Text style={[styles.tableCol, {width: '33%'}]}>Total</Text>
+                                        <Text style={styles.tableCol}>{(totalPackages / (totalDrivingTimeHours*60)*100).toFixed(2)}</Text>
+                                        <Text style={styles.tableCol}>{(totalPackages / totalDistanceMiles * 100).toFixed(2)}</Text>
+                                        <Text style={styles.tableCol}>{(totalLoadWeight / totalMaxWeight * 100).toFixed(2)}</Text>
+                                        <Text style={styles.tableCol}>{(totalLoadVolume / totalMaxVolume * 100).toFixed(2)}</Text>
+                                    </View>
                                 </View>
                             </View>
                         </Page>
