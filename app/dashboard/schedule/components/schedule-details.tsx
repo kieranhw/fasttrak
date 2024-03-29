@@ -458,11 +458,8 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent>
-                                {scheduleComplete == true && isScheduledToday == true &&
+                                {isScheduledToday == true &&
                                     <p>View schedule report</p>
-                                }
-                                {scheduleComplete == false &&
-                                    <p>Deliveries must be completed first</p>
                                 }
                                 {isScheduledToday == false &&
                                     <p>No schedule to report</p>
