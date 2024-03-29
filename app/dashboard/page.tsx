@@ -505,11 +505,9 @@ function renderAnalyticsCard2(selection: Selection) {
       const dateStr = format(new Date(schedule.delivery_date), 'dd/MM/yy');
       scheduleStatsMap[dateStr] = scheduleStatsMap[dateStr] || { milesDriven: 0, timeDrivenHours: 0 };
 
-      // Sample logic for determining if a package is standard or express
-      schedule.package_order.forEach(pkg => {
-        scheduleStatsMap[dateStr].milesDriven += schedule.actual_distance_miles;
-        scheduleStatsMap[dateStr].timeDrivenHours += schedule.actual_duration_mins / 60;
-      });
+      // Sum up miles and hours driven
+      scheduleStatsMap[dateStr].milesDriven += schedule.actual_distance_miles;
+      scheduleStatsMap[dateStr].timeDrivenHours += schedule.actual_duration_mins / 60;
     });
 
     // Ensure all dates in the range are included, even if no packages are scheduled
