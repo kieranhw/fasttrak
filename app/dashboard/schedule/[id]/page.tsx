@@ -123,18 +123,13 @@ export default function ScheduleDetails() {
                                 </TooltipContent>
                             </Tooltip>
                         </div>
-                        <div className="border rounded-t-none rounded-md border-divider h-[395px]">
+                        <div className="border bg-background rounded-t-none rounded-md border-divider h-[590px]">
                             {graph && solution &&
                                 <CytoscapeGraph graph={graph} solution={solution} />
                             }
                         </div>
                     </div>
                 </div>
-
-              
-
-
-
             </div>
         </TooltipProvider>
 
