@@ -51,13 +51,10 @@ export function DataTable<TData, TValue>({
     },
     initialState: {
       pagination: {
-        pageSize: 5,
+        pageSize: 8,
       },
     },
   })
-
-  // Calculate the number of empty rows to fill the table
-  const emptyRows = Math.max(0, table.initialState.pagination.pageSize - table.getRowModel().rows.length);
 
   return (
     <>
