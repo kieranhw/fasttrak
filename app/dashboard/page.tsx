@@ -757,7 +757,7 @@ export default function Dashboard() {
           <h1 className="text-foreground font-bold text-2xl">Analytics</h1>
           <div className="flex justify-between">
             <p className="text-md text-muted-foreground">
-              An overview of your system's performance this week.
+              Your system's performance for the last 7 days.
             </p>
             {/**  
             <Select value={selection} onValueChange={(value) => handleSelectChange(value as Selection)}>
