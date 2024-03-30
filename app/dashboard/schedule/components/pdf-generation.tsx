@@ -247,7 +247,7 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
                                         )
                                     )}
                                     <View style={styles.tableRow}>
-                                        <Text style={[styles.tableCol, { width: '33%' }]}>Total</Text>
+                                        <Text style={[styles.tableCol, { width: '33%' }]}>Average</Text>
                                         <Text style={styles.tableCol}>{(totalPackages / (totalDrivingTimeHours * 60) * 100).toFixed(2)}</Text>
                                         <Text style={styles.tableCol}>{(totalPackages / totalDistanceMiles * 100).toFixed(2)}</Text>
                                         <Text style={styles.tableCol}>{(totalLoadWeight / totalMaxWeight * 100).toFixed(2)}</Text>
@@ -259,8 +259,8 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
                         <Page size="A4" style={styles.page}>
                             <Text style={styles.title}>Algorithm Information</Text>
                             <Text style={{ marginBottom: 10 }} >The solution with the greatest total efficiency value has been automatically selected:</Text>
-                            <Text>Initialiser: {bestScheduleReport?.initialiser}</Text>
-                            <Text>Optimiser: {bestScheduleReport?.optimiser}</Text>
+                            <Text>Initialisation: {bestScheduleReport?.initialiser}</Text>
+                            <Text>Optimisation: {bestScheduleReport?.optimiser}</Text>
                             {bestScheduleReport?.iterations && bestScheduleReport?.optimiser !== "Genetic Algorithm" &&
                                 <Text>Iterations: {bestScheduleReport?.iterations}</Text>
                             }
@@ -273,8 +273,6 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
                             <Text>Packages pending: {bestScheduleReport?.total_packages_count}</Text>
                             <Text>Packages scheduled: {bestScheduleReport?.scheduled_packages_count}</Text>
                             <Text>Total Time Window: {bestScheduleReport?.time_window_hours! * props.schedules.length} hours</Text>
-
-
                             <Text style={[styles.subtitle, { marginTop: 10 }]}>Solution Comparison - Total Delivery Network</Text>
                             <Text style={{ marginBottom: 10 }}>Comparison of all generated solutions for the same set of vehicles and pending packages.</Text>
                             <View style={styles.table}>
