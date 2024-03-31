@@ -174,12 +174,13 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
             <div className="grid gap-2 grid-cols-1 sm:grid-cols-2 text-xs">
                 <div className="flex text-sm items-center gap-2 justify-center sm:justify-start">
                     <BiSolidTruck />
-                    {
-                        numPendingPackages !== null && numPendingPackages !== undefined
-                            ? `${vehicles.length} Available Vehicles`
-                            : <div className="flex font-normal text-xs items-center mx-2 my-auto gap-2">
-                                <Loader2 size={18} className="animate-spin" /> Loading Vehicles...
-                            </div>
+                    {!isLoading &&
+                        `${vehicles.length} Available Vehicles`
+                    }
+                    {isLoading &&
+                        <div className="flex font-normal text-xs items-center mx-2 my-auto gap-2">
+                            <Loader2 size={18} className="animate-spin" /> Loading Vehicles...
+                        </div>
                     }
                 </div>
                 <div className="flex text-sm items-center gap-2 justify-center sm:justify-start">
@@ -220,7 +221,7 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
             {/* Divider */}
             <div className="w-full border-t" />
 
-            {/* Form */}            
+            {/* Form */}
             <div className="flex justify-between gap-4">
                 <Label className="my-auto justify-center line-clamp-1">Selected Vehicles</Label>
                 <DropdownMenu>
