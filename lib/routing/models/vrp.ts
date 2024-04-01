@@ -112,8 +112,8 @@ export class VehicleRoute {
     }
 
     /***
-     * Update all measurements of the route, to be used only during the genetic algorithm
-     * when the route is being modified i.e. crossover, mutation, insertion
+     * Update all measurements of the route, to be used during the optimisation process
+     * and when analysing the actual time and distance of the final solution.
      * 
      * @param deliveryTime - time required to deliver a package
      * @returns void
@@ -127,9 +127,16 @@ export class VehicleRoute {
         this.actualTimeMins = 0;
 
         // Sum euclidean time, euclidean distance, volume, weight
-        for (let i = 0; i < this.nodes.length - 1; i++) {
+        for (let i = 0; i < this.nodes.length; i++) {
             const node = this.nodes[i];
             const nextNode = this.nodes[i + 1];
+
+            this.currentWeight += node.pkg?.weight ?? 0;
+            this.currentVolume += node.pkg?.volume ?? 0;
+
+            // Break if no next node, allowing the weight and volume to still be calculated
+            if (!nextNode) break;
+
             const distance = calculateDistance(node, nextNode);
             const traversalTime = calculateTraversalMins(distance, this.avgSpeed);
 
@@ -142,31 +149,14 @@ export class VehicleRoute {
 
             // Add the total time and distance
             this.eucTimeMins += timeRequired;
-            this.eucDistanceMiles += distance;
-
-            // Add up the weight and volume measurements
-            if (node.pkg) {
-                this.currentWeight += node.pkg.weight;
-                this.currentVolume += node.pkg.volume;
-            }
+            this.eucDistanceMiles += distance;            
         }
 
-        //console.log("UPDATING")
-        //console.log("Average Speed: ", this.avgSpeed)
-        //console.log("Distance Multiplier: ", this.distanceMultiplier)
-        //console.log("Distance: ", this.eucDistanceMiles)
-        //console.log("Time: ", this.eucTimeMins)
-        //
-        // Update the actual time
         if (this.avgSpeed !== 0 && this.distanceMultiplier !== 0) {
             this.actualDistanceMiles = this.eucDistanceMiles * this.distanceMultiplier;
             this.actualTimeMins = ((this.actualDistanceMiles / this.avgSpeed) * 60); // calculate time in minutes
-            this.actualTimeMins += this.scheduleProfile.delivery_time * this.nodes.length; // add 3 minutes for each package TODO: add real time
+            this.actualTimeMins += this.scheduleProfile.delivery_time * this.nodes.length;
         }
-        //console.log("RESULTS")
-        //console.log("Actual Distance: ", this.actualDistanceMiles)
-        //console.log("Actual Time: ", this.actualTimeMins)
-
     }
 
 }

@@ -10,7 +10,9 @@ export type ClusterWithNodes = {
     nodes: Node[];
 };
 
-export function kMeans(queue: PriorityQueue, k: number, maxIterations = 100): PriorityQueue[] {
+export function kMeans(queue: PriorityQueue, k: number, maxIterations = 100, recursionDepth = 0): PriorityQueue[] | Error {
+    const MAX_RECURSION_DEPTH = 10; 
+
     // Create a backup of the original queue data
     const originalNodes = queue.getData().slice();
 
@@ -71,12 +73,13 @@ export function kMeans(queue: PriorityQueue, k: number, maxIterations = 100): Pr
     // Check if any of the clusters are empty
     const emptyClusterExists = clusters.some(cluster => cluster.nodes.length === 0);
     if (emptyClusterExists) {
+        if (recursionDepth >= MAX_RECURSION_DEPTH) {
+            return new Error("Max recursion depth reached, unable to find non-empty clusters.");
+        }
         console.log("Empty cluster found, restarting...");
-
-        // Reinitialize the queue with the original nodes and restart clustering
         queue = new PriorityQueue();
         originalNodes.forEach(node => queue.enqueue(node));
-        return kMeans(queue, k, maxIterations);
+        return kMeans(queue, k, maxIterations, recursionDepth + 1);
     }
 
     // Convert clusters to priority queues

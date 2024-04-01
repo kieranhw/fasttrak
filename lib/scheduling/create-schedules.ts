@@ -1,7 +1,7 @@
 import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
 import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
-import { roundRobinAllocation } from "../routing/algorithms/rr-fifo";
+import { roundRobinAllocation } from "../routing/algorithms/rr-fifo/rr-fifo";
 import { geospatialClustering } from "../routing/algorithms/k-means/k-means";
 import { Edge, Graph, Node, calculateDistance, createGraph } from "../routing/models/graph";
 import { VRPSolution, VehicleRoute } from "../routing/models/vrp";
@@ -39,7 +39,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
 
     // TODO: Run the VRP algorithm to generate a solution, send to calculate average speed utils
     //const vrpSolution = await randomRoutes(graph, vehiclesData, 8);
-    const averageSpeed = 5; // miles per hour
+    
     
     // TODO: update lambda code to accept profile
     // schedule packages on AWS Lambda
@@ -47,7 +47,6 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
         packages: packagesData,
         vehicles: vehiclesData,
         depot: depot,
-        averageSpeed: averageSpeed,
         timeWindow: 8
     };
 

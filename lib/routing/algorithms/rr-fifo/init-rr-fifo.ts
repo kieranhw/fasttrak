@@ -1,8 +1,8 @@
 import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
-import { Graph, Node, Edge, createGraph, calculateDistance } from '../models/graph';
-import { VehicleRoute, VRPSolution } from '../models/vrp';
-import { calculateTraversalMins } from "../../scheduling/create-schedules";
+import { Graph, Node, Edge, createGraph, calculateDistance } from '../../models/graph';
+import { VehicleRoute, VRPSolution } from '../../models/vrp';
+import { calculateTraversalMins } from "../../../scheduling/create-schedules";
 import { ScheduleProfile } from "@/types/schedule-profile";
 
 /***
@@ -18,12 +18,12 @@ import { ScheduleProfile } from "@/types/schedule-profile";
  * @param timeWindow Number of hours to deliver packages
  * @returns VRPSolution, results in the minimum required number of vehicles to service all packages
  */
-export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], profile: ScheduleProfile, distanceMultiplier: number, avgSpeed: number): Promise<VRPSolution> {
+export async function initRandom(graph: Graph, vehicles: Vehicle[], profile: ScheduleProfile, distanceMultiplier: number, avgSpeed: number): Promise<[VRPSolution, Node[]]> {
 
     const solution = new VRPSolution();
     const availableVehicles = [...vehicles];
     const remainingPackages = [];
-    console.log(graph.nodes.length + " nodes random")
+
 
     const timeWindow = profile.time_window - 0.25;
     const deliveryTime = profile.delivery_time;
@@ -34,8 +34,6 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
         .sort((a, b) =>
             (new Date(a.pkg?.date_added || 0).getTime()) - (new Date(b.pkg?.date_added || 0).getTime())
         );
-
-
 
     // Group packages by recipient address
     const addressToPackagesMap: Record<string, Node[]> = {};
@@ -59,9 +57,8 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
         let vehiclesChecked = 0;
         while (vehiclesChecked < availableVehicles.length) {
             const route = solution.routes[vehicleIndex] || new VehicleRoute(availableVehicles[vehicleIndex], graph.depot as Node, profile);
-            const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgGroup[0], distanceMultiplier);
-            const timeRequired = calculateTraversalMins(travelCost, avgSpeed) + deliveryTime;
-            console.log(route.canAddGroup(pkgGroup, timeRequired, timeWindow))
+            const actualDistance = calculateDistance(route.nodes[route.nodes.length - 1], pkgGroup[0], distanceMultiplier);
+            const timeRequired = calculateTraversalMins(actualDistance, avgSpeed) + deliveryTime;
             solution.loadMetrics(avgSpeed, distanceMultiplier);
 
             // Half fill the vehicles, to prevent early overloading
@@ -83,7 +80,6 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
 
         // If all vehicles checked and no fit
         if (vehiclesChecked === availableVehicles.length) {
-
             if (pkgGroup.length > 1) {
                 // Split group into two and try again
                 const halfIndex = Math.ceil(pkgGroup.length / 2);
@@ -97,15 +93,35 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
         }
     }
 
+    // Search through the routes and find any packages that are duplicated
+    // If a package is duplicated, remove the later occurrence
+    for (const route of solution.routes) {
+        const seen = new Set();
+        route.nodes = route.nodes.filter(pkgNode => {
+            if (seen.has(pkgNode.pkg?.package_id)) {
+                return false;
+            } else {
+                seen.add(pkgNode.pkg?.package_id);
+                return true;
+            }
+        });
+    }
+
     // Close routes back to depot
     for (const route of solution.routes) {
         route.closeRoute(graph.depot as Node);
         route.updateMeasurements(profile.delivery_time);
     }
 
+
+
+
+
+
+
     console.log("RANDOM REMAINING PACKAGES: " + remainingPackages.length)
     console.log("RANDOM SOLUTION PACKAGES: " + solution.numberOfPackages)
 
-    return solution;
+    return [solution, remainingPackages];
 }
 

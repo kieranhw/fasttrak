@@ -152,7 +152,7 @@ function renderInfoCard() {
 
         {info && !noStore &&
           <CardDescription>
-            Your store's statistics for this month
+            Your store's statistics for {format(new Date(), 'MMMM yyyy')}
           </CardDescription>
         }
 

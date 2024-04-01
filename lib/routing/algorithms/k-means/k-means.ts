@@ -6,6 +6,7 @@ import { calculateTraversalMins } from "../../../scheduling/create-schedules";
 import { PriorityQueue } from "../../../scheduling/priority-queue";
 import { ScheduleProfile } from "@/types/schedule-profile";
 import { calculateCentroidFromNodes, calculateCentroidNodeDistance, findShortestPathForNodes, kMeans } from "./k-means-utils";
+import { roundRobinAllocation } from "../rr-fifo/rr-fifo";
 
 /***
  * Geospatial Density Clustering
@@ -52,6 +53,21 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
 
     // Step 3: Perform K-Means clustering to n clusters
     const clusterPriorityQueues = kMeans(mainQueue, numberOfClusters);
+
+    if (clusterPriorityQueues instanceof Error) {
+        // If clusters cannot be found, process as a random solution
+        const random = await roundRobinAllocation(graph, vehicles, profile, distanceMultiplier, avgSpeed);
+
+        // Find remaining packages
+        const allPackages = mainQueue.getData();
+        const remainingPackages = allPackages.filter(node => !random.routes.some(route => route.nodes.includes(node)));
+
+        // Turn remaining packages into a priority queue
+        const remainingQueue = new PriorityQueue();
+        remainingPackages.forEach(node => remainingQueue.enqueue(node));
+
+        return [random, remainingQueue];
+    }
 
     // print length of each queue
     for (const queue of clusterPriorityQueues) {
@@ -268,7 +284,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
         mainQueue.enqueue(node);
         backupQueue.dequeue();
     }
-    
+
     // Step 5: Allocate leftover packages to vehicles
     // Try to add backup queue to each route, if cant fit in any of the routes, then dequeue indefinitely
     while (!mainQueue.isEmpty()) {

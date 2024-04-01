@@ -40,6 +40,7 @@ import { ConfirmDeliveryTable } from "../confirm-delivery-table/confirm-delivery
 import { ConfirmTableColumns } from "../confirm-delivery-table/columns"
 import { updatePackages } from "@/lib/scheduling/update-packages"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { downloadGPX } from "@/lib/utils/export-gpx"
 
 export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => void): ColumnDef<DeliverySchedule>[] => [
     {
@@ -303,7 +304,7 @@ export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => 
                                 <DropdownMenuItem>Route Details</DropdownMenuItem>
                             </Link>
 
-                            <DropdownMenuItem>Export Directions</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => downloadGPX(schedule)}>Export Directions</DropdownMenuItem>
 
                             {/* If delivery already in progress, show dialog to select any items that have already been delivered */}
                             {/* else, show alert dialog to confirm that the delivery will be cancelled */}

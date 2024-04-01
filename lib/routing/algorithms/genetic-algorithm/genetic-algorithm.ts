@@ -1,6 +1,6 @@
 import { VRPSolution, VehicleRoute } from "../../models/vrp";
 import { PriorityQueue } from "../../../scheduling/priority-queue";
-import { selectRandomSegment } from "../../models/ga-utils";
+import { selectRandomSegment } from "./ga-utils";
 import { Graph, calculateDistance, createGraph } from "../../models/graph";
 import { calculateTraversalMins } from "@/lib/scheduling/create-schedules";
 import { FaThList } from "react-icons/fa";

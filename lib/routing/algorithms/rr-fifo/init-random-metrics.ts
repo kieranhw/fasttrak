@@ -1,22 +1,26 @@
 import { Package } from "@/types/package";
 import { Vehicle } from "@/types/vehicle";
-import { Graph, Node, Edge, createGraph, calculateDistance } from '../models/graph';
-import { VehicleRoute, VRPSolution } from '../models/vrp';
-import { calculateTraversalMins } from "../../scheduling/create-schedules";
+import { Graph, Node, Edge, createGraph, calculateDistance } from '../../models/graph';
+import { VehicleRoute, VRPSolution } from '../../models/vrp';
+import { calculateTraversalMins } from "../../../scheduling/create-schedules";
 import { ScheduleProfile } from "@/types/schedule-profile";
 
 /***
- * Round Robin Allocation 2
+ * Initialise random metrics
  * 
- * Sort packages into FIFO, then allocate to vehicles in a round robin fashion
- * Group packages that are going to the same address and find vehicle, if no vehicle then split group into smaller groups
+ * This algorithm is a simple round-robin allocations which allocates the packages to the vehicles as first in first out.
  * 
- * Constraints: time window, vehicle capacity (weight and volume)
+ * The only use of this is to generate the average speed and distance multiplier metrics as part of the real world travel
+ * estimation algorithm. 
  * 
- * @param graph Graph of packages and depot
+ * This has not been designed to generate a full solution or fully respect the constraints because the real world travel
+ * times are dependent on being supplied the average speed and distance multiplier. These multipliers are given as 
+ * parameters to the subsequent algorithms.
+ * 
+ * @param graph Graph of nodes: packages and depot
  * @param vehicles Array of available vehicles
  * @param timeWindow Number of hours to deliver packages
- * @returns VRPSolution, results in the minimum required number of vehicles to service all packages
+ * @returns VRPSolution
  */
 export async function initRandomMetrics(graph: Graph, vehicles: Vehicle[], profile: ScheduleProfile): Promise<VRPSolution> {
     const solution = new VRPSolution();
@@ -91,9 +95,7 @@ export async function initRandomMetrics(graph: Graph, vehicles: Vehicle[], profi
     for (const route of solution.routes) {
         route.closeRoute(graph.depot as Node);
     }
-
-
-
+    
     return solution;
 }
 

@@ -11,7 +11,7 @@ import { VRPSolution } from "../routing/models/vrp";
  * @param {VRPSolution} vrpSolution The VRP solution object containing vehicle routes and delivery nodes.
  * @returns An object containing the calculated TE, EE, SE, and overall efficiency score.
  */
-export function calculateEfficiencyScores(vrpSolution: VRPSolution): { DE: number, TE: number, VU: number, WU: number, overallEfficiency: number } {
+export function calculateEfficiencyScores(vrpSolution: VRPSolution): EfficiencyScores {
     let totalDrivingTimeMins = 0; // Total time for all routes
     let totalMilesDriven = 0; // Total distance for all routes
     let totalPackagesDelivered = 0; // Total packages delivered across all routes
@@ -57,3 +57,10 @@ export function calculateEfficiencyScores(vrpSolution: VRPSolution): { DE: numbe
     };
 }
 
+export interface EfficiencyScores {
+    DE: number;
+    TE: number;
+    VU: number;
+    WU: number;
+    overallEfficiency: number;
+}
