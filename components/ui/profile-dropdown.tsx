@@ -66,10 +66,6 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ signOut }) => 
             <DropdownMenuContent className="w-40 mr-2">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                </DropdownMenuItem>
                 <DropdownMenuItem onClick={e => signOut()}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
