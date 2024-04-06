@@ -4,7 +4,6 @@ import { ScheduleProfile } from "@/types/schedule-profile";
 import { GeneticAlgorithm } from "./genetic-algorithm/genetic-algorithm";
 import { Vehicle } from "@/types/vehicle";
 import { roundRobinAllocation } from './rr-fifo/rr-fifo';
-import { Node } from '../models/graph';
 import { EfficiencyScores, calculateEfficiencyScores } from '@/lib/utils/calculate-efficiency';
 import { initialiseMetrics as computeMetrics } from '../../google-maps/directions';
 import { initRandomMetrics } from './rr-fifo/init-random-metrics';
@@ -29,8 +28,8 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     const metrics: VRPMetrics = await computeMetrics(metricsOnlySolution);
 
     // 2. Generate a random solution to be used as a baseline and to estimate the maximum number of vehicles required
-    let randomSolution = await roundRobinAllocation(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
-    randomSolution.loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
+    let randomOnly = await roundRobinAllocation(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
+    randomOnly.loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
 
     // 3. If selected, estimate the maximum number of vehicles required to deliver all packages 
     if (profile.auto_selection == true) {
@@ -62,7 +61,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
         const EFFICIENCY_INCREASE = 0.5 // Estimated routing efficiency increase between the random solution and the final solution
 
         let currentTimeWindowMins = (profile.time_window * maximumVehiclesRequired.length) * 60; // Current time window available
-        const averageTimePerPackage = (randomSolution.actualTime * EFFICIENCY_INCREASE) / randomSolution.numberOfPackages;
+        const averageTimePerPackage = (randomOnly.actualTime * EFFICIENCY_INCREASE) / randomOnly.numberOfPackages;
         const estimatedTravelTimeMins = averageTimePerPackage * graph.nodes.length - 1; // Estimated (worst case) time to deliver all packages
 
         // From the remaining vehicles, add more vehicles if required based on the estimated time to deliver
@@ -87,9 +86,9 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     let KMeansInitial = await initKMeans(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
     KMeansInitial[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
     
-    let randomOnly = await initRandom(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
-    randomOnly[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
-    const randomOnlyEfficiency: EfficiencyScores = calculateEfficiencyScores(randomOnly[0]);
+    let randomInitial = await initRandom(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
+    randomInitial[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
+    const randomOnlyEfficiency: EfficiencyScores = calculateEfficiencyScores(randomInitial[0]);
 
     // 6. Run the Genetic Algorithm to optimise the K-Means and Random initialisation solutions
     const numGenerations = 100000;
@@ -100,7 +99,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     const kMeansOptimisedEfficiency: EfficiencyScores = calculateEfficiencyScores(kMeansOptimised);
 
     // Random Initialised
-    const gaRandomInit = new GeneticAlgorithm(randomOnly[0], graph, randomOnly[1], profile);
+    const gaRandomInit = new GeneticAlgorithm(randomInitial[0], graph, randomInitial[1], profile);
     const randomOptimised = gaRandomInit.evolve(numGenerations);
     const randomOptimisedEfficiency: EfficiencyScores = calculateEfficiencyScores(randomOptimised);
 
@@ -111,11 +110,11 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
         distance_multiplier: metrics.distanceMultiplier,
         average_speed: metrics.avgSpeed,
         vehicles_available: originalVehicles,
-        vehicles_used: randomOnly[0].routes.map(route => route.vehicle),
+        vehicles_used: randomInitial[0].routes.map(route => route.vehicle),
         total_packages_count: graph.nodes.reduce((acc, node) => acc + (node.pkg ? 1 : 0), 0),
-        scheduled_packages_count: randomOnly[0].numberOfPackages,
-        total_distance_miles: randomOnly[0].actualDistance,
-        total_duration_hours: randomOnly[0].actualTime / 60,
+        scheduled_packages_count: randomInitial[0].numberOfPackages,
+        total_distance_miles: randomInitial[0].actualDistance,
+        total_duration_hours: randomInitial[0].actualTime / 60,
         // Schedule Profile
         auto_minimise: profile.auto_selection,
         optimisation_profile: profile.optimisation_profile,
@@ -199,7 +198,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     // 8. Compare the efficiency of each solution, selecting the most efficient to be the final solution
     type SolutionEfficiencyTuple = [VRPSolution, ScheduleReport, EfficiencyScores];
     const solutionEfficiencies: SolutionEfficiencyTuple[]  = [
-        [randomOnly[0], randomOnlyReport, randomOnlyEfficiency],
+        [randomOnly, randomOnlyReport, randomOnlyEfficiency],
         [KMeansOnly[0], KMeansOnlyReport, KMeansOnlyEfficiency],
         [randomOptimised, randomOptimisedReport, randomOptimisedEfficiency],
         [kMeansOptimised, kMeansOptimisedReport, kMeansOptimisedEfficiency]

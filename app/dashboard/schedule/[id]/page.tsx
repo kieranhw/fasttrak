@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/tooltip"
 import { MdRefresh } from "react-icons/md";
 import { Button } from "@/components/ui/button";
+import { PackageMap } from "./components/map";
 
 export default function ScheduleDetails() {
 
@@ -130,6 +131,17 @@ export default function ScheduleDetails() {
                         </div>
                     </div>
                 </div>
+                {deliverySchedule &&
+
+                    <div className="h-[90vh]">
+                        <div className="border-x border-t rounded-t-md inline-flex justify-between w-full items-center p-1 h-12 bg-background">
+                            <p className="text-muted-foreground font-medium text-sm m-2">Customer Locations Map</p>
+                        </div>
+                        <div className="border bg-background rounded-t-none rounded-md border-divider h-[80vh]">
+                            <PackageMap deliverySchedule={deliverySchedule} />
+                        </div>
+                    </div>
+                }
             </div>
         </TooltipProvider>
 
