@@ -231,6 +231,20 @@ function renderInfoCard() {
               </div>
               <div className="items-start w-1/2 justify-center flex flex-col text-start pl-8">
                 <div className="text-3xl font-bold">{info?.delivery_efficiency || 0}</div>
+                <TooltipProvider>
+                  <TooltipUI>
+                    <TooltipTrigger className="cursor-default flex gap-1 items-center w-full">
+                      <p className="text-xs text-muted-foreground">
+                        Delivery Efficiency
+                      </p>
+                      <BsQuestionCircleFill className="text-muted-foreground h-3 my-0 hover:text-primary transition" />
+                    </TooltipTrigger>
+                    <TooltipContent className="w-1/2">
+                      <p>Delivery efficiency is calculated as:</p>
+                      <Image priority src="/images/eff-equation.png" width={698} height={160} alt="Image demonstrating the FastTrak dashboard" className="w-full h-full" />
+                    </TooltipContent>
+                  </TooltipUI>
+                </TooltipProvider>
               </div>
             </div>
           </div>
@@ -259,8 +273,8 @@ function renderInfoCard() {
               </div>
             </div>
           </div>
-        </CardContent>}
-
+        </CardContent>
+      }
     </Card>
   )
 }
@@ -474,6 +488,128 @@ function renderNotificationsCard() {
   }
 }
 
+function renderAnalyticsCard1(selection: Selection) {
+  type PackageCounts = { standard: number; express: number; };
+  type PackageCountMap = { [date: string]: PackageCounts; };
+
+  const [packageCountMap, setPackageCountMap] = useState<PackageCountMap>({});
+  const [isLoading, setIsLoading] = useState<Boolean>(true);
+
+  const dataForChart = Object.entries(packageCountMap).map(([date, counts]) => ({
+    date: date,
+    standard: counts.standard,
+    express: counts.express,
+  })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  const fetchPackageCountMap = async (startDate: string, endDate: string): Promise<PackageCountMap> => {
+    const { data: schedules, error } = await db.schedules.fetch.byDateRange(startDate, endDate);
+
+    let packageCountMap: PackageCountMap = {};
+
+    if (!schedules || error) {
+      return packageCountMap;
+    }
+
+    schedules.forEach(schedule => {
+      const dateStr = format(new Date(schedule.delivery_date), 'dd/MM/yy');
+      packageCountMap[dateStr] = packageCountMap[dateStr] || { standard: 0, express: 0 };
+
+      // Sample logic for determining if a package is standard or express
+      schedule.package_order.forEach(pkg => {
+        if (pkg.priority === PriorityType.Express) {
+          packageCountMap[dateStr].express++;
+        } else {
+          packageCountMap[dateStr].standard++;
+        }
+      });
+    });
+
+    // Ensure all dates in the range are included, even if no packages are scheduled
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    let currentDate = start;
+    while (currentDate <= end) {
+      const formattedDate = format(currentDate, 'dd/MM/yy');
+      packageCountMap[formattedDate] = packageCountMap[formattedDate] || { standard: 0, express: 0 };
+      currentDate = add(currentDate, { days: 1 });
+    }
+
+    return packageCountMap;
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      const endDate = new Date();
+
+      const startDate = add(endDate, { days: subtractDaysBy(selection) });
+
+      const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+      const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+
+      const packageCountMap = await fetchPackageCountMap(formattedStartDate, formattedEndDate);
+
+      if (packageCountMap) {
+        // Sort by date
+        const sortedPackageCountMap: PackageCountMap = {};
+        Object.keys(packageCountMap).sort().forEach(date => {
+          sortedPackageCountMap[date] = packageCountMap[date];
+        });
+        setPackageCountMap(sortedPackageCountMap);
+      } else {
+        console.error('Error fetching package count map');
+      }
+      setIsLoading(false);
+    };
+
+    fetchData();
+  }, [selection]);
+
+
+  return (
+    <Card className="">
+      <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
+        <div className="flex items-center justify-between w-full">
+          <CardTitle className="text-lg font-medium">
+            Packages Scheduled
+          </CardTitle>
+          <TbPackageExport size={20} />
+        </div>
+        <CardDescription>
+          Number of packages scheduled for delivery
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="mt-6 pl-0">
+        {!isLoading && dataForChart.length > 0 &&
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={dataForChart}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" tickFormatter={(value) => value.slice(0, 5)} tickMargin={5} />
+              <YAxis />
+              <Legend />
+              <Tooltip wrapperClassName="border-divider rounded-md text-sm shadow-md" />
+              <Bar name="Standard" dataKey="standard" stackId="a" fill="#8884d8" />
+              <Bar name="Express" dataKey="express" stackId="a" fill="#82ca9d" />
+            </BarChart>
+          </ResponsiveContainer>
+        }
+        {isLoading &&
+          <div className="h-72 w-full flex items-center justify-center">
+            <div className="flex gap-2 items-center justify-center text-sm text-muted-foreground"><Loader2 size={18} className="animate-spin" />Loading...</div>
+          </div>
+        }
+        {!isLoading && dataForChart.length === 0 &&
+          <div className="h-72 w-full flex items-center justify-center">
+            <div className="flex gap-2 items-center justify-center text-sm text-muted-foreground">No data to display</div>
+          </div>
+        }
+
+      </CardContent>
+    </Card>
+  )
+}
+
+
 function renderAnalyticsCard2(selection: Selection) {
   type ScheduleStatistics = { milesDriven: number; timeDrivenHours: number; };
   type ScheduleStatsMap = { [date: string]: ScheduleStatistics; };
@@ -565,7 +701,7 @@ function renderAnalyticsCard2(selection: Selection) {
         </CardDescription>
       </CardHeader>
       <CardContent className="mt-6 p-0">
-        {!isLoading &&
+        {!isLoading && dataForChart.length > 0 &&
           <ResponsiveContainer width="100%" height={300}>
             <LineChart width={730} height={250} data={dataForChart}
               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -585,130 +721,16 @@ function renderAnalyticsCard2(selection: Selection) {
             <div className="flex gap-2 items-center justify-center text-sm text-muted-foreground"><Loader2 size={18} className="animate-spin" />Loading...</div>
           </div>
         }
-      </CardContent>
-    </Card>
-  )
-}
-
-function renderAnalyticsCard1(selection: Selection) {
-  type PackageCounts = { standard: number; express: number; };
-  type PackageCountMap = { [date: string]: PackageCounts; };
-
-  const [packageCountMap, setPackageCountMap] = useState<PackageCountMap>({});
-  const [isLoading, setIsLoading] = useState<Boolean>(true);
-
-  const dataForChart = Object.entries(packageCountMap).map(([date, counts]) => ({
-    date: date,
-    standard: counts.standard,
-    express: counts.express,
-  })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-  const fetchPackageCountMap = async (startDate: string, endDate: string): Promise<PackageCountMap> => {
-    const { data: schedules, error } = await db.schedules.fetch.byDateRange(startDate, endDate);
-
-    let packageCountMap: PackageCountMap = {};
-
-    if (error) {
-      console.error('Error fetching schedules:', error);
-      return packageCountMap;
-    }
-
-    if (!schedules) {
-      return packageCountMap;
-    }
-
-    schedules.forEach(schedule => {
-      const dateStr = format(new Date(schedule.delivery_date), 'dd/MM/yy');
-      packageCountMap[dateStr] = packageCountMap[dateStr] || { standard: 0, express: 0 };
-
-      // Sample logic for determining if a package is standard or express
-      schedule.package_order.forEach(pkg => {
-        if (pkg.priority === PriorityType.Express) {
-          packageCountMap[dateStr].express++;
-        } else {
-          packageCountMap[dateStr].standard++;
-        }
-      });
-    });
-
-    // Ensure all dates in the range are included, even if no packages are scheduled
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    let currentDate = start;
-    while (currentDate <= end) {
-      const formattedDate = format(currentDate, 'dd/MM/yy');
-      packageCountMap[formattedDate] = packageCountMap[formattedDate] || { standard: 0, express: 0 };
-      currentDate = add(currentDate, { days: 1 });
-    }
-
-    return packageCountMap;
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      const endDate = new Date();
-
-      const startDate = add(endDate, { days: subtractDaysBy(selection) });
-
-      const formattedStartDate = format(startDate, 'yyyy-MM-dd');
-      const formattedEndDate = format(endDate, 'yyyy-MM-dd');
-
-      const packageCountMap = await fetchPackageCountMap(formattedStartDate, formattedEndDate);
-
-      if (packageCountMap) {
-        // Sort by date
-        const sortedPackageCountMap: PackageCountMap = {};
-        Object.keys(packageCountMap).sort().forEach(date => {
-          sortedPackageCountMap[date] = packageCountMap[date];
-        });
-        setPackageCountMap(sortedPackageCountMap);
-      } else {
-        console.error('Error fetching package count map');
-      }
-      setIsLoading(false);
-    };
-
-    fetchData();
-  }, [selection]);
-
-
-  return (
-    <Card className="">
-      <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-2">
-        <div className="flex items-center justify-between w-full">
-          <CardTitle className="text-lg font-medium">
-            Packages Scheduled
-          </CardTitle>
-          <TbPackageExport size={20} />
-        </div>
-        <CardDescription>
-          Number of packages scheduled for delivery
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="mt-6 pl-0">
-        {!isLoading &&
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={dataForChart}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" tickFormatter={(value) => value.slice(0, 5)} tickMargin={5} />
-              <YAxis />
-              <Legend />
-              <Tooltip wrapperClassName="border-divider rounded-md text-sm shadow-md" />
-              <Bar name="Standard" dataKey="standard" stackId="a" fill="#8884d8" />
-              <Bar name="Express" dataKey="express" stackId="a" fill="#82ca9d" />
-            </BarChart>
-          </ResponsiveContainer>
-        }
-        {isLoading &&
+        {!isLoading && dataForChart.length === 0 &&
           <div className="h-72 w-full flex items-center justify-center">
-            <div className="flex gap-2 items-center justify-center text-sm text-muted-foreground"><Loader2 size={18} className="animate-spin" />Loading...</div>
+            <div className="flex gap-2 items-center justify-center text-sm text-muted-foreground">No data to display</div>
           </div>
         }
       </CardContent>
     </Card>
   )
 }
+
 
 enum Selection {
   Last7 = 'last-7',
@@ -720,10 +742,6 @@ enum Selection {
 
 export default function Dashboard() {
   const [selection, setSelection] = useState<Selection>(Selection.Last7);
-
-  useEffect(() => {
-    console.log('Selection:', selection);
-  }, [selection]);
 
   // Define the event handler for the select component
   const handleSelectChange = (newValue: Selection) => {
