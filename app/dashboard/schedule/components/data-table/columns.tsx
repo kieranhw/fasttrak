@@ -65,9 +65,7 @@ export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => 
                 <div className="flex flex-col w-fit">
                     <HoverCard>
                         <HoverCardTrigger asChild>
-                            <Link href={`/dashboard/vehicles/record/${vehicle.vehicle_id}`}>
-                                <p className="hover:text-blue-500 hover:underline hover:cursor-pointer">{vehicle.registration}</p>
-                            </Link>
+                                <p className="hover:text-primary hover:underline hover:cursor-default">{vehicle.registration}</p>
                         </HoverCardTrigger>
                         <HoverCardContent className="w-50">
                             <div className="flex justify-between space-x-4">
@@ -296,21 +294,11 @@ export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => 
                                     </DialogFooter>
                                 </DialogContent>
                             </Dialog>
-
-
-
                             <DropdownMenuSeparator />
                             <Link href={`/dashboard/schedule/${schedule.schedule_id}`}>
                                 <DropdownMenuItem>Route Details</DropdownMenuItem>
                             </Link>
-
                             <DropdownMenuItem onClick={() => downloadGPX(schedule)}>Export Directions</DropdownMenuItem>
-
-                            {/* If delivery already in progress, show dialog to select any items that have already been delivered */}
-                            {/* else, show alert dialog to confirm that the delivery will be cancelled */}
-
-                            <DropdownMenuItem >Cancel Deliveries</DropdownMenuItem>
-
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </>
