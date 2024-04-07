@@ -10,7 +10,7 @@ import { addressData as randomAddresses } from "./wide-liverpool-addresses-rando
 
 export const generatePackages = async (numPackages: number): Promise<Package[]> => {
     const packages: Package[] = [];
-    const addresses: { address: string, lat: number, lng: number }[] = evenAddresses;
+    const addresses: { address: string, lat: number, lng: number }[] = randomAddresses;
 
     console.log("addresses:" + addresses.length);
 
@@ -20,6 +20,8 @@ export const generatePackages = async (numPackages: number): Promise<Package[]> 
             'min': 0,
             'max': priorities.length - 1
         });
+
+        const priority = i < numPackages * 0.2 ? PriorityType.Express : PriorityType.Standard;
 
         // Select recipient and sender addresses which are different
         const [recipientAddress, senderAddress] = faker.helpers.shuffle(addresses).slice(0, 2);
@@ -53,7 +55,7 @@ export const generatePackages = async (numPackages: number): Promise<Package[]> 
             weight: faker.number.int({ min: 5, max: 20 }),
             volume: parseFloat(faker.number.float({ min: 0.1, max: 0.4 }).toPrecision(2)),
             fragile: false,
-            priority: priorities[randomNumber],
+            priority: priority, // 20% chance of express
             delivery_notes: faker.lorem.words(10),
             date_added: faker.date.between({ from: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), to: new Date().getTime() }),
         });

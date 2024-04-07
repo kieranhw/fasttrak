@@ -91,7 +91,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     const randomOnlyEfficiency: EfficiencyScores = calculateEfficiencyScores(randomInitial[0]);
 
     // 6. Run the Genetic Algorithm to optimise the K-Means and Random initialisation solutions
-    const numGenerations = 100000;
+    const numGenerations = 2500000;
 
     // K Means
     const gaKMeansInit = new GeneticAlgorithm(KMeansInitial[0], graph, KMeansInitial[1], profile);

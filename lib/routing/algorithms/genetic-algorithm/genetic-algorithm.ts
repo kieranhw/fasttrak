@@ -17,6 +17,7 @@ export class GeneticAlgorithm {
     private deliveryNetwork: Graph;
     private remainingPackages: PriorityQueue;
     private scheduleProfile: ScheduleProfile
+    private generationFitness: { generation: number, fitness: number }[];
 
     constructor(initialPopulation: VRPSolution, graph: Graph, remainingPackages: PriorityQueue | Node[], scheduleProfile: ScheduleProfile) {
         this.deliveryNetwork = graph;
@@ -36,9 +37,10 @@ export class GeneticAlgorithm {
         this.remainingPackages = packages;
         this.bestGeneration = initialPopulation.clone();
         this.scheduleProfile = scheduleProfile;
+        this.generationFitness = [];
     }
 
-    private evolveGeneration(): void {
+    private evolveGeneration(generationNumber: number): void {
         // Evolve the current generation
 
         // Step 2: Evaluate fitness of the set of VRPSolutions and aggregate the total fitness
@@ -80,6 +82,10 @@ export class GeneticAlgorithm {
         if (offspringFitness < generationFitness) {
             this.bestGeneration = offspring;
         }
+
+        if (offspringFitness < generationFitness || generationNumber % 100 === 0) {
+            this.generationFitness.push({ generation: generationNumber, fitness: generationFitness });
+        }
     }
 
     public evolve(GENERATIONS: number): VRPSolution {
@@ -89,13 +95,14 @@ export class GeneticAlgorithm {
             fitness += routeFitness(route);
         }
         console.log("Initial Population Fitness: ", fitness)
+        this.generationFitness.push({ generation: 0, fitness: fitness });
         console.log("Initial population package count: ", this.bestGeneration.numberOfPackages)
 
         for (let i = 0; i < GENERATIONS; i++) {
-            this.evolveGeneration();
+            this.evolveGeneration(i);
 
-            if (i > GENERATIONS / 4) {
-                // Artificial Gene Transfer - start attempting to add genes to the pool after 25% of the generations
+            if (i > GENERATIONS / 5) {
+                // Artificial Gene Transfer - start attempting to add genes to the pool after 20% of the generations
                 this.bestGeneration = insert(this.bestGeneration, this.remainingPackages, this.scheduleProfile);
             }
         }
@@ -107,10 +114,20 @@ export class GeneticAlgorithm {
             endFitness += routeFitness(route);
         }
 
-
-
         console.log("End Population Fitness: ", endFitness)
         console.log("End population package count: ", this.bestGeneration.numberOfPackages)
+
+        // Export generationFitness as array and save in CSV format downloading after algorithm finishes
+        const csv = this.generationFitness.map(({ generation, fitness }) => `${generation},${fitness}`).join('\n');
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "generation-fitness.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
         return this.bestGeneration;
     }
 }
