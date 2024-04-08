@@ -1,6 +1,6 @@
 import { useRouter } from 'next/navigation';
 import { TableRow, TableCell } from "@/components/ui/table";
-import { Notification } from '@/types/db/misc';
+import { Notification } from "@/types/Notification";
 
 type NotificationItemProps = {
   notification: Notification;

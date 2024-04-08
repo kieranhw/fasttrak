@@ -5,8 +5,7 @@ import { PostgrestError } from "@supabase/supabase-js"
 import { db } from "./db"
 import { supabase } from "../supabase/client"
 import { DeliverySchedule } from "@/types/db/DeliverySchedule"
-import { DashboardInfo } from "@/types/db/misc"
-
+import { DashboardInfo } from "@/types/DashboardInfo"
 
 
 const fetchDashboardInfo = async (): Promise<{ data: DashboardInfo | null, error: PostgrestError | null }> => {

@@ -11,7 +11,7 @@ import { db } from "@/lib/db/db";
 import { UUID } from "crypto";
 import { Package } from "@/types/db/Package";
 import { Graph } from "@/lib/routing/model/Graph";
-import { VRPSolution } from "@/lib/routing/model/VehicleRoute";
+import { VRPSolution } from "@/lib/routing/model/VRPSolution";
 import { displayGraph } from "../../../../lib/utils/cytoscape-data";
 import { CytoscapeGraph } from "../../../../components/CytoscapeGraph";
 import { BreadcrumbLink } from "@/components/ui/breadcrumb-link";

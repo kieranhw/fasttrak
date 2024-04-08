@@ -1,4 +1,4 @@
-import { VRPSolution } from "../routing/model/VehicleRoute";
+import { VRPSolution } from '@/lib/routing/model/VRPSolution';
 
 /**
  * Calculates efficiency metrics for a VRP solution. Metrics include:
