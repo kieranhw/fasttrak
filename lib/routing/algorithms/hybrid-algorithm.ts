@@ -1,5 +1,6 @@
 import { Graph } from '../model/Graph';
-import { VRPSolution } from '../model/vrp';
+import { VRPSolution } from "@/lib/routing/model/VRPSolution";
+import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 import { GeneticAlgorithm } from "./genetic-algorithm/genetic-algorithm";
 import { Vehicle } from "@/types/db/Vehicle";

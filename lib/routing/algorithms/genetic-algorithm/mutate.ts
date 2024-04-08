@@ -1,6 +1,6 @@
-import { VehicleRoute } from "../../model/vrp";
+import { VehicleRoute } from "../../model/VehicleRoute";
 import { RouteNode } from '@/lib/routing/model/RouteNode';
-import { calculateDistance } from "@/lib/utils/CalculateDistance";
+import { calculateDistance } from "@/lib/utils/calculate-distance";
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 
 export function mutate(clonedRoute: VehicleRoute, depotNode: RouteNode): VehicleRoute {

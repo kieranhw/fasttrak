@@ -1,5 +1,6 @@
 import { ScheduleProfile, OptimisationProfile  } from "@/types/db/ScheduleProfile";
-import { VRPSolution, VehicleRoute } from "../../model/vrp";
+import { VRPSolution } from "@/lib/routing/model/VRPSolution";
+import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { GeneticAlgorithm } from "./genetic-algorithm";
 
 export function routeFitness(route: VehicleRoute): number {

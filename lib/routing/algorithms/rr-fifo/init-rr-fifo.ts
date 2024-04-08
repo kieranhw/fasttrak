@@ -3,7 +3,9 @@ import { Vehicle } from "@/types/db/Vehicle";
 import { Graph, createGraph } from "@/lib/routing/model/Graph";
 import { RouteNode } from '@/lib/routing/model/RouteNode';
 import { Edge } from '@/lib/routing/model/Edge';
-import { calculateDistance } from '@/lib/utils/CalculateDistance';import { VehicleRoute, VRPSolution } from '../../model/vrp';
+import { calculateDistance } from '@/lib/utils/calculate-distance';
+import { VRPSolution } from "@/lib/routing/model/VRPSolution";
+import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { calculateTraversalMins } from "../../../scheduling/create-schedules";
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 

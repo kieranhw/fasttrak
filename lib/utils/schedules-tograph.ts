@@ -1,10 +1,11 @@
 import { DeliverySchedule } from "@/types/db/DeliverySchedule";
 import { Graph, createGraph } from "../routing/model/Graph";
-import { VRPSolution, VehicleRoute } from "../routing/model/vrp";
+import { VRPSolution } from "@/lib/routing/model/VRPSolution";
+import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { OptimisationProfile, ScheduleProfile } from "@/types/db/ScheduleProfile";
 import { RouteNode } from "../routing/model/RouteNode";
 import { Location } from "@/types/Location";
-import { calculateDistance } from "./CalculateDistance";
+import { calculateDistance } from "./calculate-distance";
 import { Edge } from "../routing/model/Edge";
 
 export async function createGraphAndSolutionFromScheduleArray(schedules: DeliverySchedule[]): Promise<[Graph, VRPSolution]> {

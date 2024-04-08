@@ -1,6 +1,5 @@
-import { Notification } from "@/types/db/misc";
+import { Notification } from "@/types/Notification";
 import { db } from "../db/db";
-import { de, el } from "date-fns/locale";
 import { PostgrestError } from "@supabase/supabase-js";
 import { format, isToday, parseISO, compareAsc } from 'date-fns';
 import { DeliverySchedule, DeliveryStatus } from "@/types/db/DeliverySchedule";

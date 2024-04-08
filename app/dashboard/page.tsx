@@ -84,7 +84,7 @@ import { format, add, set } from 'date-fns';
 import { FaWarehouse } from "react-icons/fa";
 import { IoMdNotifications } from "react-icons/io";
 import { Notification } from "@/types/db/misc";
-import { getNotifications } from "@/lib/utils/notification-gen";
+import { getNotifications } from "@/lib/utils/get-notifications";
 import { supabase } from "@/lib/supabase/client";
 import { Package, PriorityType } from "@/types/db/Package";
 import { DeliverySchedule } from "@/types/db/DeliverySchedule";

@@ -1,4 +1,5 @@
-import { VRPSolution, VehicleRoute } from "../../model/vrp";
+import { VRPSolution } from "@/lib/routing/model/VRPSolution";
+import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { PriorityQueue } from "../../../scheduling/priority-queue";
 import { selectRandomSegment } from "./ga-utils";
 import { Graph, createGraph } from "../../model/Graph";

@@ -1,5 +1,5 @@
 import { PriorityQueue } from "@/lib/scheduling/priority-queue";
-import { calculateDistance } from "../../../utils/CalculateDistance";
+import { calculateDistance } from "../../../utils/calculate-distance";
 import { RouteNode } from '@/lib/routing/model/RouteNode';
 
 // Type declarations

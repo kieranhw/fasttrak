@@ -4,7 +4,7 @@ import { Package } from "@/types/db/Package";
 import { Location } from "@/types/Location";
 import { RouteNode } from "./RouteNode";
 import { Edge } from "./Edge";
-import { calculateDistance } from "@/lib/utils/CalculateDistance";
+import { calculateDistance } from "@/lib/utils/calculate-distance";
 
 /**
  * Graph to model the vehicle routing network.

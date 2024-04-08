@@ -1,6 +1,7 @@
-import { VRPSolution, VehicleRoute } from "../routing/model/vrp";
+import { VRPSolution } from "@/lib/routing/model/VRPSolution";
+import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { RouteNode } from "../routing/model/RouteNode";
-import { calculateDistance } from "../utils/CalculateDistance";
+import { calculateDistance } from "../utils/calculate-distance";
 import { calculateTraversalMins } from "../scheduling/create-schedules";
 import { loader } from "./loader";
 
