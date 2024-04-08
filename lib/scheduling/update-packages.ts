@@ -1,7 +1,7 @@
 import { UUID } from "crypto";
 import { supabase } from "../supabase/client";
-import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
-import { CurrentState, Package, PackageStatus } from "@/types/package";
+import { DeliverySchedule, DeliveryStatus } from "@/types/db/DeliverySchedule";
+import { CurrentState, Package, PackageStatus } from "@/types/db/Package";
 
 
 export async function updatePackages(schedule: DeliverySchedule, deliveredPackages: Package[], failedPackages: Package[]) {

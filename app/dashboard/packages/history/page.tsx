@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { Package } from '@/types/package';
+import { Package } from '@/types/db/Package';
 import { PackagesTable } from '../(components)/packages-table';
 import { columns } from './components/columns';
 import { db } from '@/lib/db/db';

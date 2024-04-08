@@ -1,16 +1,19 @@
-import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
-import { Package } from "@/types/package";
-import { Vehicle } from "@/types/vehicle";
+import { DeliverySchedule, DeliveryStatus } from "@/types/db/DeliverySchedule";
+import { Package } from "@/types/db/Package";
+import { Vehicle } from "@/types/db/Vehicle";
 import { roundRobinAllocation } from "../routing/algorithms/rr-fifo/rr-fifo";
 import { geospatialClustering } from "../routing/algorithms/k-means/k-means";
-import { Edge, Graph, Node, calculateDistance, createGraph } from "../routing/models/graph";
-import { VRPSolution, VehicleRoute } from "../routing/models/vrp";
+import { Graph, createGraph } from "@/lib/routing/model/Graph";
+import { RouteNode } from '@/lib/routing/model/RouteNode';
+import { Edge } from '@/lib/routing/model/Edge';
+import { calculateDistance } from '@/lib/utils/CalculateDistance';
+import { VRPSolution, VehicleRoute } from "../routing/model/vrp";
 import { UUID } from "crypto";
 import axios from 'axios';
-import { ScheduleProfile } from "@/types/schedule-profile";
+import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 import { db } from "../db/db";
 import { hybridAlgorithm } from "../routing/algorithms/hybrid-algorithm";
-import { ScheduleReport } from "@/types/schedule-report";
+import { ScheduleReport } from "@/types/db/ScheduleReport";
 
 // API Gateway endpoint URL
 const apiGatewayEndpoint = 'https://e266yv3o3eojn6auayc5za77c40pmdhb.lambda-url.eu-north-1.on.aws/';

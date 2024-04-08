@@ -1,14 +1,14 @@
-import { Node } from "@/lib/routing/models/graph";
+import { RouteNode } from '@/lib/routing/model/RouteNode';
 
 // Priority queue for node objects
 export class PriorityQueue {
-    private nodes: Node[];
+    private nodes: RouteNode[];
 
     constructor() {
         this.nodes = [];
     }
 
-    private calculatePriority(node: Node): number {
+    private calculateEffectivePriority(node: RouteNode): number {
         if (!node.pkg || !node.pkg.date_added) return 0;
 
         // Ensure date_added is a Date object
@@ -30,25 +30,25 @@ export class PriorityQueue {
 
 
 
-    enqueue(node: Node): void {
+    enqueue(node: RouteNode): void {
         if (!node.pkg) return;
-        node.pkg!.effective_priority = this.calculatePriority(node);
+        node.pkg!.effective_priority = this.calculateEffectivePriority(node);
         this.nodes.push(node);
         this.nodes.sort((a, b) => (b.pkg?.effective_priority || 0) - (a.pkg?.effective_priority || 0)); // Sort in descending order of priority
     }
 
-    dequeue(): Node | undefined {
+    dequeue(): RouteNode | undefined {
         return this.nodes.shift();
     }
 
-    dequeueNode(node: Node): Node | undefined {
+    dequeueNode(node: RouteNode): RouteNode | undefined {
         const index = this.nodes.findIndex(n => n.pkg?.package_id === node.pkg?.package_id);
         if (index !== -1) {
             return this.nodes.splice(index, 1)[0];
         }
     }
 
-    peek(index?: number): Node | undefined {
+    peek(index?: number): RouteNode | undefined {
         if (index) {
             return this.nodes[index] ?? undefined;
         } else {
@@ -56,15 +56,15 @@ export class PriorityQueue {
         }
     }
 
-    peekSmallest(): Node | undefined {
+    peekSmallest(): RouteNode | undefined {
         return [...this.nodes].sort((a, b) => a.pkg!.volume - b.pkg!.volume)[0];
     }
 
-    peekLightest(): Node | undefined {
+    peekLightest(): RouteNode | undefined {
         return [...this.nodes].sort((a, b) => a.pkg!.weight - b.pkg!.weight)[0];
     }
 
-    dequeueSmallest(): Node | undefined {
+    dequeueSmallest(): RouteNode | undefined {
         const sortedBySize = [...this.nodes].sort((a, b) => a.pkg!.volume - b.pkg!.volume);
         const smallest = sortedBySize.shift();
         if (smallest) {
@@ -73,7 +73,7 @@ export class PriorityQueue {
         return smallest;
     }
 
-    dequeueLightest(): Node | undefined {
+    dequeueLightest(): RouteNode | undefined {
         const sortedByWeight = [...this.nodes].sort((a, b) => a.pkg!.weight - b.pkg!.weight);
         const lightest = sortedByWeight.shift();
         if (lightest) {
@@ -82,7 +82,7 @@ export class PriorityQueue {
         return lightest;
     }
 
-    getData(): Node[] {
+    getData(): RouteNode[] {
         return this.nodes;
     }
 

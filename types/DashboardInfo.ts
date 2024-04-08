@@ -1,4 +1,4 @@
-import { Store } from "./store"
+import { Store } from "./db/Store"
 
 export type DashboardInfo = {
     store: Store
@@ -7,11 +7,3 @@ export type DashboardInfo = {
     miles_driven: number | string
     delivery_efficiency: number | string
 }
-
-
-export type Notification = {
-    severity: number;
-    title: string;
-    description: string;
-    onClickLink?: string;
-  }

@@ -31,7 +31,7 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { UserProfile } from "@/types/user-profile"
+import { UserProfile } from "@/types/db/UserProfile"
 import { useEffect, useState } from "react"
 import { db } from "@/lib/db/db"
 

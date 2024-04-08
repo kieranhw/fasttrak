@@ -1,9 +1,9 @@
 import { supabase } from "@/lib/supabase/client";
-import { Package } from "@/types/package";
-import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
+import { Package } from "@/types/db/Package";
+import { DeliverySchedule, DeliveryStatus } from "@/types/db/DeliverySchedule";
 import { UUID } from "crypto";
 import { db } from "./db";
-import { Vehicle } from "@/types/vehicle";
+import { Vehicle } from "@/types/db/Vehicle";
 import { PostgrestError } from "@supabase/supabase-js";
 
 // Helper function to fetch store and handle errors
@@ -73,9 +73,6 @@ export const fetchSchedulesByDateRange = async (date1: String, date2: String): P
     };
 };
 
-
-
-// Helper function to fetch packages for a schedule
 const fetchPackagesForSchedule = async (packageIds: UUID[]): Promise<Package[]> => {
     const packages = await db.packages.fetch.byIds(packageIds);
     if (!packages) throw new Error("Error fetching packages for schedule");

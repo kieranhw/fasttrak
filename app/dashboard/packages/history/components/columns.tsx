@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Package } from '@/types/package'
+import { Package } from '@/types/db/Package'
 
 import { MoreHorizontal } from "lucide-react"
 

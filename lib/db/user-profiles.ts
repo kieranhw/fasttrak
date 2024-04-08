@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
-import { UserProfile } from "@/types/user-profile";
+import { UserProfile } from "@/types/db/UserProfile";
 import { PostgrestError, User } from "@supabase/supabase-js";
 
 const fetchUserProfile = async (): Promise<{ data: UserProfile | null, error: PostgrestError | null }> => {

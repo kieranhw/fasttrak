@@ -1,9 +1,11 @@
-import { Package } from "@/types/package";
-import { Vehicle } from "@/types/vehicle";
-import { Graph, Node, Edge, createGraph, calculateDistance } from '../../models/graph';
-import { VehicleRoute, VRPSolution } from '../../models/vrp';
+import { Package } from "@/types/db/Package";
+import { Vehicle } from "@/types/db/Vehicle";
+import { Graph, createGraph } from "@/lib/routing/model/Graph";
+import { RouteNode } from '@/lib/routing/model/RouteNode';
+import { Edge } from '@/lib/routing/model/Edge';
+import { calculateDistance } from '@/lib/utils/CalculateDistance';import { VehicleRoute, VRPSolution } from '../../model/vrp';
 import { calculateTraversalMins } from "../../../scheduling/create-schedules";
-import { ScheduleProfile } from "@/types/schedule-profile";
+import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 
 /***
  * Round Robin Allocation 2
@@ -35,7 +37,7 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
         );
 
     // Group packages by recipient address
-    const addressToPackagesMap: Record<string, Node[]> = {};
+    const addressToPackagesMap: Record<string, RouteNode[]> = {};
     for (const pkgNode of sortedPackages) {
         const address = pkgNode.pkg?.recipient_address || '';
         if (!addressToPackagesMap[address]) {
@@ -44,7 +46,7 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
         addressToPackagesMap[address].push(pkgNode);
     }
 
-    const groupedPackages: Node[][] = Object.values(addressToPackagesMap);
+    const groupedPackages: RouteNode[][] = Object.values(addressToPackagesMap);
 
     let vehicleIndex = 0;
 
@@ -55,7 +57,7 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
     for (const pkgGroup of groupedPackages) {
         let vehiclesChecked = 0;
         while (vehiclesChecked < availableVehicles.length) {
-            const route = solution.routes[vehicleIndex] || new VehicleRoute(availableVehicles[vehicleIndex], graph.depot as Node, profile);
+            const route = solution.routes[vehicleIndex] || new VehicleRoute(availableVehicles[vehicleIndex], graph.depot as RouteNode, profile);
             const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgGroup[0], distanceMultiplier);
             const timeRequired = calculateTraversalMins(travelCost, avgSpeed) + deliveryTime;
             console.log(route.canAddGroup(pkgGroup, timeRequired, timeWindow))
@@ -96,7 +98,7 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
 
     // Close routes back to depot
     for (const route of solution.routes) {
-        route.closeRoute(graph.depot as Node);
+        route.closeRoute(graph.depot as RouteNode);
         route.updateMeasurements(profile.delivery_time);
     }
 

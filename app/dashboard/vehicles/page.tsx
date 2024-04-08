@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { Vehicle } from '@/types/vehicle'
+import { Vehicle } from '@/types/db/Vehicle'
 import { DataTable } from './components/data-table'
 import { columns } from './components/columns'
 import { db } from '@/lib/db/db';

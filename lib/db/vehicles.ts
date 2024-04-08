@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase/client";
-import { Vehicle } from "@/types/vehicle";
+import { Vehicle } from "@/types/db/Vehicle";
 import { db } from "./db";
-import { UserProfile } from "@/types/user-profile";
+import { UserProfile } from "@/types/db/UserProfile";
 import { UUID } from "crypto";
 
 const fetchVehicles = async (): Promise<Vehicle[] | null> => {

@@ -1,16 +1,16 @@
-import { VRPSolution, VehicleRoute } from "../../models/vrp";
+import { VRPSolution, VehicleRoute } from "../../model/vrp";
 import { PriorityQueue } from "../../../scheduling/priority-queue";
 import { selectRandomSegment } from "./ga-utils";
-import { Graph, calculateDistance, createGraph } from "../../models/graph";
+import { Graph, createGraph } from "../../model/Graph";
 import { calculateTraversalMins } from "@/lib/scheduling/create-schedules";
 import { FaThList } from "react-icons/fa";
-import { Node } from "../../models/graph";
+import { RouteNode } from '@/lib/routing/model/RouteNode';
 import { crossover } from "./crossover";
 import { routeFitness } from "./fitness";
 import { findShortestPathForNodes, mutate } from "./mutate";
 import { insert } from "./insert";
-import { ScheduleProfile } from "@/types/schedule-profile";
-import { calculateRealTimes } from "@/lib/google-maps/directions";
+import { ScheduleProfile } from "@/types/db/ScheduleProfile";
+import { calculateActualTravel } from "@/lib/google-maps/directions";
 
 export class GeneticAlgorithm {
     private bestGeneration: VRPSolution;
@@ -19,7 +19,7 @@ export class GeneticAlgorithm {
     private scheduleProfile: ScheduleProfile
     private generationFitness: { generation: number, fitness: number }[];
 
-    constructor(initialPopulation: VRPSolution, graph: Graph, remainingPackages: PriorityQueue | Node[], scheduleProfile: ScheduleProfile) {
+    constructor(initialPopulation: VRPSolution, graph: Graph, remainingPackages: PriorityQueue | RouteNode[], scheduleProfile: ScheduleProfile) {
         this.deliveryNetwork = graph;
 
         // Convert nodes to priority queue
@@ -64,7 +64,7 @@ export class GeneticAlgorithm {
         for (const route of offspring.routes) {
             // 20% chance of mutation if there is more than one route, else always mutate
             if (Math.random() < 0.2 || offspring.routes.length === 1) {
-                const mutatedRoute = mutate(route, this.deliveryNetwork.depot as Node);
+                const mutatedRoute = mutate(route, this.deliveryNetwork.depot as RouteNode);
                 offspring.routes[offspring.routes.indexOf(route)] = mutatedRoute;
             }
         }

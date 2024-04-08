@@ -6,7 +6,7 @@ import {
     useAdvancedMarkerRef
 } from '@vis.gl/react-google-maps';
 import { FaHome, FaWarehouse } from 'react-icons/fa';
-import { Package } from '@/types/package';
+import { Package } from '@/types/db/Package';
 
 
 interface MarkerWithInfowindowProps {

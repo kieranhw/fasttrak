@@ -1,17 +1,19 @@
-import { DeliverySchedule } from "@/types/delivery-schedule";
-import { Edge, Graph, Node, calculateDistance, createGraph } from "../routing/models/graph";
-import { VRPSolution, VehicleRoute } from "../routing/models/vrp";
-import { OptimisationProfile, ScheduleProfile } from "@/types/schedule-profile";
+import { DeliverySchedule } from "@/types/db/DeliverySchedule";
+import { Graph, createGraph } from "../routing/model/Graph";
+import { VRPSolution, VehicleRoute } from "../routing/model/vrp";
+import { OptimisationProfile, ScheduleProfile } from "@/types/db/ScheduleProfile";
+import { RouteNode } from "../routing/model/RouteNode";
+import { Location } from "@/types/Location";
+import { calculateDistance } from "./CalculateDistance";
+import { Edge } from "../routing/model/Edge";
 
 export async function createGraphAndSolutionFromScheduleArray(schedules: DeliverySchedule[]): Promise<[Graph, VRPSolution]> {
     const graph = new Graph();
     const solution = new VRPSolution();
 
-
-    // TODO: Get real depot coords
     // Create nodes for depot, assuming all schedules share the same depot
-    const depotCoordinates = { lat: schedules[0].depot_lat, lng: schedules[0].depot_lng };
-    const depotNode = new Node(null, depotCoordinates, true);
+    const depotCoordinates: Location = { lat: schedules[0].depot_lat, lng: schedules[0].depot_lng };
+    const depotNode = new RouteNode(null, depotCoordinates, true);
     graph.addNode(depotNode);
     console.log(schedules)
 
@@ -24,7 +26,7 @@ export async function createGraphAndSolutionFromScheduleArray(schedules: Deliver
 
             if (pkg) {
                 const coordinates = { lat: pkg.recipient_address_lat as number, lng: pkg.recipient_address_lng as number };
-                const pkgNode = new Node(pkg, coordinates);
+                const pkgNode = new RouteNode(pkg, coordinates);
                 graph.addNode(pkgNode);
                 graph.addEdge(new Edge(depotNode, pkgNode, calculateDistance(depotNode, pkgNode)));
             }
@@ -71,13 +73,13 @@ export async function createGraphAndSolutionFromSchedule(schedule: DeliverySched
     // Create nodes for depot, assuming all schedules share the same depot
     // TODO: Change depot coordinates by pulling from DB
     const depotCoordinates = { lat: 53.403782, lng: -2.971970 };
-    const depotNode = new Node(null, depotCoordinates, true);
+    const depotNode = new RouteNode(null, depotCoordinates, true);
     graph.addNode(depotNode);
 
     // Create nodes for packages and edges from depot to each package
     for (const pkg of schedule.package_order) {
         const coordinates = { lat: pkg.recipient_address_lat as number, lng: pkg.recipient_address_lng as number };
-        const pkgNode = new Node(pkg, coordinates);
+        const pkgNode = new RouteNode(pkg, coordinates);
         graph.addNode(pkgNode);
         graph.addEdge(new Edge(depotNode, pkgNode, calculateDistance(depotNode, pkgNode)));
     }

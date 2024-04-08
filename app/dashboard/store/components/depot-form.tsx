@@ -26,7 +26,7 @@ import { toast } from "@/components/ui/use-toast"
 import { db } from "@/lib/db/db"
 import { useEffect, useState } from "react"
 import { geocodeAddress as geocoder } from "@/lib/google-maps/geocoder"
-import { Depot } from "@/types/depot"
+import { Depot } from "@/types/db/Depot"
 import { Loader2 } from "lucide-react"
 import { MdEdit } from "react-icons/md"
 

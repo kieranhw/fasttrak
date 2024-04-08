@@ -1,8 +1,8 @@
 import { supabase } from "@/lib/supabase/client";
-import { Package, CurrentState, PackageStatus } from "@/types/package";
+import { Package, CurrentState, PackageStatus } from "@/types/db/Package";
 import { UUID } from "crypto";
 import { db } from "./db";
-import { DeliveryStatus } from "@/types/delivery-schedule";
+import { DeliveryStatus } from "@/types/db/DeliverySchedule";
 import { cookies } from "next/headers";
 
 // Fetch all packages for a user

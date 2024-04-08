@@ -1,9 +1,9 @@
 import { PriorityQueue } from "@/lib/scheduling/priority-queue";
-import { VRPSolution, VehicleRoute } from "../../models/vrp";
+import { VRPSolution, VehicleRoute } from "../../model/vrp";
 import { routeFitness } from "./fitness";
 import { calculateTraversalMins } from "@/lib/scheduling/create-schedules";
-import { calculateDistance } from "../../models/graph";
-import { ScheduleProfile } from "@/types/schedule-profile";
+import { calculateDistance } from "../../model/Graph";
+import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 
 export function insert(offspring: VRPSolution, remainingPackages: PriorityQueue , profile: ScheduleProfile): VRPSolution {
     // 1. Peek node from priority queue 

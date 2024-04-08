@@ -1,5 +1,6 @@
-import { VRPSolution, VehicleRoute } from "../routing/models/vrp";
-import { Node, calculateDistance } from "../routing/models/graph";
+import { VRPSolution, VehicleRoute } from "../routing/model/vrp";
+import { RouteNode } from "../routing/model/RouteNode";
+import { calculateDistance } from "../utils/CalculateDistance";
 import { calculateTraversalMins } from "../scheduling/create-schedules";
 import { loader } from "./loader";
 
@@ -16,43 +17,51 @@ interface VRP {
     avgSpeed: number;
 }
 
+/**
+ * Calculate the estimated distance multiplier and average speed for the solution.
+ * 
+ * This is only used for calculating the estimated metrics for optimisation, and not for calculating
+ * the actual distance and time for the routes.
+ * 
+ * @param solution - VRPSolution object containing all of the routes
+ * @returns Promise of VRP object containing the updated VRPSolution, distance multiplier, and average speed
+ */
 export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
-    const test = true;
+    // Enable test mode to bypass calling Google Maps API
+    const test: Boolean = false;
+
     if (test == true) {
         const distanceMultiplier = 1.5;
         const avgSpeed = 20;
         solution.loadMetrics(avgSpeed, distanceMultiplier);
-        return {solution, distanceMultiplier ,avgSpeed};
+        return { solution, distanceMultiplier, avgSpeed };
     }
 
-    if (!service) {
-        await initDirectionsService();
-    }
+    if (!service) await initDirectionsService();
 
     const responses = [];
-    let totalActualDistance = 0;
-    let totalActualTime = 0;
-    let totalEucDistance = 0;
+    let totalActualDistanceMiles = 0;
+    let totalActualTimeHours = 0;
+    let totalEucDistanceMiles = 0;
     let totalEucDuration = 0;
 
     for (const route of solution.routes) {
-
         // Filter out route nodes which have duplicate addresses
-        const uniqueNodes: Node[] = route.nodes.filter((node, index, self) => {
+        const uniqueNodes: RouteNode[] = route.nodes.filter((node, index, self) => {
             const firstIndex = self.findIndex(n => n.pkg?.recipient_address === node.pkg?.recipient_address);
             return firstIndex === index;
         },);
 
         // Determine the indices of the nodes to be selected
         const selectedIndices = createEvenlySpreadIndices(uniqueNodes.length);
-        const nodes: Node[] = selectedIndices.map(index => uniqueNodes[index]);
+        const nodes: RouteNode[] = selectedIndices.map(index => uniqueNodes[index]);
 
         // Get total euclidean distance for the selected nodes
         for (let i = 0; i < nodes.length - 1; i++) {
             const node = nodes[i];
             const nextNode = nodes[i + 1];
             const distance = calculateDistance(node, nextNode);
-            totalEucDistance += distance;
+            totalEucDistanceMiles += distance;
             totalEucDuration += calculateTraversalMins(distance);
         }
 
@@ -77,35 +86,128 @@ export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
                 if (status !== "OK") {
                     console.error("Error:", status);
                 } else if (response) {
-                    console.log(response);
                     responses.push(response);
 
-
-                    response.routes[0].legs.forEach((element, index) => {
-                        const distanceMeters = element.distance?.value; // returns in meters
-                        const durationSeconds = element.duration?.value; // returns in seconds
+                    // Calculate total actual distance and time for each leg of the route
+                    response.routes[0].legs.forEach((element) => {
+                        const distanceMeters = element.distance?.value;
+                        const durationSeconds = element.duration?.value;
                         if (distanceMeters && durationSeconds) {
-                            totalActualDistance += distanceMeters / 1609;  // convert to miles
-                            totalActualTime += durationSeconds / 3600; // convert to hours
+                            // Convert units
+                            totalActualDistanceMiles += distanceMeters / 1609;
+                            totalActualTimeHours += durationSeconds / 3600;
                         }
                     });
-
                 }
             }
         );
-
-
     }
 
-    // calculate average speed
-    const avgSpeed = totalActualDistance / totalActualTime;
-    const distanceMultiplier = totalActualDistance / totalEucDistance;
+    const avgSpeed = totalActualDistanceMiles / totalActualTimeHours; // miles per hour
+    const distanceMultiplier = totalActualDistanceMiles / totalEucDistanceMiles; // ratio of actual distance to euclidean distance
 
+    // Update the solution with the calculated metrics
     solution.loadMetrics(avgSpeed, distanceMultiplier);
 
-    return {solution, distanceMultiplier, avgSpeed}; 
+    return { solution, distanceMultiplier, avgSpeed };
 }
 
+/**
+ * Calculate the actual distance and time values for each route using the Google Maps Directions API.
+ * 
+ * This is used to update the routes with the actual distance and time travelled by the vehicle. The API
+ * returns the actual distance and time between each node in the route, the route object is updated with these values.
+ * 
+ * The API requests are done in chunks of 25 as the API has a limit of 25 waypoints per request.
+ * 
+ * @param route - VehicleRoute object containing the route nodes and package information
+ */
+export async function calculateActualTravel(route: VehicleRoute): Promise<void> {
+    if (!service) await initDirectionsService();
+
+    // Store the accumulated actual distance and time for the route
+    let totalActualDuration = 0;
+    let totalActualDistance = 0;
+    let responseRouteLegs = 0;
+
+    // Separate the depot and customer locations, then create an array of all nodes
+    const depot = new google.maps.LatLng(route.depotNode.coordinates.lat, route.depotNode.coordinates.lng);
+    const customerLocations = route.nodes.map(node => new google.maps.LatLng(node.coordinates.lat, node.coordinates.lng))
+        .filter((location) => location.lat() !== depot.lat() && location.lng() !== depot.lng());
+    const allNodes = [depot, ...customerLocations, depot];
+
+    console.log("Estimated Metrics For Route: " + customerLocations.length + " packages")
+    console.log(route.actualDistanceMiles.toFixed(2) + " miles")
+    console.log(route.actualTimeMins.toFixed(2) + " minutes")
+
+    // Divide the nodes into chunks of 25 waypoints
+    let chunks: google.maps.LatLng[][] = [];
+
+    for (let i = 0; i < allNodes.length; i += 25) {
+        let chunk = allNodes.slice(i, i + 25);
+        chunks.push(chunk);
+    }
+
+    // Ensure each chunk is of minimum size 3 and maximum size 25
+    if (chunks.length > 1 && chunks[chunks.length - 1].length < 3) {
+        const lastChunk = chunks[-1];
+        const secondLastChunk = chunks[-2];
+
+        // Move nodes from the second last chunk to the last chunk until it has at least 3 nodes
+        if (lastChunk !== undefined && secondLastChunk !== undefined) {
+            while (lastChunk.length < 3) {
+                lastChunk.unshift(secondLastChunk.pop()!);
+            }
+        } else {
+            alert("Error: Unable to adjust chunks");
+            return;
+        }
+    }
+
+    // Iterate through the chunks of 25 waypoints
+    for (let i = 0; i < chunks.length; i++) {
+        const chunk = chunks[i];
+        await service.route(
+            {
+                origin: chunk[0] as google.maps.LatLng,
+                destination: chunk[chunk.length - 1] as google.maps.LatLng,
+                waypoints: chunk.slice(1, -1).map(waypoint => ({ location: waypoint })),
+                travelMode: google.maps.TravelMode.DRIVING,
+                unitSystem: google.maps.UnitSystem.IMPERIAL,
+                avoidHighways: false,
+                avoidTolls: true,
+                drivingOptions: {
+                    departureTime: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1, 7),
+                    trafficModel: google.maps.TrafficModel.PESSIMISTIC,
+                },
+            },
+            (response, status) => {
+                if (status !== "OK") {
+                    console.error("Error:", status);
+                } else if (response) {
+                    response.routes[0].legs.forEach((element, index) => {
+                        responseRouteLegs++;
+                        const durationSeconds = element.duration?.value; // returns in seconds
+                        const distanceMeters = element.distance?.value; // returns in meters
+                        if (durationSeconds && distanceMeters) {
+                            totalActualDuration += durationSeconds / 3600; // convert to hours
+                            totalActualDistance += distanceMeters / 1609;  // convert to miles
+                        }
+                    });
+                }
+            }
+        );
+    }
+
+    // Modify the route object with the actual distance and time
+    route.actualDistanceMiles = totalActualDistance;
+    route.actualTimeMins = totalActualDuration * 60;
+    route.actualTimeCalculated = true;
+
+    console.log("Actual Metrics for Route: " + responseRouteLegs + " legs")
+    console.log(route.actualDistanceMiles.toFixed(2) + " miles")
+    console.log(route.actualTimeMins.toFixed(2) + " minutes")
+}
 
 function createEvenlySpreadIndices(length: number, maxIndices: number = 25): number[] {
     const indices: number[] = [0]; // Start with index 0
@@ -136,53 +238,4 @@ function createEvenlySpreadIndices(length: number, maxIndices: number = 25): num
     }
 
     return indices;
-}
-
-// Function to calculate real times between each node in the route, splits into 25 waypoints to allow for google maps api limitations
-export async function calculateRealTimes(route: VehicleRoute) : Promise<void> {
-    if (!service) {
-        await initDirectionsService();
-    }
-
-    let totalActualDuration = 0;
-    let totalActualDistance = 0;
-    const origin = new google.maps.LatLng(route.nodes[0].coordinates.lat, route.nodes[0].coordinates.lng); // Starting at node 0 (depot)
-    const destinations = route.nodes.map(pkg => new google.maps.LatLng(pkg.coordinates.lat, pkg.coordinates.lng));
-    const responses = [];
-    for (let i = 0; i < destinations.length; i += 25) {
-        const chunk = destinations.slice(i, i + 25);
-        await service.route(
-            {
-                origin: origin,
-                destination: origin,
-                waypoints: chunk.map(destination => ({ location: destination })),
-                travelMode: google.maps.TravelMode.DRIVING,
-                unitSystem: google.maps.UnitSystem.IMPERIAL,
-                avoidHighways: false,
-                avoidTolls: true,
-                drivingOptions: {
-                    departureTime: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1, 7),
-                    trafficModel: google.maps.TrafficModel.PESSIMISTIC,
-                },
-            },
-            (response, status) => {
-                if (status !== "OK") {
-                    console.error("Error:", status);
-                } else if (response) {
-                    console.log(response);
-                    responses.push(response);
-                    response.routes[0].legs.forEach((element, index) => {
-                        const durationSeconds = element.duration?.value; // returns in seconds
-                        const distanceMeters = element.distance?.value; // returns in meters
-                        if (durationSeconds && distanceMeters) {
-                            totalActualDuration += durationSeconds / 3600; // convert to hours
-                            totalActualDistance += distanceMeters / 1609;  // convert to miles
-                        }
-                    });
-                }
-            }
-        );
-    }
-    route.actualDistanceMiles = totalActualDistance;
-    route.actualTimeMins = totalActualDuration * 60;
 }

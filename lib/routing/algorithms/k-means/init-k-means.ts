@@ -1,10 +1,13 @@
-import { Package } from "@/types/package";
-import { Vehicle } from "@/types/vehicle";
-import { Graph, Node, Edge, createGraph, calculateDistance } from '../../models/graph';
-import { VehicleRoute, VRPSolution } from '../../models/vrp';
+import { Package } from "@/types/db/Package";
+import { Vehicle } from "@/types/db/Vehicle";
+import { Graph, createGraph } from '../../model/Graph';
+import { RouteNode } from '@/lib/routing/model/RouteNode';
+import { Edge } from '@/lib/routing/model/Edge';
+import { calculateDistance } from '@/lib/utils/CalculateDistance';
+import { VehicleRoute, VRPSolution } from '../../model/vrp';
 import { calculateTraversalMins } from "../../../scheduling/create-schedules";
 import { PriorityQueue } from "../../../scheduling/priority-queue";
-import { ScheduleProfile } from "@/types/schedule-profile";
+import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 import { initRandom } from "../rr-fifo/init-rr-fifo";
 import { calculateCentroidFromNodes, calculateCentroidNodeDistance, findShortestPathForNodes, kMeans } from "./k-means-utils";
 
@@ -73,7 +76,7 @@ export async function initKMeans(graph: Graph, vehicles: Vehicle[], profile: Sch
         const clusterQueue = clusterPriorityQueues[index];
 
         // Create a new route for the vehicle cluster
-        const route = new VehicleRoute(vehicle, graph.depot as Node, profile);
+        const route = new VehicleRoute(vehicle, graph.depot as RouteNode, profile);
         route.distanceMultiplier = distanceMultiplier;
         route.avgSpeed = avgSpeed;
 
@@ -85,7 +88,7 @@ export async function initKMeans(graph: Graph, vehicles: Vehicle[], profile: Sch
 
             if (nextNode == undefined) {
                 // set next node to depot
-                const depotNode = graph.depot as Node;
+                const depotNode = graph.depot as RouteNode;
                 nextNode = depotNode;
             }
 
@@ -111,7 +114,7 @@ export async function initKMeans(graph: Graph, vehicles: Vehicle[], profile: Sch
         }
 
         // Find shortest path for the route
-        const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
+        const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as RouteNode);
         route.nodes = shortestPath;
         route.updateMeasurements(deliveryTime);
 
@@ -162,7 +165,7 @@ export async function initKMeans(graph: Graph, vehicles: Vehicle[], profile: Sch
                 break;
             }
             // Find shortest path
-            const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
+            const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as RouteNode);
             route.nodes = shortestPath;
             route.updateMeasurements(deliveryTime);
         }
@@ -175,8 +178,8 @@ export async function initKMeans(graph: Graph, vehicles: Vehicle[], profile: Sch
 
     // Close each route and find the shortest path for each
     for (const route of solution.routes) {
-        route.closeRoute(graph.depot as Node);
-        const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as Node);
+        route.closeRoute(graph.depot as RouteNode);
+        const shortestPath = findShortestPathForNodes(route.nodes, graph.depot as RouteNode);
         route.nodes = shortestPath;
         route.updateMeasurements(deliveryTime);
     }

@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/table"
 
 import { Button } from "@/components/ui/button"
-import { Package } from "@/types/package"
+import { Package } from "@/types/db/Package"
 
 interface ConfirmDeliveryTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];

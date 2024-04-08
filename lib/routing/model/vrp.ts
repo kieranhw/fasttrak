@@ -1,13 +1,15 @@
-import { Vehicle } from "@/types/vehicle";
-import { calculateDistance } from "./graph";
-import { Package } from "@/types/package";
-import { Node } from "./graph";
+import { Vehicle } from "@/types/db/Vehicle";
+import { Package } from "@/types/db/Package";
+import { Graph, createGraph } from "@/lib/routing/model/Graph";
+import { RouteNode } from '@/lib/routing/model/RouteNode';
+import { Edge } from '@/lib/routing/model/Edge';
+import { calculateDistance } from '@/lib/utils/CalculateDistance';
 import { calculateTraversalMins } from "../../scheduling/create-schedules";
-import { ScheduleProfile } from "@/types/schedule-profile";
+import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 
 // Model of one individual vehicle route
 export class VehicleRoute {
-    public nodes: Node[] = [];
+    public nodes: RouteNode[] = [];
 
     // measurements
     public eucTimeMins: number = 0;  // euclidean time in minutes
@@ -20,10 +22,11 @@ export class VehicleRoute {
     public distanceMultiplier: number = 0; // DM
     public actualTimeMins: number = 0;  // in minutes
     public actualDistanceMiles: number = 0; // distance in miles
+    public actualTimeCalculated: boolean = false;
 
     constructor(
         public vehicle: Vehicle,
-        public depotNode: Node, // depot node
+        public depotNode: RouteNode, // depot node
         public scheduleProfile: ScheduleProfile,
     ) {
         this.nodes.push(depotNode);
@@ -31,7 +34,7 @@ export class VehicleRoute {
 
     clone(): VehicleRoute {
         const clonedRoute = new VehicleRoute(this.vehicle, this.depotNode.clone(), this.scheduleProfile);
-        // Properly clone each Node
+        // Properly clone each RouteNode
         clonedRoute.nodes = this.nodes.map(node => node.clone());
 
         clonedRoute.eucTimeMins = this.eucTimeMins;
@@ -48,10 +51,10 @@ export class VehicleRoute {
     }
 
     // Check if the vehicle can add a package to the route
-    canAddPackage(pkg: Package, pkgNode: Node, timeRequired: number, timeWindowhours: number): boolean {
+    canAddPackage(pkg: Package, pkgNode: RouteNode, timeRequired: number, timeWindowhours: number): boolean {
         // update measurements
         this.updateMeasurements(this.scheduleProfile.delivery_time);
-        
+
         // Convert tw to minutes
         const timeWindowMins = (timeWindowhours * 60);
 
@@ -67,7 +70,7 @@ export class VehicleRoute {
     }
 
     // Check if the vehicle can add a group of packages to the route
-    canAddGroup(pkgGroup: Node[], timeRequired: number, timeWindowHours: number): boolean {
+    canAddGroup(pkgGroup: RouteNode[], timeRequired: number, timeWindowHours: number): boolean {
         let groupWeight = 0;
         let groupVolume = 0;
 
@@ -95,13 +98,13 @@ export class VehicleRoute {
     }
 
 
-    addNode(node: Node, timeRequired: number): void {
+    addNode(node: RouteNode, timeRequired: number): void {
         this.nodes.push(node);
         this.updateMeasurements(this.scheduleProfile.delivery_time);
     }
 
     // Close the route by adding the depot node
-    closeRoute(depot: Node): void {
+    closeRoute(depot: RouteNode): void {
         const lastNode = this.nodes[this.nodes.length - 1];
         const cost = calculateDistance(lastNode, depot);
         const timeRequired = calculateTraversalMins(cost, this.avgSpeed);
@@ -119,6 +122,12 @@ export class VehicleRoute {
      * @returns void
      */
     updateMeasurements(deliveryTime: number): void {
+        // Do not recalculate if already finalised with real metrics
+        if (this.actualTimeCalculated == true) {
+            this.actualTimeMins = this.actualTimeMins + this.scheduleProfile.delivery_time * this.nodes.length;
+            return
+        }
+
         this.eucTimeMins = 0;
         this.eucDistanceMiles = 0;
         this.currentVolume = 0;
@@ -149,7 +158,7 @@ export class VehicleRoute {
 
             // Add the total time and distance
             this.eucTimeMins += timeRequired;
-            this.eucDistanceMiles += distance;            
+            this.eucDistanceMiles += distance;
         }
 
         if (this.avgSpeed !== 0 && this.distanceMultiplier !== 0) {

@@ -28,7 +28,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 import { FaCopy } from "react-icons/fa"
 import { IoMdRefresh } from "react-icons/io";
-import { Store } from "@/types/store"
+import { Store } from "@/types/db/Store"
 import { SetStateAction, useEffect, useState } from "react"
 import { db } from "@/lib/db/db"
 import { generateIC } from "@/lib/utils/generate-ids"

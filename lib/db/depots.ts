@@ -1,11 +1,11 @@
 import { supabase } from "@/lib/supabase/client";
-import { UserProfile } from "@/types/user-profile";
+import { UserProfile } from "@/types/db/UserProfile";
 import { UUID } from "crypto";
 import { db } from "./db";
-import { Depot } from "@/types/depot";
+import { Depot } from "@/types/db/Depot";
 import { cookies } from "next/headers";
 import { PostgrestError } from "@supabase/supabase-js";
-import { Store } from "@/types/store";
+import { Store } from "@/types/db/Store";
 
 // Create new Depot
 const createDepot = async (depot: Omit<Depot, 'id'>): Promise<{ data: Depot | null, error: PostgrestError | null }> => {

@@ -1,5 +1,5 @@
-import { DeliverySchedule } from '@/types/delivery-schedule';
-import { Package } from '@/types/package';
+import { DeliverySchedule } from '@/types/db/DeliverySchedule';
+import { Package } from '@/types/db/Package';
 import { format } from 'date-fns';
 
 export function downloadGPX(schedule: DeliverySchedule): void {

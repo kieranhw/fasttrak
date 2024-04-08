@@ -1,6 +1,6 @@
 import { createSchedules } from '@/lib/scheduling/create-schedules';
-import { Vehicle } from '@/types/vehicle';
-import { Package, PriorityType } from "@/types/package"
+import { Vehicle } from '@/types/db/Vehicle';
+import { Package, PriorityType } from "@/types/db/Package"
 import { addressData } from "@/lib/data/liverpool-addresses";
 import { supabase } from "@/lib/supabase/client";
 

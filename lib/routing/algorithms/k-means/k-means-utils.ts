@@ -1,13 +1,13 @@
 import { PriorityQueue } from "@/lib/scheduling/priority-queue";
-import { calculateDistance } from "../../models/graph";
-import { Node } from "../../models/graph";
+import { calculateDistance } from "../../../utils/CalculateDistance";
+import { RouteNode } from '@/lib/routing/model/RouteNode';
 
 // Type declarations
 export type Coordinate = [number, number];
 
 export type ClusterWithNodes = {
     index: number;
-    nodes: Node[];
+    nodes: RouteNode[];
 };
 
 export function kMeans(queue: PriorityQueue, k: number, maxIterations = 100, recursionDepth = 0): PriorityQueue[] | Error {
@@ -17,7 +17,7 @@ export function kMeans(queue: PriorityQueue, k: number, maxIterations = 100, rec
     const originalNodes = queue.getData().slice();
 
     // Dequeue all packages into nodes array
-    const nodes: Node[] = [];
+    const nodes: RouteNode[] = [];
     while (!queue.isEmpty()) {
         const node = queue.dequeue();
         if (node) {
@@ -92,7 +92,7 @@ export function kMeans(queue: PriorityQueue, k: number, maxIterations = 100, rec
     return priorityQueueClusters;
 }
 
-export function calculateCentroidFromNodes(nodes: Node[]): Coordinate {
+export function calculateCentroidFromNodes(nodes: RouteNode[]): Coordinate {
     const sum = nodes.reduce((acc, node) => {
         if (!node.pkg) return acc;
         acc[0] += node.pkg!.recipient_address_lat;
@@ -102,12 +102,12 @@ export function calculateCentroidFromNodes(nodes: Node[]): Coordinate {
     return [sum[0] / nodes.length, sum[1] / nodes.length];
 }
 
-export function calculateCentroidNodeDistance(centroid: Coordinate, node: Node): number {
+export function calculateCentroidNodeDistance(centroid: Coordinate, node: RouteNode): number {
     return Math.hypot(centroid[0] - node.pkg!.recipient_address_lat, centroid[1] - node.pkg!.recipient_address_lng);
 }
 
-export function findShortestPathForNodes(cluster: Node[], depot: Node): Node[] {
-    const path: Node[] = [];
+export function findShortestPathForNodes(cluster: RouteNode[], depot: RouteNode): RouteNode[] {
+    const path: RouteNode[] = [];
     let remainingNodes = [...cluster];
     let currentNode = depot;
 
@@ -126,8 +126,8 @@ export function findShortestPathForNodes(cluster: Node[], depot: Node): Node[] {
 }
 
 
-export function findNearestNeighbour(currentNode: Node, nodes: Node[]): Node | undefined {
-    let nearestNode: Node | undefined;
+export function findNearestNeighbour(currentNode: RouteNode, nodes: RouteNode[]): RouteNode | undefined {
+    let nearestNode: RouteNode | undefined;
     let shortestDistance = Number.MAX_VALUE;
 
     for (const node of nodes) {

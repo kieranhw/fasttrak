@@ -1,11 +1,11 @@
-import { Depot } from "@/types/depot"
-import { Store } from "@/types/store"
-import { UserProfile } from "@/types/user-profile"
+import { Depot } from "@/types/db/Depot"
+import { Store } from "@/types/db/Store"
+import { UserProfile } from "@/types/db/UserProfile"
 import { PostgrestError } from "@supabase/supabase-js"
 import { db } from "./db"
 import { supabase } from "../supabase/client"
-import { DeliverySchedule } from "@/types/delivery-schedule"
-import { DashboardInfo } from "@/types/misc"
+import { DeliverySchedule } from "@/types/db/DeliverySchedule"
+import { DashboardInfo } from "@/types/db/misc"
 
 
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Vehicle } from '@/types/vehicle'
+import { Vehicle } from '@/types/db/Vehicle'
 
 import { MoreHorizontal } from "lucide-react"
 

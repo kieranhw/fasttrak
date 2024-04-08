@@ -30,13 +30,13 @@ import { FaCopy } from "react-icons/fa"
 import { IoMdRefresh } from "react-icons/io";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { db } from "@/lib/db/db"
-import { Store } from "@/types/store"
+import { Store } from "@/types/db/Store"
 import { PostgrestError } from "@supabase/supabase-js"
 import { useEffect, useState } from "react"
 import { generateIC } from "@/lib/utils/generate-ids"
 import { geocodeAddress as geocoder } from "@/lib/google-maps/geocoder"
 import { sanitizeFloat } from "@/lib/utils/validation"
-import { Depot } from "@/types/depot"
+import { Depot } from "@/types/db/Depot"
 
 export const depotFormSchema = z.object({
     name: z.string({

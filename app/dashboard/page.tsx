@@ -78,16 +78,16 @@ import {
 } from "@/components/ui/tooltip"
 import Image from "next/image";
 import { db } from "@/lib/db/db";
-import { DashboardInfo } from "@/types/misc";
+import { DashboardInfo } from "@/types/db/misc";
 import { Skeleton } from "@/components/ui/skeleton"
 import { format, add, set } from 'date-fns';
 import { FaWarehouse } from "react-icons/fa";
 import { IoMdNotifications } from "react-icons/io";
-import { Notification } from "@/types/misc";
+import { Notification } from "@/types/db/misc";
 import { getNotifications } from "@/lib/utils/notification-gen";
 import { supabase } from "@/lib/supabase/client";
-import { Package, PriorityType } from "@/types/package";
-import { DeliverySchedule } from "@/types/delivery-schedule";
+import { Package, PriorityType } from "@/types/db/Package";
+import { DeliverySchedule } from "@/types/db/DeliverySchedule";
 import { TbPackageExport } from "react-icons/tb";
 import { FaTruckFast } from "react-icons/fa6";
 

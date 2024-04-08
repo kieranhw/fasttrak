@@ -16,7 +16,7 @@ import { useState } from "react";
 import { generatePackages } from "@/lib/data/generatePackages";
 import { createClient } from "@/lib/supabase/client";
 import evenData from "@/lib/data/experiment-1/even-data.json";
-import { Package } from "@/types/package";
+import { Package } from "@/types/db/Package";
 
 export default function DemoTools() {
     const supabase = createClient();

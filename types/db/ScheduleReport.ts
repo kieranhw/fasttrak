@@ -1,5 +1,5 @@
 import { UUID } from "crypto";
-import { Vehicle } from "./vehicle";
+import { Vehicle } from "./Vehicle";
 
 
 export enum ScheduleInitialiser {

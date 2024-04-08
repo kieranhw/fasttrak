@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import { VehicleSchema } from "./vehicle-schema";
-import { Vehicle } from "@/types/vehicle";
+import { Vehicle } from "@/types/db/Vehicle";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 

@@ -10,10 +10,10 @@ import { ScheduleDetails } from "./components/schedule-details";
 import { useEffect, useState } from "react";
 import { ScheduleAnalysis } from "./components/schedule-analysis";
 import { useSearchParams } from "next/navigation";
-import { DeliverySchedule } from "@/types/delivery-schedule";
-import { Store } from "@/types/store";
+import { DeliverySchedule } from "@/types/db/DeliverySchedule";
+import { Store } from "@/types/db/Store";
 import { db } from "@/lib/db/db";
-import { Depot } from "@/types/depot";
+import { Depot } from "@/types/db/Depot";
 
 export default function ScheduleDeliveries() {
   // TODO: Fetch schedules here instead of in details

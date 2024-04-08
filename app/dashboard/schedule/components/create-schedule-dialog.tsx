@@ -15,13 +15,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Select, SelectTrigger, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Vehicle } from "@/types/vehicle";
+import { Vehicle } from "@/types/db/Vehicle";
 import { format } from "date-fns";
 import { BiSolidTruck } from "react-icons/bi";
 import { PiPackageBold } from "react-icons/pi";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from 'lucide-react';
-import { OptimisationProfile, ScheduleProfile } from '@/types/schedule-profile';
+import { OptimisationProfile, ScheduleProfile } from '@/types/db/ScheduleProfile';
 import { MdError, MdInfoOutline } from 'react-icons/md';
 import { db } from '@/lib/db/db';
 import { HiLightningBolt } from 'react-icons/hi';

@@ -3,7 +3,7 @@
 import { SetStateAction, useEffect, useState } from "react";
 import { columns } from "./data-table/columns";
 import { DataTable } from "./data-table/data-table";
-import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule";
+import { DeliverySchedule, DeliveryStatus } from "@/types/db/DeliverySchedule";
 import { createClient } from "@/lib/supabase/client";
 
 import { format } from "date-fns"
@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/dialog"
 
 import { createSchedules } from "@/lib/scheduling/create-schedules";
-import { createGraphAndSolutionFromScheduleArray } from "@/lib/scheduling/schedules-to-graph";
+import { createGraphAndSolutionFromScheduleArray } from "@/lib/utils/schedules-to-graph";
 
 import { db } from "@/lib/db/db";
 import { displayGraph } from "@/lib/utils/cytoscape-data";
@@ -40,13 +40,13 @@ import { CytoscapeGraph } from "@/components/CytoscapeGraph";
 import { MdRefresh } from "react-icons/md"
 import { useRouter, useSearchParams } from "next/navigation";
 import { ScheduleDialogContent } from "./create-schedule-dialog";
-import { ScheduleProfile } from "@/types/schedule-profile";
-import { CurrentState, PackageStatus } from "@/types/package";
+import { ScheduleProfile } from "@/types/db/ScheduleProfile";
+import { CurrentState, PackageStatus } from "@/types/db/Package";
 import { BreadcrumbLink } from "@/components/ui/breadcrumb-link";
 import { ScheduleReport } from "./pdf-generation";
 import { GetServerSideProps } from 'next';
-import { Store } from "@/types/store";
-import { Depot } from "@/types/depot";
+import { Store } from "@/types/db/Store";
+import { Depot } from "@/types/db/Depot";
 
 
 

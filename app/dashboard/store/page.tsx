@@ -4,13 +4,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { StoreForm } from './components/store-form';
 import { db } from '@/lib/db/db';
-import { Store } from '@/types/store';
+import { Store } from '@/types/db/Store';
 import { CreateStoreForm } from './components/create-store-form';
 import { CreateDepotForm } from './components/depot-form';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
-import { Depot } from '@/types/depot';
+import { Depot } from '@/types/db/Depot';
 import { JoinStoreForm } from './components/join-store-form';
 
 export default function Store() {

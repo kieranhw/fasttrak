@@ -1,9 +1,9 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, PDFViewer, Font } from "@react-pdf/renderer";
-import { DeliverySchedule } from '@/types/delivery-schedule';
-import { Store } from '@/types/store';
-import { Depot } from '@/types/depot';
-import { PriorityType } from '@/types/package';
+import { DeliverySchedule } from '@/types/db/DeliverySchedule';
+import { Store } from '@/types/db/Store';
+import { Depot } from '@/types/db/Depot';
+import { PriorityType } from '@/types/db/Package';
 
 
 const styles = StyleSheet.create({

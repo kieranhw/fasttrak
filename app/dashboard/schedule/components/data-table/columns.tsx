@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef, RowSelectionState } from "@tanstack/react-table"
-import { Package } from '@/types/package'
+import { Package } from '@/types/db/Package'
 
 import { MoreHorizontal } from "lucide-react"
 
@@ -28,8 +28,8 @@ import {
 import Link from "next/link"
 import { useState } from "react"
 import { UUID } from "crypto"
-import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule"
-import { Vehicle } from "@/types/vehicle"
+import { DeliverySchedule, DeliveryStatus } from "@/types/db/DeliverySchedule"
+import { Vehicle } from "@/types/db/Vehicle"
 import { db } from "@/lib/db/db"
 import {
     HoverCard,

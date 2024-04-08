@@ -1,8 +1,8 @@
 import { supabase } from "@/lib/supabase/client";
-import { UserProfile } from "@/types/user-profile";
+import { UserProfile } from "@/types/db/UserProfile";
 import { UUID } from "crypto";
 import { db } from "./db";
-import { Store } from "@/types/store";
+import { Store } from "@/types/db/Store";
 import { PostgrestError } from "@supabase/supabase-js";
 
 // Fetch store as type Store from store id saved in user profile

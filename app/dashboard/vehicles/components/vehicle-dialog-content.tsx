@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { VehicleForm } from "./add-vehicle-form/vehicle-form";
 import { VehicleSchema } from "./add-vehicle-form/vehicle-schema";
 import * as z from "zod";
-import { Vehicle } from '@/types/vehicle';
+import { Vehicle } from '@/types/db/Vehicle';
 
 interface VehicleDialogProps {
   vehicle?: Vehicle;

@@ -1,7 +1,7 @@
 import { UUID } from "crypto";
-import { Package } from "./package";
-import { Vehicle } from "./vehicle";
-import { ScheduleReport } from "./schedule-report";
+import { Package } from "./Package";
+import { Vehicle } from "./Vehicle";
+import { ScheduleReport } from "./ScheduleReport";
 
 export enum DeliveryStatus {
     Scheduled = "Scheduled",

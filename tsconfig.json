@@ -23,6 +23,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "lib/routing/algorithm-1 backup", "lib/routing/algorithm1.mjs", "lib/routing/models/graph.ts", "lib/data/liverpool-addresses.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "lib/routing/algorithm-1 backup", "lib/routing/algorithm1.mjs", "lib/routing/model/Graph.ts", "lib/data/liverpool-addresses.js"],
   "exclude": ["node_modules"]
 }

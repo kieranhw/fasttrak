@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useEffect, useState } from 'react';
-import { Package } from '@/types/package';
+import { Package } from '@/types/db/Package';
 import { supabase } from '@/lib/supabase/client';
 import { PackagesTable } from '../(components)/packages-table';
 import { columns } from './components/columns';

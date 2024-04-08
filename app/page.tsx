@@ -10,7 +10,7 @@ import './globals.css'
 
 import bgFull from '@/public/images/bgFull.jpg'
 import { useEffect, useState } from 'react';
-import { UserProfile } from '@/types/user-profile';
+import { UserProfile } from '@/types/db/UserProfile';
 import { MdLowPriority } from 'react-icons/md';
 import { LiaClipboardListSolid } from "react-icons/lia";
 import { cookies } from "next/headers";

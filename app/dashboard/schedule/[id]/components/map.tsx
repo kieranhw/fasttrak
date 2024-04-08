@@ -1,4 +1,4 @@
-import { DeliverySchedule } from '@/types/delivery-schedule';
+import { DeliverySchedule } from '@/types/db/DeliverySchedule';
 import { APIProvider, AdvancedMarker, Map, Marker } from '@vis.gl/react-google-maps';
 import MarkerWithInfowindow from './marker';
 

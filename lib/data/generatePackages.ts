@@ -1,6 +1,6 @@
-import { CurrentState, Package, PackageStatus, PriorityType } from "@/types/package"
-import { Vehicle } from "@/types/vehicle"
-import { DeliverySchedule, DeliveryStatus } from "@/types/delivery-schedule"
+import { CurrentState, Package, PackageStatus, PriorityType } from "@/types/db/Package"
+import { Vehicle } from "@/types/db/Vehicle"
+import { DeliverySchedule, DeliveryStatus } from "@/types/db/DeliverySchedule"
 import { UUID } from "crypto"
 import { faker } from '@faker-js/faker';
 import { generateFT } from "@/lib/utils/generate-ids";

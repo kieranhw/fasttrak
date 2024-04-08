@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { displayGraph } from '../lib/utils/cytoscape-data'
-import { Graph } from '@/lib/routing/models/graph';
-import { VRPSolution } from '@/lib/routing/models/vrp';
+import { Graph } from '@/lib/routing/model/Graph';
+import { VRPSolution } from '@/lib/routing/model/vrp';
 
 interface Props {
   graph: Graph;

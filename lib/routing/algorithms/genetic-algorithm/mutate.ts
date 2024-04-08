@@ -1,8 +1,9 @@
-import { VehicleRoute } from "../../models/vrp";
-import { Node, calculateDistance } from "../../models/graph";
-import { ScheduleProfile } from "@/types/schedule-profile";
+import { VehicleRoute } from "../../model/vrp";
+import { RouteNode } from '@/lib/routing/model/RouteNode';
+import { calculateDistance } from "@/lib/utils/CalculateDistance";
+import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 
-export function mutate(clonedRoute: VehicleRoute, depotNode: Node): VehicleRoute {
+export function mutate(clonedRoute: VehicleRoute, depotNode: RouteNode): VehicleRoute {
     // Randomly select a mutation strategy
     const mutationType = Math.floor(Math.random() * 4);
 
@@ -40,9 +41,9 @@ export function swapNodes(route: VehicleRoute): void {
     }
 }
 
-export function findShortestPathForNodes(route: VehicleRoute, depot: Node): VehicleRoute {
+export function findShortestPathForNodes(route: VehicleRoute, depot: RouteNode): VehicleRoute {
 
-    const path: Node[] = [];
+    const path: RouteNode[] = [];
     let remainingNodes = [...route.nodes];
     let currentNode = depot;
 
@@ -65,8 +66,8 @@ export function findShortestPathForNodes(route: VehicleRoute, depot: Node): Vehi
     return route;
 }
 
-export function findNearestNeighbour(currentNode: Node, nodes: Node[], distanceMultiplier: number): Node | undefined {
-    let nearestNode: Node | undefined;
+export function findNearestNeighbour(currentNode: RouteNode, nodes: RouteNode[], distanceMultiplier: number): RouteNode | undefined {
+    let nearestNode: RouteNode | undefined;
     let shortestDistance = Number.MAX_VALUE;
 
     for (const node of nodes) {
