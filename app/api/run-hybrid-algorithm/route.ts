@@ -14,6 +14,9 @@ type Data = {
     metrics: VRPMetrics;
 }
 
+// Maximum duration to run the serverless function
+export const maxDuration = 300;
+
 /**
  * POST request handler to run the hybrid algorithm server side.
  * 
@@ -23,7 +26,8 @@ type Data = {
 export async function POST(req: NextRequest) {
     if (req.method !== 'POST') {
         return NextResponse.json({
-            error: 'Method not allowed'
+            error: 'Method not allowed',
+            status: 405
         });
     }
 
@@ -42,7 +46,8 @@ export async function POST(req: NextRequest) {
         // If any of the body is missing, return an error
         if (!packagesData || !depot || !vehiclesData || !profile || !metrics) {
             return NextResponse.json({
-                error: 'Missing data in the request body'
+                error: 'Missing data in the request body',
+                status: 400
             });
         }
 
@@ -55,11 +60,13 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({
             vrpSolution,
-            scheduleReport
-        });
+            scheduleReport,
+            status: 200
+        },);
     } catch (error) {
         return NextResponse.json({
-            error: 'An error occurred'
+            error: 'An error occurred',
+            status: 500
         });
     }
 };
