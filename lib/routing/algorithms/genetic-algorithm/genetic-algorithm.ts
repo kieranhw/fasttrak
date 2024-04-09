@@ -1,4 +1,5 @@
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
+import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { PriorityQueue } from "../../../scheduling/priority-queue";
 import { RouteNode } from '@/lib/routing/model/RouteNode';
 import { crossover } from "./crossover";
@@ -6,7 +7,6 @@ import { routeFitness } from "./fitness";
 import {  mutate } from "./mutate";
 import { insert } from "./insert";
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
-
 
 export class GeneticAlgorithm {
     private bestGeneration: VRPSolution;
@@ -37,26 +37,27 @@ export class GeneticAlgorithm {
     }
 
     private evolveGeneration(generationNumber: number): void {
-        // Evolve the current generation
+        // 1. Update the measurements of the best generation
+        this.bestGeneration.updateRouteMeasurements();
 
-        // Step 2: Evaluate fitness of the set of VRPSolutions and aggregate the total fitness
+        // 2. Evaluate fitness of the bestGeneration and aggregate the total fitness
         let generationFitness = 0;
         for (const route of this.bestGeneration.routes) {
             route.scheduleProfile = this.scheduleProfile;
             generationFitness += routeFitness(route);
         }
 
-        // Create a deep copy of the best generation
+        // 3. Create a deep copy of the best generation
         let offspring = this.bestGeneration.clone();
 
-        // Step 4: Crossover
+        // 4. Crossover
         if (offspring.routes.length > 1) {
             offspring = crossover(offspring);
         }
 
         offspring.updateRouteMeasurements()
 
-        // Step 5: Mutation
+        // 5. Mutation
         for (const route of offspring.routes) {
             // 20% chance of mutation if there is more than one route, else always mutate
             if (Math.random() < 0.2 || offspring.routes.length === 1) {
@@ -65,10 +66,9 @@ export class GeneticAlgorithm {
             }
         }
 
-
         offspring.updateRouteMeasurements()
 
-        // Step 6: Evaluate fitness of new population
+        // 6. Evaluate fitness of new population
         let offspringFitness = 0;
         for (const route of offspring.routes) {
             offspringFitness += routeFitness(route);
@@ -79,6 +79,7 @@ export class GeneticAlgorithm {
             this.bestGeneration = offspring;
         }
 
+        // Log the fitness of the generation
         if (offspringFitness < generationFitness || generationNumber % 100 === 0) {
             this.generationFitness.push({ generation: generationNumber, fitness: generationFitness });
         }
@@ -91,6 +92,7 @@ export class GeneticAlgorithm {
             fitness += routeFitness(route);
         }
 
+        // Main loop
         for (let i = 0; i < this.generations; i++) {
             this.evolveGeneration(i);
 

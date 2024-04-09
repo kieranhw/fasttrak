@@ -4,7 +4,6 @@ import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { GeneticAlgorithm } from "./genetic-algorithm";
 
 export function routeFitness(route: VehicleRoute): number {
-    route.updateMeasurements(route.scheduleProfile.delivery_time);
 
     const TimeWindowMins = (route.scheduleProfile.time_window * 60); // Time window in mins
 
