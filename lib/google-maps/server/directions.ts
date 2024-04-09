@@ -1,16 +1,14 @@
+import { RouteNode } from "@/lib/routing/model/RouteNode";
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
 import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
-import { RouteNode } from "../routing/model/RouteNode";
-import { calculateDistance } from "../utils/calculate-distance";
-import { calculateTraversalMins } from "../scheduling/create-schedules";
-import { loader } from "./loader";
+import { calculateTraversalMins } from "@/lib/scheduling/create-schedules";
+import { calculateDistance } from "@/lib/utils/calculate-distance";
+import { Client, DirectionsRequest, LatLng, TravelMode, TravelRestriction, UnitSystem } from "@googlemaps/google-maps-services-js";
 
-let service: google.maps.DirectionsService;
 
-const initDirectionsService = async () => {
-    await loader.importLibrary("routes");
-    service = new google.maps.DirectionsService();
-};
+
+
+const client = new Client({});
 
 interface VRP {
     solution: VRPSolution;
@@ -38,7 +36,6 @@ export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
         return { solution, distanceMultiplier, avgSpeed };
     }
 
-    if (!service) await initDirectionsService();
 
     const responses = [];
     let totalActualDistanceMiles = 0;
@@ -69,39 +66,7 @@ export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
         const origin = new google.maps.LatLng(route.nodes[0].coordinates.lat, route.nodes[0].coordinates.lng); // Starting at node 0 (depot)
         const destinations = nodes.map(pkg => new google.maps.LatLng(pkg.coordinates.lat, pkg.coordinates.lng));
 
-        await service.route(
-            {
-                origin: origin,
-                destination: origin,
-                waypoints: destinations.map(destination => ({ location: destination })),
-                travelMode: google.maps.TravelMode.DRIVING,
-                unitSystem: google.maps.UnitSystem.IMPERIAL,
-                avoidHighways: false,
-                avoidTolls: true,
-                drivingOptions: {
-                    departureTime: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1, 7),
-                    trafficModel: google.maps.TrafficModel.PESSIMISTIC,
-                },
-            },
-            (response, status) => {
-                if (status !== "OK") {
-                    console.error("Error:", status);
-                } else if (response) {
-                    responses.push(response);
 
-                    // Calculate total actual distance and time for each leg of the route
-                    response.routes[0].legs.forEach((element) => {
-                        const distanceMeters = element.distance?.value;
-                        const durationSeconds = element.duration?.value;
-                        if (distanceMeters && durationSeconds) {
-                            // Convert units
-                            totalActualDistanceMiles += distanceMeters / 1609;
-                            totalActualTimeHours += durationSeconds / 3600;
-                        }
-                    });
-                }
-            }
-        );
     }
 
     const avgSpeed = totalActualDistanceMiles / totalActualTimeHours; // miles per hour
@@ -124,8 +89,6 @@ export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
  * @param route - VehicleRoute object containing the route nodes and package information
  */
 export async function calculateActualTravel(route: VehicleRoute): Promise<void> {
-    if (!service) await initDirectionsService();
-    
     const test: Boolean = true;
     if (test == true) {
         return;
@@ -141,10 +104,6 @@ export async function calculateActualTravel(route: VehicleRoute): Promise<void> 
     const customerLocations = route.nodes.map(node => new google.maps.LatLng(node.coordinates.lat, node.coordinates.lng))
         .filter((location) => location.lat() !== depot.lat() && location.lng() !== depot.lng());
     const allNodes = [depot, ...customerLocations, depot];
-
-    console.log("Estimated Metrics For Route: " + customerLocations.length + " packages")
-    console.log(route.actualDistanceMiles.toFixed(2) + " miles")
-    console.log(route.actualTimeMins.toFixed(2) + " minutes")
 
     // Divide the nodes into chunks of 25 waypoints
     let chunks: google.maps.LatLng[][] = [];
@@ -173,46 +132,40 @@ export async function calculateActualTravel(route: VehicleRoute): Promise<void> 
     // Iterate through the chunks of 25 waypoints
     for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
-        await service.route(
-            {
-                origin: chunk[0] as google.maps.LatLng,
-                destination: chunk[chunk.length - 1] as google.maps.LatLng,
-                waypoints: chunk.slice(1, -1).map(waypoint => ({ location: waypoint })),
-                travelMode: google.maps.TravelMode.DRIVING,
-                unitSystem: google.maps.UnitSystem.IMPERIAL,
-                avoidHighways: false,
-                avoidTolls: true,
-                drivingOptions: {
-                    departureTime: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1, 7),
-                    trafficModel: google.maps.TrafficModel.PESSIMISTIC,
-                },
-            },
-            (response, status) => {
-                if (status !== "OK") {
-                    console.error("Error:", status);
-                } else if (response) {
-                    response.routes[0].legs.forEach((element, index) => {
-                        responseRouteLegs++;
-                        const durationSeconds = element.duration?.value; // returns in seconds
-                        const distanceMeters = element.distance?.value; // returns in meters
-                        if (durationSeconds && distanceMeters) {
+
+        const directionsRequest: DirectionsRequest = {
+            params: {
+                origin: `${chunk[0].lat()},${chunk[0].lng()}`,
+                destination: `${chunk[chunk.length - 1].lat()},${chunk[chunk.length - 1].lng()}`, // Return to depot
+                waypoints: chunk.slice(1, -1).map(waypoint => `${waypoint.lat},${waypoint.lng}`),
+                mode: TravelMode.driving,
+                units: UnitSystem.imperial,
+                avoid: [TravelRestriction.tolls],
+                key: process.env.GOOGLE_MAPS_API_KEY!,
+            }
+        };
+
+        client.directions(directionsRequest)
+            .then((response) => {
+                if (response) {
+                    // Calculate total actual distance and time for each leg of the route
+                    response.data.routes[0].legs.forEach((element) => {
+                        const distanceMeters = element.distance?.value;
+                        const durationSeconds = element.duration?.value;
+                        if (distanceMeters && durationSeconds) {
+                            // Convert units
                             totalActualDuration += durationSeconds / 3600; // convert to hours
                             totalActualDistance += distanceMeters / 1609;  // convert to miles
                         }
                     });
                 }
-            }
-        );
+            });
     }
 
     // Modify the route object with the actual distance and time
     route.actualDistanceMiles = totalActualDistance;
     route.actualTimeMins = totalActualDuration * 60;
     route.actualTimeCalculated = true;
-
-    console.log("Actual Metrics for Route: " + responseRouteLegs + " legs")
-    console.log(route.actualDistanceMiles.toFixed(2) + " miles")
-    console.log(route.actualTimeMins.toFixed(2) + " minutes")
 }
 
 function createEvenlySpreadIndices(length: number, maxIndices: number = 25): number[] {

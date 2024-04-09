@@ -1,28 +1,22 @@
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
-import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { PriorityQueue } from "../../../scheduling/priority-queue";
-import { selectRandomSegment } from "./ga-utils";
-import { Graph, createGraph } from "../../model/Graph";
-import { calculateTraversalMins } from "@/lib/scheduling/create-schedules";
-import { FaThList } from "react-icons/fa";
 import { RouteNode } from '@/lib/routing/model/RouteNode';
 import { crossover } from "./crossover";
 import { routeFitness } from "./fitness";
-import { findShortestPathForNodes, mutate } from "./mutate";
+import {  mutate } from "./mutate";
 import { insert } from "./insert";
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
-import { calculateActualTravel } from "@/lib/google-maps/directions";
+
 
 export class GeneticAlgorithm {
     private bestGeneration: VRPSolution;
-    private deliveryNetwork: Graph;
     private remainingPackages: PriorityQueue;
     private scheduleProfile: ScheduleProfile
     private generationFitness: { generation: number, fitness: number }[];
+    private depot: RouteNode;
+    private generations: number;
 
-    constructor(initialPopulation: VRPSolution, graph: Graph, remainingPackages: PriorityQueue | RouteNode[], scheduleProfile: ScheduleProfile) {
-        this.deliveryNetwork = graph;
-
+    constructor(initialPopulation: VRPSolution, depot: RouteNode, remainingPackages: PriorityQueue | RouteNode[], scheduleProfile: ScheduleProfile, generations: number) {
         // Convert nodes to priority queue
         let packages = new PriorityQueue();
         if (remainingPackages instanceof PriorityQueue) {
@@ -34,7 +28,8 @@ export class GeneticAlgorithm {
             }
             packages = queue;
         }
-        
+        this.depot = depot;
+        this.generations = generations;
         this.remainingPackages = packages;
         this.bestGeneration = initialPopulation.clone();
         this.scheduleProfile = scheduleProfile;
@@ -65,7 +60,7 @@ export class GeneticAlgorithm {
         for (const route of offspring.routes) {
             // 20% chance of mutation if there is more than one route, else always mutate
             if (Math.random() < 0.2 || offspring.routes.length === 1) {
-                const mutatedRoute = mutate(route, this.deliveryNetwork.depot as RouteNode);
+                const mutatedRoute = mutate(route, this.depot);
                 offspring.routes[offspring.routes.indexOf(route)] = mutatedRoute;
             }
         }
@@ -73,7 +68,7 @@ export class GeneticAlgorithm {
 
         offspring.updateRouteMeasurements()
 
-        // Step 7: Evaluate fitness of new population
+        // Step 6: Evaluate fitness of new population
         let offspringFitness = 0;
         for (const route of offspring.routes) {
             offspringFitness += routeFitness(route);
@@ -89,20 +84,17 @@ export class GeneticAlgorithm {
         }
     }
 
-    public evolve(GENERATIONS: number): VRPSolution {
+    public evolve(): VRPSolution {
         // Test Initial Population
         let fitness = 0;
         for (const route of this.bestGeneration.routes) {
             fitness += routeFitness(route);
         }
-        console.log("Initial Population Fitness: ", fitness)
-        this.generationFitness.push({ generation: 0, fitness: fitness });
-        console.log("Initial population package count: ", this.bestGeneration.numberOfPackages)
 
-        for (let i = 0; i < GENERATIONS; i++) {
+        for (let i = 0; i < this.generations; i++) {
             this.evolveGeneration(i);
 
-            if (i > GENERATIONS / 5) {
+            if (i > this.generations / 5) {
                 // Artificial Gene Transfer - start attempting to add genes to the pool after 20% of the generations
                 this.bestGeneration = insert(this.bestGeneration, this.remainingPackages, this.scheduleProfile);
             }
@@ -115,21 +107,6 @@ export class GeneticAlgorithm {
             endFitness += routeFitness(route);
         }
 
-        console.log("End Population Fitness: ", endFitness)
-        console.log("End population package count: ", this.bestGeneration.numberOfPackages)
-
-        // Export generationFitness as array and save in CSV format downloading after algorithm finishes
-        const csv = this.generationFitness.map(({ generation, fitness }) => `${generation},${fitness}`).join('\n');
-        const blob = new Blob([csv], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "generation-fitness.csv";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
         return this.bestGeneration;
     }
 }
-

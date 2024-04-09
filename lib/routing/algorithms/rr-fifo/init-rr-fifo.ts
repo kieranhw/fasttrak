@@ -1,6 +1,6 @@
 import { Package } from "@/types/db/Package";
 import { Vehicle } from "@/types/db/Vehicle";
-import { Graph, createGraph } from "@/lib/routing/model/Graph";
+import { Graph } from "@/lib/routing/model/Graph";
 import { RouteNode } from '@/lib/routing/model/RouteNode';
 import { Edge } from '@/lib/routing/model/Edge';
 import { calculateDistance } from '@/lib/utils/calculate-distance';

@@ -1,5 +1,5 @@
 import { DeliverySchedule } from "@/types/db/DeliverySchedule";
-import { Graph, createGraph } from "../routing/model/Graph";
+import { Graph } from "../routing/model/Graph";
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
 import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { OptimisationProfile, ScheduleProfile } from "@/types/db/ScheduleProfile";

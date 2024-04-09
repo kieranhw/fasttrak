@@ -1,6 +1,6 @@
 import { Package } from "@/types/db/Package";
 import { Vehicle } from "@/types/db/Vehicle";
-import { Graph, createGraph } from "@/lib/routing/model/Graph";
+import { Graph } from "@/lib/routing/model/Graph";
 import { RouteNode } from '@/lib/routing/model/RouteNode';
 import { Edge } from '@/lib/routing/model/Edge';
 import { calculateDistance } from '@/lib/utils/calculate-distance';
@@ -38,7 +38,6 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
 
     console.log(graph.nodes.length + " nodes kmeans")
 
-
     const timeWindowHours = profile.time_window - 0.25;
     const deliveryTime = profile.delivery_time;
 
@@ -73,11 +72,6 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
         return [random, remainingQueue];
     }
 
-    // print length of each queue
-    for (const queue of clusterPriorityQueues) {
-        console.log("Cluster queues")
-        console.log(queue.getData().length);
-    }
 
     // Step 4: Allocate priority queue clusters to vehicles
     // For each cluster, allocate packages from the respective priority queue to the vehicle until the first constraint is met
