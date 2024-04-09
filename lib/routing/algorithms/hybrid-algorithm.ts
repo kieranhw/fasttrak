@@ -44,8 +44,12 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     const originalVehicles = vehicles.slice(); // Clone the vehicles array
 
     // 1. Generate a random solution to be used as a baseline and to estimate the maximum number of vehicles required
+    // Start timer to calculate the time taken to generate the solution
+    const start1 = Date.now();
     let randomOnly = await roundRobinAllocation(Object.assign({}, graph), vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
     randomOnly.loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
+    const end1 = Date.now();
+    const time1 = (end1 - start1) / 1000;
 
     // 3. If selected, estimate the maximum number of vehicles required to deliver all packages 
     if (profile.auto_selection == true) {
@@ -94,9 +98,12 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     }
 
     // 4. Run K-Means clustering to get a solution without any optimisation
+    const start2 = Date.now();
     let kMeansOnly = await KMeansClustering(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
     kMeansOnly[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
     const KMeansOnlyEfficiency: EfficiencyScores = calculateEfficiencyScores(kMeansOnly[0]);
+    const end2 = Date.now();
+    const time2 = (end2 - start2) / 1000;
 
     // 5. Run K-Means and Random initialisation to get an initial solution for the GA
     let KMeansInitial = await initKMeans(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
@@ -110,14 +117,20 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     const NUM_GENERATIONS = 100000;
 
     // K Means
+    const start3 = Date.now();
     const gaKMeansInit = new GeneticAlgorithm(KMeansInitial[0], graph.depot!, KMeansInitial[1], profile, NUM_GENERATIONS);
     const kMeansOptimised = gaKMeansInit.evolve();
     const kMeansOptimisedEfficiency: EfficiencyScores = calculateEfficiencyScores(kMeansOptimised);
+    const end3 = Date.now();
+    const time3 = (end3 - start3) / 1000;
 
     // Random Initialised
+    const start4 = Date.now();
     const gaRandomInit = new GeneticAlgorithm(randomInitial[0], graph.depot!, randomInitial[1], profile, NUM_GENERATIONS);
     const randomOptimised = gaRandomInit.evolve();
     const randomOptimisedEfficiency: EfficiencyScores = calculateEfficiencyScores(randomOptimised);
+    const end4 = Date.now();
+    const time4 = (end4 - start4) / 1000;
 
     // 7. Calculate the real times and distances for the optimised solutions
     for (const solution of [randomOnly, kMeansOnly[0], kMeansOptimised, randomOptimised]) {
@@ -246,6 +259,12 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     const finalSolution = mostEfficientSolution[0];
     const scheduleReport = mostEfficientSolution[1];
     scheduleReport.other_solutions = remainingSolutions.map(solution => solution[1]);
+
+    // (Test) print the time to process each
+    console.log(`Random Only: ${time1} seconds`);
+    console.log(`K-Means Only: ${time2} seconds`);
+    console.log(`K-Means Optimised: ${time3} seconds`);
+    console.log(`Random Optimised: ${time4} seconds`);
 
     return { finalSolution, scheduleReport };
 }
