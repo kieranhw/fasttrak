@@ -11,7 +11,6 @@ import { DashboardInfo } from "@/types/DashboardInfo"
 const fetchDashboardInfo = async (): Promise<{ data: DashboardInfo | null, error: PostgrestError | null }> => {
     const store = await db.stores.fetch.forUser();
     if (!store.data || store.error) {
-        console.log("Store ID not found for the user")
         return { data: null, error: { message: 'Store ID not found for the user', details: '', hint: '', code: '' } };
     }
     // Fetch schedules for store id where delivery_date is between start and end of the current month

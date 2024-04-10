@@ -8,7 +8,6 @@ const fetchUserProfile = async (): Promise<{ data: UserProfile | null, error: Po
         const userId = user.data.user?.id;
 
         if (!userId) {
-            console.error("User not found");
             return { data: null, error: null };
         }
 
@@ -20,7 +19,6 @@ const fetchUserProfile = async (): Promise<{ data: UserProfile | null, error: Po
 
         return { data: data ?? null, error };
     } catch (error) {
-        console.error("Error fetching user profile: ", error);
         return { data: null, error: error as PostgrestError };
     }
 }
@@ -43,7 +41,6 @@ const updateUserStore = async (storeId: string): Promise<{ data: UserProfile | n
 
         return { data: data ?? null, error };
     } catch (error) {
-        console.error("Error updating user profile: ", error);
         return { data: null, error: error as PostgrestError };
     }
 }
@@ -57,13 +54,11 @@ const fetchUserProfileByEmail = async (email: string): Promise<{ data: UserProfi
             .maybeSingle();
 
         if (error || !data) {
-            //console.error("Error fetching user profile by email or not found: ", error);
             return { data: null, error, found: false };
         }
 
         return { data, error: null, found: true };
     } catch (error) {
-        //console.error("Error fetching user profile by email: ", error);
         return { data: null, error: error as PostgrestError, found: false };
     }
 };
@@ -74,7 +69,6 @@ const createProfileByUser = async (user: User, firstName: string, lastName: stri
 
     // Check if email and userId are not undefined
     if (!email || !userId) {
-        console.error("User email or ID is missing");
         return { data: null, error: { message: "User email or ID is missing" } as PostgrestError };
     }
 
@@ -88,14 +82,11 @@ const createProfileByUser = async (user: User, firstName: string, lastName: stri
             .single(); // Assuming you are inserting a single record and want to return it
 
         if (error) {
-            console.error("Error creating user profile: ", error);
             return { data: null, error };
         }
 
-        console.log("Profile created successfully:", data);
         return { data, error: null };
     } catch (error) {
-        console.error("Exception when creating user profile: ", error);
         return { data: null, error: error as PostgrestError };
     }
 };
@@ -106,7 +97,6 @@ const leaveStore = async (): Promise<{ data: UserProfile | null, error: Postgres
         const userId = user.data.user?.id;
 
         if (!userId) {
-            console.error("User not found");
             return { data: null, error: null };
         }
 
@@ -118,7 +108,6 @@ const leaveStore = async (): Promise<{ data: UserProfile | null, error: Postgres
 
         return { data: data ?? null, error };
     } catch (error) {
-        console.error("Error leaving store: ", error);
         return { data: null, error: error as PostgrestError };
     }
 }

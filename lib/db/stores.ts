@@ -10,12 +10,10 @@ const fetchStoreForUser = async (): Promise<{ data: Store | null, error: Postgre
     const { data: userProfile, error: userError } = await db.profiles.fetch.current();
 
     if (userError) {
-        console.error("Error fetching user profile: ", userError);
         return { data: null, error: userError };
     }
 
     if (!userProfile) {
-        console.error("User profile not found");
         return { data: null, error: userError };
     }
 
@@ -26,7 +24,6 @@ const fetchStoreForUser = async (): Promise<{ data: Store | null, error: Postgre
         .single();
 
     if (storeError) {
-        console.error("Error fetching store: ", storeError);
         return { data: null, error: storeError };
     } else {
         return { data: storeData, error: null };
