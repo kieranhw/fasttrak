@@ -129,7 +129,6 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
 
     // Schedule progress states
     const [inProgress, setInProgress] = useState(false); // Check if any schedules are in progress to disable delete button
-    const [scheduleComplete, setScheduleComplete] = useState(false); // Check if all schedules are completed to enable report button
 
     useEffect(() => {
         async function fetchData() {
@@ -140,7 +139,6 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
             // Set loading state if no cached data
             setIsScheduleLoading(true);
             setInProgress(false);
-            setScheduleComplete(true);
 
             let schedules = await db.schedules.fetch.byDate(date);
 
@@ -157,10 +155,6 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                         setInProgress(true);
                     }
 
-                    // Check all schedules for completion
-                    if (schedule.status !== DeliveryStatus.Completed) {
-                        setScheduleComplete(false);
-                    }
                 });
 
                 buildGraph(schedules);
@@ -199,11 +193,6 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
             buildGraph(updatedSchedules);
         } else {
             refreshData();
-        }
-
-        // If all schedules are completed, set scheduleComplete to true
-        if (props.schedules.every(schedule => schedule.status === DeliveryStatus.Completed)) {
-            setScheduleComplete(true);
         }
     }
 
