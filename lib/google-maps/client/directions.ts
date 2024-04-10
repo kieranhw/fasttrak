@@ -2,7 +2,7 @@ import { VRPSolution } from "@/lib/routing/model/VRPSolution";
 import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { RouteNode } from "../../routing/model/RouteNode";
 import { calculateDistance } from "../../utils/calculate-distance";
-import { calculateTravelTime } from "../../scheduling/create-schedules";
+import { calculateTravelTime } from "@/lib/utils/calculate-travel-time";
 import { loader } from "./loader";
 
 let service: google.maps.DirectionsService;

@@ -232,8 +232,16 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
         // Create schedules if vehicles and packages are available
         if (vehicles && packages) {
             const response = await createSchedules(vehicles, packages, date, profile);
-            if (response && response.schedules && response.schedules.length > 0) deliverySchedule = response.schedules as DeliverySchedule[];
-            if (response && response.report) scheduleReport = response.report;
+
+            if (response === null || (!response.schedules || response.schedules.length == 0) || (!response.report)) {
+                setIsScheduleLoading(false);
+                setIsScheduling(false);
+                alert("Unable to create schedules. Please try again later.")
+                return;
+            } else {
+                deliverySchedule = response.schedules as DeliverySchedule[];
+                scheduleReport = response.report;
+            }
         }
 
         // TODO: Optimisation required

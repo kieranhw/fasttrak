@@ -22,23 +22,26 @@ import { generateMetrics as generateMetrics } from "../routing/algorithms/genera
  * @param profile The schedule profile containing configuration settings
  * @returns array of delivery schedules and a schedule report
  */
-export async function createSchedules(vehiclesData: Vehicle[], packagesData: Package[], date: Date, profile: ScheduleProfile): 
-Promise<{ schedules: DeliverySchedule[], report: ScheduleReport } | undefined> {
-    
+export async function createSchedules(vehiclesData: Vehicle[], packagesData: Package[], date: Date, profile: ScheduleProfile):
+    Promise<{ schedules: DeliverySchedule[], report: ScheduleReport } | null> {
+
     // Validate data before processing
     const depot = await db.depots.fetch.forUser();
-    switch (true) {
-        case packagesData.length === 0:
-            alert("No packages to schedule.");
-            return;
-        case vehiclesData.length === 0:
-            alert("No vehicles available.");
-            return;
-        case !depot || !depot.data?.depot_lat || !depot.data?.depot_lng:
-            alert("No depot location available.");
-            return;
+
+    if (!vehiclesData || vehiclesData.length === 0) {
+        alert("No vehicles available.");
+        return null;
     }
 
+    if (!packagesData || packagesData.length === 0) {
+        alert("No packages to schedule.");
+        return null;
+    }
+
+    if (!depot || !depot.data || !depot.data.depot_lat || !depot.data.depot_lng) {
+        alert("No depot location available.");
+        return null;
+    }
 
     // Create fully connected graph from packages and depot
     const graph = new Graph(packagesData, { lat: depot.data.depot_lat, lng: depot.data.depot_lng }, true);
@@ -110,7 +113,7 @@ Promise<{ schedules: DeliverySchedule[], report: ScheduleReport } | undefined> {
     if (schedules && schedules.length > 0 && scheduleReport) {
         return { schedules: schedules, report: scheduleReport };
     } else {
-        return
+        return null;
     }
 
 }
