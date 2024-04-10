@@ -390,6 +390,7 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button
+                                    disabled={isScheduling}
                                     variant={"outline"}
                                     className={cn(
                                         "min-w-[210px] justify-start text-left font-normal",
@@ -422,6 +423,7 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
 
                         <div className="inline-flex justify-between gap-1">
                             <Button
+                                disabled={isScheduling}
                                 className="w-10 h-10 p-0"
                                 variant="outline"
                                 onClick={e => {
@@ -432,13 +434,13 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                             >
                                 <ChevronLeft size={16} />
                             </Button>
-                            <Button variant="outline" onClick={e => handleDateChange(new Date())}>
+                            <Button disabled={isScheduling} variant="outline" onClick={e => handleDateChange(new Date())}>
                                 Today
                             </Button>
                             <Button
                                 className="w-10 h-10 p-0"
                                 variant="outline"
-                                disabled={!isNextDateValid()}
+                                disabled={!isNextDateValid() || isScheduling}
                                 onClick={e => {
                                     if (date) {
                                         const newDate = new Date(date);
@@ -458,7 +460,7 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                             <TooltipTrigger asChild>
                                 <div>
                                     <Button variant="outline"
-                                        disabled={!( isScheduledToday == true) || isScheduleLoading == true}
+                                        disabled={!(isScheduledToday == true) || isScheduleLoading == true || isScheduling}
                                         onClick={handleAnalysis}
                                     >
                                         Report
@@ -479,7 +481,7 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                             <TooltipTrigger asChild>
                                 <div>
                                     <Button variant="outline"
-                                        disabled={isScheduleLoading == true || isScheduledToday == false || date! < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date! < new Date("1900-01-01") || inProgress === true}
+                                        disabled={isScheduleLoading == true || isScheduledToday == false || date! < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date! < new Date("1900-01-01") || inProgress === true || isScheduling}
                                         onClick={e => handleDeleteSchedule()}
                                     >
                                         Delete
@@ -545,7 +547,7 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                                 <p className="text-muted-foreground font-medium text-sm m-2">Delivery Network</p>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <Button variant="ghost" size="icon" onClick={e => buildGraph(props.schedules)}>
+                                        <Button disabled={isScheduling} variant="ghost" size="icon" onClick={e => buildGraph(props.schedules)}>
                                             <MdRefresh className="text-muted-foreground" size={18} />
                                         </Button>
                                     </TooltipTrigger>

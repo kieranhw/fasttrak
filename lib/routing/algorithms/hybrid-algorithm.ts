@@ -49,7 +49,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     let randomOnly = await roundRobinAllocation(Object.assign({}, graph), vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
     randomOnly.loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
     const end1 = Date.now();
-    const time1 = (end1 - start1) / 1000;
+    console.log("Random solution computed in " + (end1 - start1) / 1000 + " seconds");
 
     // 3. If selected, estimate the maximum number of vehicles required to deliver all packages 
     if (profile.auto_selection == true) {
@@ -103,7 +103,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     kMeansOnly[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
     const KMeansOnlyEfficiency: EfficiencyScores = calculateEfficiencyScores(kMeansOnly[0]);
     const end2 = Date.now();
-    const time2 = (end2 - start2) / 1000;
+    console.log("K-Means solution computed in " + (end2 - start2) / 1000 + " seconds");
 
     // 5. Run K-Means and Random initialisation to get an initial solution for the GA
     let KMeansInitial = await initKMeans(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
@@ -122,7 +122,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     const kMeansOptimised = gaKMeansInit.evolve();
     const kMeansOptimisedEfficiency: EfficiencyScores = calculateEfficiencyScores(kMeansOptimised);
     const end3 = Date.now();
-    const time3 = (end3 - start3) / 1000;
+    console.log("K-Means Optimised solution computed in " + (end3 - start3) / 1000 + " seconds");
 
     // Random Initialised
     const start4 = Date.now();
@@ -130,7 +130,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     const randomOptimised = gaRandomInit.evolve();
     const randomOptimisedEfficiency: EfficiencyScores = calculateEfficiencyScores(randomOptimised);
     const end4 = Date.now();
-    const time4 = (end4 - start4) / 1000;
+    console.log("Random Optimised solution computed in " + (end4 - start4) / 1000 + " seconds");
 
     // 7. Calculate the real times and distances for the optimised solutions
     for (const solution of [randomOnly, kMeansOnly[0], kMeansOptimised, randomOptimised]) {
@@ -259,12 +259,6 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     const finalSolution = mostEfficientSolution[0];
     const scheduleReport = mostEfficientSolution[1];
     scheduleReport.other_solutions = remainingSolutions.map(solution => solution[1]);
-
-    // (Test) print the time to process each
-    console.log(`Random Only: ${time1} seconds`);
-    console.log(`K-Means Only: ${time2} seconds`);
-    console.log(`K-Means Optimised: ${time3} seconds`);
-    console.log(`Random Optimised: ${time4} seconds`);
 
     return { finalSolution, scheduleReport };
 }

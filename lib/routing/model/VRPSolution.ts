@@ -1,6 +1,9 @@
 import { VehicleRoute } from "./VehicleRoute";
-import { RouteNode } from "./RouteNode";
 
+/**
+ * Represents a solution to the VRP as a collection of vehicle routes.
+ * Holds metrics for the solution to calculate non-Euclidean distances.
+ */
 export class VRPSolution {
     public routes: VehicleRoute[] = [];
     public avgSpeed: number = 0; // V bar

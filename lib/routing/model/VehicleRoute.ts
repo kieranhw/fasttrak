@@ -7,7 +7,9 @@ import { calculateDistance } from '@/lib/utils/calculate-distance';
 import { calculateTravelTime } from '@/lib/utils/calculate-travel-time';
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 
-// Model of one individual vehicle route
+/**
+ * VehicleRoute class to model a single vehicle route in the vehicle routing problem.
+ */
 export class VehicleRoute {
     public nodes: RouteNode[] = [];
 
