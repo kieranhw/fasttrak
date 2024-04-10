@@ -24,7 +24,6 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
     // Initialise solution and load metrics
     const solution = new VRPSolution();
     solution.loadMetrics(avgSpeed, distanceMultiplier);
-
     const timeWindowHours = profile.time_window * 0.95; // Time window with 5% buffer
     const deliveryTime = profile.delivery_time;
 
@@ -55,22 +54,21 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
      * If no vehicle can fit, split group into two and try again
      * If no vehicle can fit a single package, package is not allocated
      */
+    let currVehicle = 0;
     for (const pkgGroup of groupedPackages) {
         let vehiclesChecked = 0;
-        let currVehicle = 0;
 
-        const stillVehiclesToCheck = vehiclesChecked < availableVehicles.length;
-
-        while (stillVehiclesToCheck) {
+        while (vehiclesChecked < availableVehicles.length) {
             // Get the vehicles route or create a new one
             const route = solution.routes[currVehicle] || new VehicleRoute(availableVehicles[currVehicle], graph.depot as RouteNode, profile);
 
             // Calculate time required to travel from last node in the route to the potential new node
             const distanceMiles = calculateDistance(route.nodes[route.nodes.length - 1], pkgGroup[0], distanceMultiplier);
             const timeRequiredMins = calculateTravelTime(distanceMiles, avgSpeed) + deliveryTime;
+            solution.loadMetrics(avgSpeed, distanceMultiplier);
 
             // Check if the route can accommodate the package group
-            if (route.canAddGroup(pkgGroup, timeRequiredMins)) {
+            if (route.canAddGroup(pkgGroup, timeRequiredMins, timeWindowHours)) {
                 // Add each package in the group to the route
                 for (const pkgNode of pkgGroup) {
                     const distanceMiles = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode, distanceMultiplier);
@@ -108,18 +106,7 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
         }
     }
 
-    // Check for duplicate packages in routes
-    for (const route of solution.routes) {
-        const seen = new Set();
-        route.nodes = route.nodes.filter(pkgNode => {
-            if (seen.has(pkgNode.pkg?.package_id)) {
-                return false;
-            } else {
-                seen.add(pkgNode.pkg?.package_id);
-                return true;
-            }
-        });
-    }
+    solution.cleanRoutes();
 
     // Close routes back to depot
     for (const route of solution.routes) {

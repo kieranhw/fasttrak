@@ -45,8 +45,9 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
 
     // 1. Generate a random solution to be used as a baseline and to estimate the maximum number of vehicles required
     // Start timer to calculate the time taken to generate the solution
+    console.log("starting random only")
     const start1 = Date.now();
-    let randomOnly = await roundRobinAllocation(Object.assign({}, graph), vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
+    let randomOnly = await roundRobinAllocation(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
     randomOnly.loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
     const end1 = Date.now();
     console.log("Random solution computed in " + (end1 - start1) / 1000 + " seconds");
@@ -152,11 +153,11 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
         distance_multiplier: metrics.distanceMultiplier,
         average_speed: metrics.avgSpeed,
         vehicles_available: originalVehicles,
-        vehicles_used: randomInitial[0].routes.map(route => route.vehicle),
+        vehicles_used: randomOnly.routes.map(route => route.vehicle),
         total_packages_count: graph.nodes.reduce((acc, node) => acc + (node.pkg ? 1 : 0), 0),
-        scheduled_packages_count: randomInitial[0].numberOfPackages,
-        total_distance_miles: randomInitial[0].actualDistance,
-        total_duration_hours: randomInitial[0].actualTime / 60,
+        scheduled_packages_count: randomOnly.numberOfPackages,
+        total_distance_miles: randomOnly.actualDistance,
+        total_duration_hours: randomOnly.actualTime / 60,
         // Schedule Profile
         auto_minimise: profile.auto_selection,
         optimisation_profile: profile.optimisation_profile,

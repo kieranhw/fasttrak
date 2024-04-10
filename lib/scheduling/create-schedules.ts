@@ -25,7 +25,7 @@ import { generateMetrics as generateMetrics } from "../routing/algorithms/genera
 export async function createSchedules(vehiclesData: Vehicle[], packagesData: Package[], date: Date, profile: ScheduleProfile):
     Promise<{ schedules: DeliverySchedule[], report: ScheduleReport } | null> {
 
-    // Validate data before processing
+        // Validate data before processing
     const depot = await db.depots.fetch.forUser();
 
     if (!vehiclesData || vehiclesData.length === 0) {
@@ -80,6 +80,11 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
         vrpSolution = response.finalSolution;
         scheduleReport = response.scheduleReport;
     }
+ 
+    // Process the solution locally as a fallback
+    //const response = await hybridAlgorithm(graph, vehiclesData, profile, metrics, false);
+    //vrpSolution = response.finalSolution;
+    //scheduleReport = response.scheduleReport;
 
     // Initialize an empty array to hold delivery schedules for each vehicle
     let schedules: DeliverySchedule[] = [];

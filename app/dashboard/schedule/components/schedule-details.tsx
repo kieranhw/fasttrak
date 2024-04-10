@@ -85,10 +85,8 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
 
 
     const handleDateChange = (selectedDate: number | SetStateAction<Date>) => {
-        console.log("date called")
         if (selectedDate instanceof Date) {
             setDate(selectedDate);
-            console.log("date set:", selectedDate)
 
             // Format the date to 'ddMMyyyy'
             const formattedDate = format(selectedDate, 'ddMMyyyy');
@@ -136,7 +134,6 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
     useEffect(() => {
         async function fetchData() {
             if (!date) {
-                console.log("no date"); // Return early if date is null
                 return;
             }
 
@@ -285,7 +282,6 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
 
                     const { data: store, error: storeError } = await db.stores.fetch.forUser();
                     if (!store || storeError) {
-                        console.error("Unable to retrieve user store.");
                         return [] as DeliverySchedule[];
                     }
 
@@ -317,7 +313,6 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                         alert(error.message)
                     } else {
                         // If successfully scheduled, update scheduledPackageIds status to scheduled
-                        console.log("Successfully scheduled")
                         const { error } = await supabase
                             .from('packages')
                             .update({ status: PackageStatus.Pending, current_state: CurrentState.InTransit })

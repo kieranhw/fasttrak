@@ -109,6 +109,7 @@ export class GeneticAlgorithm {
             endFitness += routeFitness(route);
         }
 
+        this.bestGeneration.cleanRoutes();
         return this.bestGeneration;
     }
 }

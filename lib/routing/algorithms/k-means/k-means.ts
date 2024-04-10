@@ -36,8 +36,6 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
     solution.loadMetrics(avgSpeed, distanceMultiplier);
     const availableVehicles = [...vehicles];
 
-    console.log(graph.nodes.length + " nodes kmeans")
-
     const timeWindowHours = profile.time_window - 0.25;
     const deliveryTime = profile.delivery_time;
 
@@ -376,6 +374,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
         }
     } while (allocationAttempted && !mainQueue.isEmpty());
 
+    solution.cleanRoutes();
 
     // Close each route and find the shortest path for each
     for (const route of solution.routes) {

@@ -79,17 +79,17 @@ export class VehicleRoute {
      * @param timeWindowHours 
      * @returns 
      */
-    canAddGroup(pkgGroup: RouteNode[], timeRequiredMins: number, timeWindowHours?: number): boolean {
+    canAddGroup(pkgGroup: RouteNode[], timeRequiredMins: number, timeWindowHours: number): boolean {
+        // Total up the weight and volume of the group
+        let groupWeight = 0;
+        let groupVolume = 0;
+
         this.updateMeasurements(this.scheduleProfile.delivery_time);
-        const timeWindowMins = (timeWindowHours ?? this.scheduleProfile.time_window) * 60;
+        const timeWindowMins = (timeWindowHours * 60);
 
         // Calculate distance to travel from potential new node to the depot node
         const actualDistanceToDepot = calculateDistance(pkgGroup[0], this.depotNode, this.distanceMultiplier);
         const timeToDepot = calculateTravelTime(actualDistanceToDepot, this.avgSpeed);
-
-        // Total up the weight and volume of the group
-        let groupWeight = 0;
-        let groupVolume = 0;
 
         for (const pkgNode of pkgGroup) {
             if (!pkgNode.pkg) continue;
@@ -105,7 +105,6 @@ export class VehicleRoute {
             this.actualTimeMins + timeRequiredMins + timeToDepot <= timeWindowMins
         );
     }
-
 
     addNode(node: RouteNode, timeRequired: number): void {
         this.nodes.push(node);

@@ -55,21 +55,20 @@ export async function initRandom(graph: Graph, vehicles: Vehicle[], profile: Sch
      * If no vehicle can fit, split group into two and try again
      * If no vehicle can fit a single package, package is not allocated
      */
+    let currVehicle = 0; 
     for (const pkgGroup of groupedPackages) {
         let vehiclesChecked = 0;
-        let currVehicle = 0; 
 
-        const stillVehiclesToCheck = vehiclesChecked < availableVehicles.length;
-
-        while (stillVehiclesToCheck) {
+        while (vehiclesChecked < availableVehicles.length) {
             // Get the vehicles route or create a new one
             const route = solution.routes[currVehicle] || new VehicleRoute(availableVehicles[currVehicle], graph.depot as RouteNode, profile);
 
             // Calculate time required to travel from last node in the route to the potential new node
             const distanceMiles = calculateDistance(route.nodes[route.nodes.length - 1], pkgGroup[0], distanceMultiplier);
             const timeRequiredMins = calculateTravelTime(distanceMiles, avgSpeed) + deliveryTime;
+            solution.updateRouteMeasurements();
 
-            // Check if the route can accommodate the package group, with 75% of the time window
+            // Check if the route can accommodate the package group
             if (route.canAddGroup(pkgGroup, timeRequiredMins, timeWindowHours)) {
                 // Add each package in the group to the route
                 for (const pkgNode of pkgGroup) {
@@ -108,19 +107,7 @@ export async function initRandom(graph: Graph, vehicles: Vehicle[], profile: Sch
         }
     }
 
-
-    // Check for duplicate packages in routes
-    for (const route of solution.routes) {
-        const seen = new Set();
-        route.nodes = route.nodes.filter(pkgNode => {
-            if (seen.has(pkgNode.pkg?.package_id)) {
-                return false;
-            } else {
-                seen.add(pkgNode.pkg?.package_id);
-                return true;
-            }
-        });
-    }
+    solution.cleanRoutes();
 
     // Close routes back to depot
     for (const route of solution.routes) {

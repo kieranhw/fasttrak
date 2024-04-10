@@ -177,6 +177,8 @@ export async function initKMeans(graph: Graph, vehicles: Vehicle[], profile: Sch
         mainQueue.dequeue();
     }
 
+    solution.cleanRoutes();
+
     // Close each route and find the shortest path for each
     for (const route of solution.routes) {
         route.closeRoute(graph.depot as RouteNode);

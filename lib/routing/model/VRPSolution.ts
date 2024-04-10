@@ -82,4 +82,21 @@ export class VRPSolution {
 
         return clonedSolution;
     }
+
+    /**
+     * Clean data in the routes - remove any duplicate packages.
+     */
+    cleanRoutes(): void {
+        for (const route of this.routes) {
+            const seen = new Set();
+            route.nodes = route.nodes.filter(pkgNode => {
+                if (seen.has(pkgNode.pkg?.package_id)) {
+                    return false;
+                } else {
+                    seen.add(pkgNode.pkg?.package_id);
+                    return true;
+                }
+            });
+        }
+    }
 }

@@ -24,7 +24,7 @@ export async function generateMetrics(graph: Graph, vehicles: Vehicle[], profile
     const solution = new VRPSolution();
     const availableVehicles = [...vehicles];
 
-    const timeWindowHours = profile.time_window * 2; // Double the time window to allocate packages as many as possible
+    const timeWindowHours = profile.time_window; // Double the time window to allocate packages as many as possible
     const deliveryTime = profile.delivery_time;
 
     // Sort packages by date added (FIFO) and filter out depot node
