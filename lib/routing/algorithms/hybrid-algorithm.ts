@@ -6,7 +6,7 @@ import { GeneticAlgorithm } from "./genetic-algorithm/genetic-algorithm";
 import { Vehicle } from "@/types/db/Vehicle";
 import { roundRobinAllocation } from './rr-fifo/rr-fifo';
 import { EfficiencyScores, calculateEfficiencyScores } from '@/lib/utils/calculate-efficiency';
-import { initialiseMetrics as computeMetrics, calculateActualTravel as calculateActualTravelClient } from '../../google-maps/directions';
+import { initialiseMetrics as computeMetrics, calculateActualTravel as calculateActualTravelClient } from '../../google-maps/client/directions';
 import { calculateActualTravel as calculateActualTravelServer } from '@/lib/google-maps/server/directions';
 import { generateMetrics } from './generate-metrics';
 import { geospatialClustering as KMeansClustering } from './k-means/k-means';

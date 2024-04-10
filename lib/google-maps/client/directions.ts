@@ -1,8 +1,8 @@
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
 import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
-import { RouteNode } from "../routing/model/RouteNode";
-import { calculateDistance } from "../utils/calculate-distance";
-import { calculateTraversalMins } from "../scheduling/create-schedules";
+import { RouteNode } from "../../routing/model/RouteNode";
+import { calculateDistance } from "../../utils/calculate-distance";
+import { calculateTravelTime } from "../../scheduling/create-schedules";
 import { loader } from "./loader";
 
 let service: google.maps.DirectionsService;
@@ -63,7 +63,7 @@ export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
             const nextNode = nodes[i + 1];
             const distance = calculateDistance(node, nextNode);
             totalEucDistanceMiles += distance;
-            totalEucDuration += calculateTraversalMins(distance);
+            totalEucDuration += calculateTravelTime(distance);
         }
 
         const origin = new google.maps.LatLng(route.nodes[0].coordinates.lat, route.nodes[0].coordinates.lng); // Starting at node 0 (depot)

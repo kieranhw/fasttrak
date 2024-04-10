@@ -12,7 +12,7 @@ import { generateFT } from "@/lib/utils/generate-ids";
 import { Button } from "@/components/ui/button";
 import { Loader } from '@googlemaps/js-api-loader';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { geocodeAddresses as geocode } from "@/lib/google-maps/geocoder";
+import { geocodeAddresses as geocode } from "@/lib/google-maps/client/geocoder";
 import { toast } from "@/components/ui/use-toast";
 
 export default function AddPackage() {

@@ -1,14 +1,8 @@
 import { DeliverySchedule, DeliveryStatus } from "@/types/db/DeliverySchedule";
 import { Package } from "@/types/db/Package";
 import { Vehicle } from "@/types/db/Vehicle";
-import { roundRobinAllocation } from "../routing/algorithms/rr-fifo/rr-fifo";
-import { geospatialClustering } from "../routing/algorithms/k-means/k-means";
 import { Graph } from "@/lib/routing/model/Graph";
-import { RouteNode } from '@/lib/routing/model/RouteNode';
-import { Edge } from '@/lib/routing/model/Edge';
-import { calculateDistance } from '@/lib/utils/calculate-distance';
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
-import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { UUID } from "crypto";
 import axios from 'axios';
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
@@ -16,14 +10,23 @@ import { db } from "../db/db";
 import { VRPMetrics, hybridAlgorithm } from "../routing/algorithms/hybrid-algorithm";
 import { ScheduleReport } from "@/types/db/ScheduleReport";
 import { generateMetrics as generateMetrics } from "../routing/algorithms/generate-metrics";
-import { initialiseMetrics } from "../google-maps/directions";
 
-// API Gateway endpoint URL
-const apiGatewayEndpoint = 'https://e266yv3o3eojn6auayc5za77c40pmdhb.lambda-url.eu-north-1.on.aws/';
-
-export async function createSchedules(vehiclesData: Vehicle[], packagesData: Package[], date: Date, profile: ScheduleProfile): Promise<{ schedules: DeliverySchedule[], report: ScheduleReport } | undefined> {
+/**
+ * The main function to create delivery schedules for a given set of vehicles and packages.
+ * 
+ * Processes the data via the hybrid algorithm and returns the delivery schedules and a report.
+ * 
+ * @param vehiclesData The available vehicles to be scheduled
+ * @param packagesData The packages to be scheduled
+ * @param date The date of the delivery schedule
+ * @param profile The schedule profile containing configuration settings
+ * @returns array of delivery schedules and a schedule report
+ */
+export async function createSchedules(vehiclesData: Vehicle[], packagesData: Package[], date: Date, profile: ScheduleProfile): 
+Promise<{ schedules: DeliverySchedule[], report: ScheduleReport } | undefined> {
+    
+    // Validate data before processing
     const depot = await db.depots.fetch.forUser();
-
     switch (true) {
         case packagesData.length === 0:
             alert("No packages to schedule.");
@@ -78,7 +81,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
     // Initialize an empty array to hold delivery schedules for each vehicle
     let schedules: DeliverySchedule[] = [];
 
-    // Map vehicle routes to delivery schedules
+    // Map vehicle routes to DeliverySchedule objects
     for (const route of vrpSolution.routes) {
         let schedule: DeliverySchedule = {
             vehicle_id: route.vehicle.vehicle_id,
@@ -112,13 +115,4 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
 
 }
 
-// Estimate duration based on distance and time to deliver each package
-export function calculateTraversalMins(distance: number, averageSpeed?: number): number {
-    if (!averageSpeed || averageSpeed == 0) {
-        averageSpeed = 20; // miles per hour
-    }
-    // estimated time to travel distance in minutes 
-    const estimatedDuration = (distance / averageSpeed) * 60;
 
-    return estimatedDuration;
-}

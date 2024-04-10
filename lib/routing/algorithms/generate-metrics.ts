@@ -4,10 +4,10 @@ import { RouteNode } from '@/lib/routing/model/RouteNode';
 import { calculateDistance } from '@/lib/utils/calculate-distance';
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
 import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
-import { calculateTraversalMins } from "../../scheduling/create-schedules";
+import { calculateTravelTime } from "@/lib/utils/calculate-travel-time";
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 import { VRPMetrics } from "./hybrid-algorithm";
-import { initialiseMetrics } from "@/lib/google-maps/directions";
+import { initialiseMetrics } from "@/lib/google-maps/client/directions";
 
 /***
  * Generate VRP metrics using random initialisation.
@@ -53,12 +53,12 @@ export async function generateMetrics(graph: Graph, vehicles: Vehicle[], profile
         while (vehiclesChecked < availableVehicles.length) {
             const route = solution.routes[vehicleIndex] || new VehicleRoute(availableVehicles[vehicleIndex], graph.depot as RouteNode, profile);
             const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgGroup[0]);
-            const timeRequired = calculateTraversalMins(travelCost) + deliveryTime;
+            const timeRequired = calculateTravelTime(travelCost) + deliveryTime;
 
             if (route.canAddGroup(pkgGroup, timeRequired, timeWindowHours)) {
                 for (const pkgNode of pkgGroup) {
                     const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode);
-                    const timeRequired = calculateTraversalMins(travelCost) + deliveryTime;
+                    const timeRequired = calculateTravelTime(travelCost) + deliveryTime;
                     route.addNode(pkgNode, timeRequired);
                 }
                 if (!solution.routes[vehicleIndex]) {

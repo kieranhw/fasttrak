@@ -2,7 +2,7 @@ import { PriorityQueue } from "@/lib/scheduling/priority-queue";
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
 import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { routeFitness } from "./fitness";
-import { calculateTraversalMins } from "@/lib/scheduling/create-schedules";
+import { calculateTravelTime } from "@/lib/utils/calculate-travel-time";
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 import { calculateDistance } from "@/lib/utils/calculate-distance";
 
@@ -32,7 +32,7 @@ export function insert(offspring: VRPSolution, remainingPackages: PriorityQueue 
         if (route.actualTimeMins < timeWindow && route.currentVolume + node.pkg!.volume <= route.vehicle.max_volume && route.currentWeight + node.pkg!.weight <= route.vehicle.max_load) {
             // Calculate the travel cost and time required to travel from the last node in the route to the new node
             const travelCost = calculateDistance(route.nodes[route.nodes.length - 2], node, route.distanceMultiplier);
-            const travelTime = calculateTraversalMins(travelCost) + deliveryTime; // Calculate time required to traverse nodes, plus time to deliver package
+            const travelTime = calculateTravelTime(travelCost) + deliveryTime; // Calculate time required to traverse nodes, plus time to deliver package
 
             // Check if the package can be added to the vehicle route
             if (route.canAddPackage(node.pkg!, node, travelTime, timeWindow)) {

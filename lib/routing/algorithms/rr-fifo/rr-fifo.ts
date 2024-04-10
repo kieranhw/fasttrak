@@ -5,7 +5,7 @@ import { RouteNode } from '@/lib/routing/model/RouteNode';
 import { Edge } from '@/lib/routing/model/Edge';
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
 import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
-import { calculateTraversalMins } from "../../../scheduling/create-schedules";
+import { calculateTravelTime } from "@/lib/utils/calculate-travel-time";
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 import { calculateDistance } from "@/lib/utils/calculate-distance";
 
@@ -67,14 +67,14 @@ export async function roundRobinAllocation(graph: Graph, vehicles: Vehicle[], pr
 
             // Calculate time required to travel from last node in the route to the potential new node
             const distanceMiles = calculateDistance(route.nodes[route.nodes.length - 1], pkgGroup[0], distanceMultiplier);
-            const timeRequiredMins = calculateTraversalMins(distanceMiles, avgSpeed) + deliveryTime;
+            const timeRequiredMins = calculateTravelTime(distanceMiles, avgSpeed) + deliveryTime;
 
             // Check if the route can accommodate the package group
             if (route.canAddGroup(pkgGroup, timeRequiredMins)) {
                 // Add each package in the group to the route
                 for (const pkgNode of pkgGroup) {
                     const distanceMiles = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode, distanceMultiplier);
-                    const timeRequiredMins = calculateTraversalMins(distanceMiles, avgSpeed) + deliveryTime;
+                    const timeRequiredMins = calculateTravelTime(distanceMiles, avgSpeed) + deliveryTime;
                     route.addNode(pkgNode, timeRequiredMins);
                 }
 

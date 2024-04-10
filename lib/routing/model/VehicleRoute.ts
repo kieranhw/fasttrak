@@ -4,7 +4,7 @@ import { Graph } from "@/lib/routing/model/Graph";
 import { RouteNode } from '@/lib/routing/model/RouteNode';
 import { Edge } from '@/lib/routing/model/Edge';
 import { calculateDistance } from '@/lib/utils/calculate-distance';
-import { calculateTraversalMins } from "../../scheduling/create-schedules";
+import { calculateTravelTime } from '@/lib/utils/calculate-travel-time';
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 
 // Model of one individual vehicle route
@@ -60,7 +60,7 @@ export class VehicleRoute {
 
         // calculate distance to travel from potential new node to depot
         const actualDistanceToDepot = calculateDistance(pkgNode, this.depotNode, this.distanceMultiplier);
-        const timeToDepot = calculateTraversalMins(actualDistanceToDepot, this.avgSpeed);
+        const timeToDepot = calculateTravelTime(actualDistanceToDepot, this.avgSpeed);
 
         return (
             this.currentWeight + pkg.weight < this.vehicle.max_load &&
@@ -83,7 +83,7 @@ export class VehicleRoute {
 
         // Calculate distance to travel from potential new node to the depot node
         const actualDistanceToDepot = calculateDistance(pkgGroup[0], this.depotNode, this.distanceMultiplier);
-        const timeToDepot = calculateTraversalMins(actualDistanceToDepot, this.avgSpeed);
+        const timeToDepot = calculateTravelTime(actualDistanceToDepot, this.avgSpeed);
 
         // Total up the weight and volume of the group
         let groupWeight = 0;
@@ -114,7 +114,7 @@ export class VehicleRoute {
     closeRoute(depot: RouteNode): void {
         const lastNode = this.nodes[this.nodes.length - 1];
         const cost = calculateDistance(lastNode, depot);
-        const timeRequired = calculateTraversalMins(cost, this.avgSpeed);
+        const timeRequired = calculateTravelTime(cost, this.avgSpeed);
         this.eucTimeMins += timeRequired;
         this.eucDistanceMiles += cost;
         this.nodes.push(depot);
@@ -154,7 +154,7 @@ export class VehicleRoute {
             if (!nextNode) break;
 
             const distance = calculateDistance(node, nextNode);
-            const traversalTime = calculateTraversalMins(distance, this.avgSpeed);
+            const traversalTime = calculateTravelTime(distance, this.avgSpeed);
 
             let timeRequired = 0;
             if (nextNode.isDepot) {

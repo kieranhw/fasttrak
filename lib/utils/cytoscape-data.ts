@@ -2,7 +2,7 @@ import cytoscape from "cytoscape";
 import { Graph } from "@/lib/routing/model/Graph";
 import { calculateDistance } from "@/lib/utils/calculate-distance";
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
-import { calculateTraversalMins } from "@/lib/scheduling/create-schedules";
+import { calculateTravelTime } from "@/lib/scheduling/create-schedules";
 
 interface CyEdge {
     data: {
@@ -100,7 +100,7 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
             // Prevent creating an edge if source and target nodes are the same or have the same package address
             if (sourceIndex !== targetIndex && cyNodes[sourceIndex].data.pkgAddress !== cyNodes[targetIndex].data.pkgAddress) {
                 const edgeCost = calculateDistance(node, nextNode);
-                const minutesToTraverse = calculateTraversalMins(edgeCost);
+                const minutesToTraverse = calculateTravelTime(edgeCost);
                 const routeName = `${minutesToTraverse.toFixed(2)} mins`;
     
                 cyEdges.push({

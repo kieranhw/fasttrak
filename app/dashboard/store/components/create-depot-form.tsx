@@ -34,7 +34,7 @@ import { Store } from "@/types/db/Store"
 import { PostgrestError } from "@supabase/supabase-js"
 import { useEffect, useState } from "react"
 import { generateIC } from "@/lib/utils/generate-ids"
-import { geocodeAddress as geocoder } from "@/lib/google-maps/geocoder"
+import { geocodeAddress as geocoder } from "@/lib/google-maps/client/geocoder"
 import { sanitizeFloat } from "@/lib/utils/validation"
 import { Depot } from "@/types/db/Depot"
 

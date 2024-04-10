@@ -6,7 +6,7 @@ import { Edge } from '@/lib/routing/model/Edge';
 import { calculateDistance } from '@/lib/utils/calculate-distance';
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
 import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
-import { calculateTraversalMins } from "../../../scheduling/create-schedules";
+import { calculateTravelTime } from "@/lib/utils/calculate-travel-time";
 import { PriorityQueue } from "../../../scheduling/priority-queue";
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 import { initRandom } from "../rr-fifo/init-rr-fifo";
@@ -96,7 +96,7 @@ export async function initKMeans(graph: Graph, vehicles: Vehicle[], profile: Sch
             if (nextNode) {
                 // Calculate the travel cost and time required to travel from the last node in the route to the next node
                 const actualDistance = calculateDistance(node, nextNode, distanceMultiplier);
-                const travelTime = calculateTraversalMins(actualDistance, avgSpeed) + deliveryTime;
+                const travelTime = calculateTravelTime(actualDistance, avgSpeed) + deliveryTime;
 
                 // Check if the package can be added to the vehicle route
                 if (node.pkg && route.canAddPackage(node.pkg, node, travelTime, timeWindowHours)) {
@@ -152,7 +152,7 @@ export async function initKMeans(graph: Graph, vehicles: Vehicle[], profile: Sch
 
             // Calculate the travel cost and time required to travel from the last node in the route to the next node
             const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], node, distanceMultiplier);
-            const travelTime = calculateTraversalMins(travelCost, avgSpeed) + deliveryTime; // Calculate time required to traverse nodes, plus time to deliver package
+            const travelTime = calculateTravelTime(travelCost, avgSpeed) + deliveryTime; // Calculate time required to traverse nodes, plus time to deliver package
 
             // If travel cost is more than triple the average time to travel for this route, skip this route
             const averageTimeToTravel = route.actualTimeMins / route.nodes.length;
