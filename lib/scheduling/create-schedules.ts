@@ -15,51 +15,39 @@ import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 import { db } from "../db/db";
 import { VRPMetrics, hybridAlgorithm } from "../routing/algorithms/hybrid-algorithm";
 import { ScheduleReport } from "@/types/db/ScheduleReport";
-import { initRandomMetrics } from "../routing/algorithms/rr-fifo/init-random-metrics";
+import { generateMetrics as generateMetrics } from "../routing/algorithms/generate-metrics";
 import { initialiseMetrics } from "../google-maps/directions";
 
 // API Gateway endpoint URL
 const apiGatewayEndpoint = 'https://e266yv3o3eojn6auayc5za77c40pmdhb.lambda-url.eu-north-1.on.aws/';
 
 export async function createSchedules(vehiclesData: Vehicle[], packagesData: Package[], date: Date, profile: ScheduleProfile): Promise<{ schedules: DeliverySchedule[], report: ScheduleReport } | undefined> {
-    console.log("Scheduling packages...");
-    if (packagesData.length === 0) {
-        console.log("No packages to schedule.");
-        return;
-    }
-
-    if (vehiclesData.length === 0) {
-        console.log("No vehicles to schedule.");
-        return;
-    }
-
-    // Profile
-    console.log("profile:", profile)
-
-    // TODO: Get depot here, set to variable to be used in createGraph
     const depot = await db.depots.fetch.forUser();
 
-    if (!depot || !depot.data?.depot_lat || !depot.data?.depot_lng) {
-        return;
+    switch (true) {
+        case packagesData.length === 0:
+            alert("No packages to schedule.");
+            return;
+        case vehiclesData.length === 0:
+            alert("No vehicles available.");
+            return;
+        case !depot || !depot.data?.depot_lat || !depot.data?.depot_lng:
+            alert("No depot location available.");
+            return;
     }
 
-    // TODO: Run the VRP algorithm to generate a solution, send to calculate average speed utils
-    //const vrpSolution = await randomRoutes(graph, vehiclesData, 8);
-    // 1. Generate a solution without any metrics to be used for calculating the metrics
+
+    // Create fully connected graph from packages and depot
     const graph = new Graph(packagesData, { lat: depot.data.depot_lat, lng: depot.data.depot_lng }, true);
 
-    const metricsOnlySolution = await initRandomMetrics(graph, vehiclesData, profile);
+    // Calculate the conversion metrics for the delivery network
+    const metrics: VRPMetrics = await generateMetrics(graph, vehiclesData, profile);
 
-    // Calculate metrics using the solution
-    const metrics: VRPMetrics = await initialiseMetrics(metricsOnlySolution);
-
-
+    // Call the hybrid algorithm to process the data via API 
     let vrpSolution = new VRPSolution();
     let scheduleReport: ScheduleReport | undefined = undefined;
 
-
-    // RUN SERVER SIDE 
-    const data1 = {
+    const data = {
         packagesData: packagesData,
         depot: { lat: depot.data.depot_lat, lng: depot.data.depot_lng },
         vehiclesData: vehiclesData,
@@ -67,47 +55,25 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
         metrics: metrics,
     };
 
-    type Response = {
-        vrpSolution: VRPSolution,
-        scheduleReport: ScheduleReport
-    }
-
     try {
-        const response = await axios.post('/api/run-hybrid-algorithm', JSON.stringify(data1), {
-            headers: {
-                'Content-Type': 'application/json'
-            }
+        // Call the API endpoint with the data
+        const response = await axios.post('/api/run-hybrid-algorithm', JSON.stringify(data), {
+            headers: { 'Content-Type': 'application/json' }
         });
 
-        // With axios, the response data is accessed with response.data
-        const result: Response = response.data;
+        const result: { vrpSolution: VRPSolution, scheduleReport: ScheduleReport } = response.data;
         vrpSolution = result.vrpSolution;
         scheduleReport = result.scheduleReport;
-        console.log("RESPONSE", result); // Process your result here
     } catch (error) {
-        // With axios, the error response can be accessed via error.response
-        if ((error as any).response) {
-            console.error(`HTTP error! Status: ${(error as any).response.status}`, (error as any).response.data);
-        } else {
-            console.error('Error making POST request:', (error as any).message);
-        }
-    }
+        // Handle error and validate data before processing locally
+        console.error('Error processing data via API:', error);
+        console.warn('Processing locally...');
 
-
-
-    // TODO: Add 30 second timeout for local processing
-    /** 
-    if (vrpSolution.routes.length === 0) {
-        if (graph.nodes.length === 0) {
-            console.log("No packages to schedule.");
-            return;
-        }
-
+        // Process the solution locally as a fallback
         const response = await hybridAlgorithm(graph, vehiclesData, profile, metrics, false);
         vrpSolution = response.finalSolution;
         scheduleReport = response.scheduleReport;
     }
-*/
 
     // Initialize an empty array to hold delivery schedules for each vehicle
     let schedules: DeliverySchedule[] = [];

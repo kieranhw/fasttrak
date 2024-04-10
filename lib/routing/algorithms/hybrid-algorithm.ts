@@ -8,7 +8,7 @@ import { roundRobinAllocation } from './rr-fifo/rr-fifo';
 import { EfficiencyScores, calculateEfficiencyScores } from '@/lib/utils/calculate-efficiency';
 import { initialiseMetrics as computeMetrics, calculateActualTravel as calculateActualTravelClient } from '../../google-maps/directions';
 import { calculateActualTravel as calculateActualTravelServer } from '@/lib/google-maps/server/directions';
-import { initRandomMetrics } from './rr-fifo/init-random-metrics';
+import { generateMetrics } from './generate-metrics';
 import { geospatialClustering as KMeansClustering } from './k-means/k-means';
 import { ScheduleInitialiser, ScheduleOptimiser, ScheduleReport } from '@/types/db/ScheduleReport';
 import { initKMeans } from './k-means/init-k-means';

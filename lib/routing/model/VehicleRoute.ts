@@ -69,19 +69,26 @@ export class VehicleRoute {
         );
     }
 
-    // Check if the vehicle can add a group of packages to the route
-    canAddGroup(pkgGroup: RouteNode[], timeRequired: number, timeWindowHours: number): boolean {
-        let groupWeight = 0;
-        let groupVolume = 0;
-
+    /**
+     * Check if the vehicle can add a group of packages to the route by comparing against the vehicle's capacity,
+     * the time required to deliver the group, and the time window for the delivery.
+     * @param pkgGroup 
+     * @param timeRequiredMins 
+     * @param timeWindowHours 
+     * @returns 
+     */
+    canAddGroup(pkgGroup: RouteNode[], timeRequiredMins: number, timeWindowHours?: number): boolean {
         this.updateMeasurements(this.scheduleProfile.delivery_time);
-        let timeWindowMins = (timeWindowHours * 60);
+        const timeWindowMins = (timeWindowHours ?? this.scheduleProfile.time_window) * 60;
 
-        // All packages have same address so cost is the same
+        // Calculate distance to travel from potential new node to the depot node
         const actualDistanceToDepot = calculateDistance(pkgGroup[0], this.depotNode, this.distanceMultiplier);
         const timeToDepot = calculateTraversalMins(actualDistanceToDepot, this.avgSpeed);
 
         // Total up the weight and volume of the group
+        let groupWeight = 0;
+        let groupVolume = 0;
+
         for (const pkgNode of pkgGroup) {
             if (!pkgNode.pkg) continue;
 
@@ -93,7 +100,7 @@ export class VehicleRoute {
         return (
             this.currentWeight + groupWeight <= this.vehicle.max_load &&
             this.currentVolume + groupVolume <= this.vehicle.max_volume &&
-            this.actualTimeMins + timeRequired + timeToDepot <= timeWindowMins
+            this.actualTimeMins + timeRequiredMins + timeToDepot <= timeWindowMins
         );
     }
 

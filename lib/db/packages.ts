@@ -12,10 +12,8 @@ const fetchPackages = async () => {
     const { data: store, error } = await db.stores.fetch.forUser();
 
     if (!store) {
-        console.error("User not attached to store");
         return;
     } if (error) {
-        console.error("Error fetching store: ", error);
         return;
     } else {
 
@@ -25,7 +23,6 @@ const fetchPackages = async () => {
             .order('created_at', { ascending: false })
             .eq('store_id', store.store_id);
         if (error) {
-            console.error("Error fetching packages: ", error);
             return;
         } else {
             return (packages as Package[]);
@@ -39,10 +36,8 @@ const fetchPackagesByPending = async () => {
     const { data: store, error } = await db.stores.fetch.forUser();
 
     if (!store) {
-        console.error("User not atatched to store");
         return;
     } if (error) {
-        console.error("Error fetching store: ", error);
         return;
     } else {
         let { data: packages, error } = await supabase
@@ -52,7 +47,6 @@ const fetchPackagesByPending = async () => {
             .order('created_at', { ascending: false })
             .eq('store_id', store.store_id);
         if (error) {
-            console.error("Error fetching packages: ", error);
             return;
         } else {
             return (packages as Package[]);
@@ -71,7 +65,6 @@ const fetchPackagesByIds = async (ids: UUID[]) => {
         .select('*')
         .in('package_id', ids)
     if (error) {
-        console.error("Error fetching packages: ", error);
         return;
     } else {
         return (packages as Package[]);
@@ -84,10 +77,8 @@ const fetchPackagesInventory = async () => {
     const { data: store, error } = await db.stores.fetch.forUser();
 
     if (!store) {
-        console.error("User not attached to store");
         return;
     } if (error) {
-        console.error("Error fetching store: ", error);
         return;
     } else {
         const { data: packages, error } = await supabase
@@ -96,7 +87,6 @@ const fetchPackagesInventory = async () => {
             .eq('store_id', store.store_id)
             .eq('current_state', CurrentState.Pending || CurrentState.InTransit || CurrentState.Scheduled);
         if (error) {
-            console.error("Error fetching packages: ", error);
             return;
         } else {
             // Sort from date_added in descending order
@@ -120,10 +110,8 @@ const fetchPackageDeliveryHistory = async () => {
     const { data: store, error } = await db.stores.fetch.forUser();
 
     if (!store) {
-        console.error("User not attached to store");
         return;
     } if (error) {
-        console.error("Error fetching store: ", error);
         return;
     } else {
         const { data: packages, error } = await supabase
@@ -132,7 +120,6 @@ const fetchPackageDeliveryHistory = async () => {
             .eq('store_id', store.store_id)
             .eq('current_state', CurrentState.Delivered);
         if (error) {
-            console.error("Error fetching packages: ", error);
             return;
         } else {
             return (packages as Package[]);
@@ -144,16 +131,13 @@ const fetchPackageDeliveryHistory = async () => {
 // Remove package by ID
 // TODO: Ensure data consistency by removing package from all delivery schedules
 const removePackageById = async (id: UUID) => {
-    console.log("Removing package: " + id)
 
     // Fetch store for user
     const { data: store, error } = await db.stores.fetch.forUser();
 
     if (!store) {
-        console.error("User not atatched to store");
         return;
     } if (error) {
-        console.error("Error fetching store: ", error);
         return;
     } else {
         const { error } = await supabase
@@ -162,7 +146,6 @@ const removePackageById = async (id: UUID) => {
             .eq('package_id', id)
             .eq('store_id', store.store_id);
         if (error) {
-            console.error("Error removing package: ", error);
             return
         } else {
             return
@@ -197,7 +180,6 @@ const updatePackageStatusByIds = async (ids: UUID[], scheduleStatus: DeliverySta
             })
             .in('package_id', ids)
         if (error) {
-            console.error("Error updating package status: ", error);
             return
         }
     }
@@ -207,7 +189,6 @@ const updatePackageStatusByIds = async (ids: UUID[], scheduleStatus: DeliverySta
         .update({ status: scheduleStatus, current_state: packageState })
         .in('package_id', ids)
     if (error) {
-        console.error("Error updating package status: ", error);
         return
     } else {
         return

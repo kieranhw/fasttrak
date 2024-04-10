@@ -1,36 +1,30 @@
-import { Package } from "@/types/db/Package";
 import { Vehicle } from "@/types/db/Vehicle";
 import { Graph } from "@/lib/routing/model/Graph";
 import { RouteNode } from '@/lib/routing/model/RouteNode';
-import { Edge } from '@/lib/routing/model/Edge';
 import { calculateDistance } from '@/lib/utils/calculate-distance';
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
 import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
-import { calculateTraversalMins } from "../../../scheduling/create-schedules";
+import { calculateTraversalMins } from "../../scheduling/create-schedules";
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
+import { VRPMetrics } from "./hybrid-algorithm";
+import { initialiseMetrics } from "@/lib/google-maps/directions";
 
 /***
- * Initialise random metrics
+ * Generate VRP metrics using random initialisation.
  * 
- * This algorithm is a simple round-robin allocations which allocates the packages to the vehicles as first in first out.
- * 
- * The only use of this is to generate the average speed and distance multiplier metrics as part of the real world travel
- * estimation algorithm. 
- * 
- * This has not been designed to generate a full solution or fully respect the constraints because the real world travel
- * times are dependent on being supplied the average speed and distance multiplier. These multipliers are given as 
- * parameters to the subsequent algorithms.
- * 
- * @param graph Graph of nodes: packages and depot
+ * Generates a VRPSolution using the same approach as the RR FIFO algorithm, without respecting time constraints. Uses the solution
+ * to calculate the average speed and distance multiplier metrics.
+
+ * @param graph Graph of packages and depot
  * @param vehicles Array of available vehicles
  * @param timeWindow Number of hours to deliver packages
- * @returns VRPSolution
+ * @returns VRPSolution of VehicleRoutes.
  */
-export async function initRandomMetrics(graph: Graph, vehicles: Vehicle[], profile: ScheduleProfile): Promise<VRPSolution> {
+export async function generateMetrics(graph: Graph, vehicles: Vehicle[], profile: ScheduleProfile): Promise<VRPMetrics> {
     const solution = new VRPSolution();
     const availableVehicles = [...vehicles];
 
-    const timeWindow = profile.time_window;
+    const timeWindowHours = profile.time_window * 2; // Double the time window to allocate packages as many as possible
     const deliveryTime = profile.delivery_time;
 
     // Sort packages by date added (FIFO) and filter out depot node
@@ -54,10 +48,6 @@ export async function initRandomMetrics(graph: Graph, vehicles: Vehicle[], profi
 
     let vehicleIndex = 0;
 
-    // Round robin allocation
-    // For each group of packages, find a vehicle that can fit the group
-    // If no vehicle, split group into two and try again
-    // If no vehicle can fit package, package is not allocated
     for (const pkgGroup of groupedPackages) {
         let vehiclesChecked = 0;
         while (vehiclesChecked < availableVehicles.length) {
@@ -65,7 +55,7 @@ export async function initRandomMetrics(graph: Graph, vehicles: Vehicle[], profi
             const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgGroup[0]);
             const timeRequired = calculateTraversalMins(travelCost) + deliveryTime;
 
-            if (route.canAddGroup(pkgGroup, timeRequired, timeWindow)) {
+            if (route.canAddGroup(pkgGroup, timeRequired, timeWindowHours)) {
                 for (const pkgNode of pkgGroup) {
                     const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode);
                     const timeRequired = calculateTraversalMins(travelCost) + deliveryTime;
@@ -99,7 +89,9 @@ export async function initRandomMetrics(graph: Graph, vehicles: Vehicle[], profi
     for (const route of solution.routes) {
         route.closeRoute(graph.depot as RouteNode);
     }
-    
-    return solution;
+
+    const metrics: VRPMetrics = await initialiseMetrics(solution);
+
+    return metrics;
 }
 

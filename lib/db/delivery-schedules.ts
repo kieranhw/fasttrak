@@ -10,7 +10,6 @@ import { PostgrestError } from "@supabase/supabase-js";
 const fetchStoreAndHandleError = async () => {
     const { data: store, error } = await db.stores.fetch.forUser();
     if (error || !store) {
-        console.error("Error fetching store or store not found: ", error);
         throw new Error("Store fetching failed");
     }
     return store;
@@ -39,7 +38,6 @@ export const fetchSchedulesByDate = async (date: Date): Promise<DeliverySchedule
 
         return schedules as DeliverySchedule[];
     } catch (error) {
-        console.error("Error in fetchSchedulesByDate:", error);
         return null;
     }
 };
@@ -68,7 +66,6 @@ export const fetchSchedulesByDateRange = async (date1: String, date2: String): P
 
         return { data: schedules, error: null };
     } catch (error) {
-        console.error("Error in fetchSchedulesByDateRange:", error);
         return { data: null, error: { message: (error as Error).message, details: '', hint: '', code: '' } }
     };
 };
@@ -112,7 +109,6 @@ export const fetchScheduleById = async (scheduleId: UUID): Promise<DeliverySched
 
         return schedule;
     } catch (error) {
-        console.error("Error in fetchScheduleById:", error);
         return null;
     }
 };
@@ -140,7 +136,6 @@ const updateScheduleStatus = async (
 
         return { data: updatedSchedule, error: null };
     } catch (error) {
-        console.error("Error in updateScheduleStatus:", error);
         return {
             data: null,
             error: {

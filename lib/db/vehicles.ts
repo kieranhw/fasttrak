@@ -9,7 +9,6 @@ const fetchVehicles = async (): Promise<Vehicle[] | null> => {
         const { data: userProfile, error: userProfileError } = await db.profiles.fetch.current();
 
         if (userProfileError || !userProfile || !userProfile.store_id) {
-            console.error("Error fetching user profile or store_id is missing:", userProfileError);
             return null;
         }
 
@@ -25,7 +24,6 @@ const fetchVehicles = async (): Promise<Vehicle[] | null> => {
 
         return vehicles as Vehicle[] ?? null;
     } catch (error) {
-        console.error("Error in fetchVehicles:", error);
         return null;
     }
 };
@@ -46,7 +44,6 @@ const fetchVehicleById = async (id: UUID): Promise<Vehicle | null> => {
 
         return data ?? null;
     } catch (error) {
-        console.error("Error in fetchVehicleById:", error);
         return null;
     }
 }
@@ -65,7 +62,6 @@ const deleteVehicleById = async (id: UUID): Promise<boolean> => {
 
         return true;
     } catch (error) {
-        console.error("Error in deleteVehicleById:", error);
         return false;
     }
 }
@@ -95,7 +91,6 @@ export const createVehicle = async (vehicleData: Partial<Vehicle>): Promise<{ da
 
         return { data, error: null };
     } catch (error) {
-        console.error("Error in createVehicle:", error);
         return { data: null, error: error as Error };
     }
 };
@@ -112,7 +107,6 @@ const updateVehicleById = async (vehicleId: UUID, vehicleData: Partial<Vehicle>)
 
         return { data, error: null };
     } catch (error) {
-        console.error("Error in updateVehicleById:", error);
         return { data: null, error: error as Error };
     }
 };
