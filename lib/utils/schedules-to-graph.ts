@@ -11,31 +11,26 @@ import { Edge } from "../routing/model/Edge";
 export async function createGraphAndSolutionFromScheduleArray(schedules: DeliverySchedule[]): Promise<[Graph, VRPSolution]> {
     const graph = new Graph();
     const solution = new VRPSolution();
+    solution.loadMetrics(schedules[0].metric_avg_speed!, schedules[0].metric_distance_multiplier!)
 
     // Create nodes for depot, assuming all schedules share the same depot
     const depotCoordinates: Location = { lat: schedules[0].depot_lat, lng: schedules[0].depot_lng };
     const depotNode = new RouteNode(null, depotCoordinates, true);
     graph.addNode(depotNode);
-    console.log(schedules)
 
     // Create nodes for packages and edges from depot to each package
     for (const schedule of schedules) {
-        console.log(schedule.package_order)
-
         for (const pkg of schedule.package_order) {
-            // catch error if pkg.recipient_address_lat or lng is null
-
             if (pkg) {
                 const coordinates = { lat: pkg.recipient_address_lat as number, lng: pkg.recipient_address_lng as number };
                 const pkgNode = new RouteNode(pkg, coordinates);
                 graph.addNode(pkgNode);
-                graph.addEdge(new Edge(depotNode, pkgNode, calculateDistance(depotNode, pkgNode)));
+                graph.addEdge(new Edge(depotNode, pkgNode, calculateDistance(depotNode, pkgNode, schedules[0].metric_distance_multiplier!)));
             }
-
         }
     }
 
-    // TODO: Test if manual setting works. This should not affect the graph because it is not being processed, only
+    // Manual settings to populate the schedules. This should not affect the graph because it is not being processed, only
     // for building a visualisation
     const scheduleProfile: ScheduleProfile = {
         optimisation_profile: OptimisationProfile.Eco,
@@ -47,20 +42,18 @@ export async function createGraphAndSolutionFromScheduleArray(schedules: Deliver
 
     // Create VehicleRoutes and VRPSolution from schedules
     for (const schedule of schedules) {
-
         const route = new VehicleRoute(schedule.vehicle, depotNode, scheduleProfile);
         for (const pkg of schedule.package_order) {
             if (pkg) {
                 const pkgNode = graph.nodes.find(node => node.pkg?.package_id === pkg.package_id);
                 if (pkgNode) {
-                    const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode);
                     route.addNode(pkgNode, 0);  // Assume timeRequired is 0 for simplicity
                 }
             }
-
         }
         route.closeRoute(depotNode);
         solution.addRoute(route);
+        solution.updateRouteMeasurements();
     }
 
     return [graph, solution];
@@ -70,6 +63,7 @@ export async function createGraphAndSolutionFromScheduleArray(schedules: Deliver
 export async function createGraphAndSolutionFromSchedule(schedule: DeliverySchedule): Promise<[Graph, VRPSolution]> {
     const graph = new Graph();
     const solution = new VRPSolution();
+    solution.loadMetrics(schedule.metric_avg_speed!, schedule.metric_distance_multiplier!)
 
     // Create nodes for depot, assuming all schedules share the same depot
     // TODO: Change depot coordinates by pulling from DB
@@ -82,7 +76,7 @@ export async function createGraphAndSolutionFromSchedule(schedule: DeliverySched
         const coordinates = { lat: pkg.recipient_address_lat as number, lng: pkg.recipient_address_lng as number };
         const pkgNode = new RouteNode(pkg, coordinates);
         graph.addNode(pkgNode);
-        graph.addEdge(new Edge(depotNode, pkgNode, calculateDistance(depotNode, pkgNode)));
+        graph.addEdge(new Edge(depotNode, pkgNode, calculateDistance(depotNode, pkgNode, schedule.metric_distance_multiplier!)));
     }
 
     // TODO: Test if manual setting works. This should not affect the graph because it is not being processed, only
@@ -101,11 +95,12 @@ export async function createGraphAndSolutionFromSchedule(schedule: DeliverySched
         const pkgNode = graph.nodes.find(node => node.pkg?.package_id === pkg.package_id);
         if (pkgNode) {
             const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgNode);
-            route.addNode(pkgNode, 0);  // Assume timeRequired is 0 for simplicity
+            route.addNode(pkgNode, 0); 
         }
     }
     route.closeRoute(depotNode);
     solution.addRoute(route);
+    solution.updateRouteMeasurements();
 
     return [graph, solution];
 }

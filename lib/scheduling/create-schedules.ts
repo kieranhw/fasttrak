@@ -25,7 +25,7 @@ import { generateMetrics as generateMetrics } from "../routing/algorithms/genera
 export async function createSchedules(vehiclesData: Vehicle[], packagesData: Package[], date: Date, profile: ScheduleProfile):
     Promise<{ schedules: DeliverySchedule[], report: ScheduleReport } | null> {
 
-        // Validate data before processing
+    // Validate data before processing
     const depot = await db.depots.fetch.forUser();
 
     if (!vehiclesData || vehiclesData.length === 0) {
@@ -80,7 +80,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
         vrpSolution = response.finalSolution;
         scheduleReport = response.scheduleReport;
     }
- 
+
     // Process the solution locally as a fallback
     //const response = await hybridAlgorithm(graph, vehiclesData, profile, metrics, false);
     //vrpSolution = response.finalSolution;
@@ -109,6 +109,8 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
             actual_distance_miles: route.actualDistanceMiles.toFixed(2) as unknown as number,
             load_weight: route.currentWeight,
             load_volume: route.currentVolume,
+            metric_distance_multiplier: route.distanceMultiplier,
+            metric_avg_speed: route.avgSpeed,
             created_at: new Date()
         };
 

@@ -98,8 +98,8 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
     
             // Prevent creating an edge if source and target nodes are the same or have the same package address
             if (sourceIndex !== targetIndex && cyNodes[sourceIndex].data.pkgAddress !== cyNodes[targetIndex].data.pkgAddress) {
-                const edgeCost = calculateDistance(node, nextNode);
-                const minutesToTraverse = calculateTravelTime(edgeCost);
+                const edgeCost = calculateDistance(node, nextNode, route.distanceMultiplier);
+                const minutesToTraverse = calculateTravelTime(edgeCost, route.avgSpeed);
                 const routeName = `${minutesToTraverse.toFixed(2)} mins`;
     
                 cyEdges.push({
@@ -126,7 +126,7 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
             edges: cyEdges,
         },
         layout: { name: 'preset' },
-        autoungrabify: false,
+        autoungrabify: true,
         style: [
             {
                 selector: 'node',

@@ -31,4 +31,6 @@ export type DeliverySchedule = {
     load_volume: number;
     created_at: Date;
     schedule_report?: ScheduleReport;
+    metric_distance_multiplier?: number;
+    metric_avg_speed?: number;
 };

@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/dialog"
 
 import { createSchedules } from "@/lib/scheduling/create-schedules";
-import { createGraphAndSolutionFromScheduleArray } from "@/lib/utils/schedules-tograph";
+import { createGraphAndSolutionFromScheduleArray } from "@/lib/utils/schedules-to-graph";
 
 import { db } from "@/lib/db/db";
 import { displayGraph } from "@/lib/utils/cytoscape-data";
@@ -296,7 +296,9 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                             actual_distance_miles: deliverySchedule[schedule].actual_distance_miles,
                             load_weight: deliverySchedule[schedule].load_weight,
                             load_volume: deliverySchedule[schedule].load_volume,
-                            schedule_report: reportId
+                            schedule_report: reportId,
+                            metric_distance_multiplier: deliverySchedule[schedule].metric_distance_multiplier,
+                            metric_avg_speed: deliverySchedule[schedule].metric_avg_speed
                         })
                     if (error) {
                         alert(error.message)

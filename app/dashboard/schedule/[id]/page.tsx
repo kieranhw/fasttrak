@@ -1,7 +1,7 @@
 'use client'
 
 import { fetchSchedulesByDate } from "@/lib/db/delivery-schedules";
-import { createGraphAndSolutionFromSchedule } from "@/lib/utils/schedules-tograph";
+import { createGraphAndSolutionFromSchedule } from "@/lib/utils/schedules-to-graph";
 import { DeliverySchedule } from "@/types/db/DeliverySchedule";
 import { useState, useEffect } from "react";
 import { date } from "zod";
