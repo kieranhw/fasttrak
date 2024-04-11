@@ -71,7 +71,7 @@ export const CreateStoreForm: React.FC<StoreFormProps> = ({ refreshStore, refres
             const { data: createdStore, error } = await db.stores.create(store);
 
             if (error) {
-                console.log("Error occurred while creating store:", error);
+                //console.log("Error occurred while creating store:", error);
                 // Handle the error case here
             } else if (createdStore && createdStore.store_id) {
                 // Here you have the created store with the UUID
@@ -80,7 +80,7 @@ export const CreateStoreForm: React.FC<StoreFormProps> = ({ refreshStore, refres
                 refreshDepot(); // Clear previous states if page not refreshed
             } else {
                 // Handle the case where the store was not returned
-                console.log("Store was not created.");
+                //console.log("Store was not created.");
             }
         } catch (error) {
             console.error("An unexpected error occurred:", error);

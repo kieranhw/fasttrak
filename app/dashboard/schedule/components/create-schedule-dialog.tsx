@@ -145,7 +145,7 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
             delivery_time: parseInt(formFields.deliveryTime),
         };
 
-        console.log(scheduleProfile);
+        //console.log(scheduleProfile);
 
         // Call the handleScheduleDelivery function to process the schedule
         handleScheduleDelivery(scheduleProfile);

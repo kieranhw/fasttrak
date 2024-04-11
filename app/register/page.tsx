@@ -28,7 +28,7 @@ export default function Login({
 }) {
     const signUp = async (email: string, password: string, confirmPassword: string, firstName: string, lastName: string) => {
         "use server";
-        console.log("Sign up called")
+        //console.log("Sign up called")
 
         const origin = headers().get("origin");
         const cookieStore = cookies();

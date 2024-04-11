@@ -186,7 +186,7 @@ export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => 
                 const res = await db.schedules.update.status(id, status)
 
                 if (res) {
-                    console.log("Delivery status updated successfully.")
+                    //console.log("Delivery status updated successfully.")
                     refreshSchedule(res.data!);
 
                 } else {
@@ -211,14 +211,14 @@ export const columns = (refreshSchedule: (updatedSchedule: DeliverySchedule) => 
                 const deliveredPackages = schedule.package_order.filter(pkg => deliveredPackageIds.includes(pkg.package_id));
                 const failedPackages = schedule.package_order.filter(pkg => failedPackageIds.includes(pkg.package_id));
 
-                console.log("Before update")
+                //console.log("Before update")
 
                 const newSchedule = await updatePackages(schedule, deliveredPackages, failedPackages);
 
-                console.log("Before refresh")
+                //console.log("Before refresh")
                 if (newSchedule) {
                     refreshSchedule(newSchedule);
-                    console.log("after refresh")
+                    //console.log("after refresh")
 
                 }
             }

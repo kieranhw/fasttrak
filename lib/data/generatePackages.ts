@@ -12,7 +12,7 @@ export const generatePackages = async (numPackages: number): Promise<Package[]> 
     const packages: Package[] = [];
     const addresses: { address: string, lat: number, lng: number }[] = randomAddresses;
 
-    console.log("addresses:" + addresses.length);
+    //console.log("addresses:" + addresses.length);
 
     for (let i = 0; i < numPackages; i++) {
         const priorities: PriorityType[] = [PriorityType.Standard, PriorityType.Express];

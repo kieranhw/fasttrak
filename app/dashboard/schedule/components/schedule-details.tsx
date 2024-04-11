@@ -258,7 +258,7 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                 })
                 .select();
             if (report.error) {
-                console.log(report.error)
+                //console.log(report.error)
             } else {
                 for (const schedule in deliverySchedule) {
                     let packageOrderIds = [];

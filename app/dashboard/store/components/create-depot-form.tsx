@@ -89,7 +89,7 @@ export function CreateDepotForm() {
 
         try {
             const { data: createdDepot, error } = await db.depots.create(depot);
-            console.log("Created depot: " + createdDepot)
+            //console.log("Created depot: " + createdDepot)
 
             if (error) {
                 alert("Error occurred while creating depot: " + error);

@@ -19,7 +19,7 @@ export default function ManagePackage() {
       const packages = await db.packages.fetch.inventory();
       if (packages) {
         setData(packages);
-        console.log(packages);
+        //console.log(packages);
       }
     }
     fetchData();

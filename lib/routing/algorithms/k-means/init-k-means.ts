@@ -66,9 +66,9 @@ export async function initKMeans(graph: Graph, vehicles: Vehicle[], profile: Sch
 
     // print length of each queue
     for (const queue of clusterPriorityQueues) {
-        console.log(queue.getData().length);
+        //console.log(queue.getData().length);
     }
-    console.log("Leftover after clustering: " + mainQueue.getData().length);
+    //console.log("Leftover after clustering: " + mainQueue.getData().length);
 
     // Step 4: Allocate priority queue clusters to vehicles
     // For each cluster, allocate packages from the respective priority queue to the vehicle until the first constraint is met

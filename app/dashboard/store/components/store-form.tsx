@@ -132,7 +132,7 @@ export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate, refr
             if (store && store.store_id) {
                 const { data: returnedStore, error } = await db.stores.update.byId(store.store_id, updatedStore);
                 if (error) {
-                    console.log("Error occurred while updating store:", error);
+                    //console.log("Error occurred while updating store:", error);
                 } else if (returnedStore) {
                     // Update store in state
                     onStoreUpdate(returnedStore);
@@ -170,7 +170,7 @@ export const StoreForm: React.FC<StoreFormProps> = ({ store, onStoreUpdate, refr
         const res = await db.profiles.leaveStore();
 
         if (res.error) {
-            console.log("Error occurred while leaving store:", res.error);
+            //console.log("Error occurred while leaving store:", res.error);
         } else {
             refreshStore();
             toast({

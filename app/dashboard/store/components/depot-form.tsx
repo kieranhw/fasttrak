@@ -139,7 +139,7 @@ export const CreateDepotForm: React.FC<CreateDepotFormProps> = ({ depot, onDepot
                 // Update depot
                 const { data: returnedDepot, error } = await db.depots.update.byId(depot.depot_id, updatedDepot);
                 if (error) {
-                    console.log("Error occurred while updating depot:", error);
+                    //console.log("Error occurred while updating depot:", error);
                 } else if (returnedDepot) {
                     // Update store in state
                     onDepotUpdate(returnedDepot);
@@ -154,7 +154,7 @@ export const CreateDepotForm: React.FC<CreateDepotFormProps> = ({ depot, onDepot
                 // Create new depot
                 const { data: createdDepot, error } = await db.depots.create(updatedDepot);
                 if (error) {
-                    console.log("Error occurred while creating depot:", error);
+                    //console.log("Error occurred while creating depot:", error);
                 } else if (createdDepot) {
                     // Update store in state
                     onDepotUpdate(createdDepot);
@@ -252,7 +252,7 @@ export const CreateDepotForm: React.FC<CreateDepotFormProps> = ({ depot, onDepot
             setIsFormChanged(formChanged);
 
         }
-        console.log()
+        //console.log()
     }, [watchedFields, depot]);
 
 

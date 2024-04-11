@@ -23,7 +23,7 @@ export default function ManagePackage() {
         });
         
         setData(packages);
-        console.log(packages);
+        //console.log(packages);
       }
     }
     fetchData();

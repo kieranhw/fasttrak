@@ -142,9 +142,9 @@ export async function calculateActualTravel(route: VehicleRoute): Promise<void> 
         .filter((location) => location.lat() !== depot.lat() && location.lng() !== depot.lng());
     const allNodes = [depot, ...customerLocations, depot];
 
-    console.log("Estimated Metrics For Route: " + customerLocations.length + " packages")
-    console.log(route.actualDistanceMiles.toFixed(2) + " miles")
-    console.log(route.actualTimeMins.toFixed(2) + " minutes")
+    //console.log("Estimated Metrics For Route: " + customerLocations.length + " packages")
+    //console.log(route.actualDistanceMiles.toFixed(2) + " miles")
+    //console.log(route.actualTimeMins.toFixed(2) + " minutes")
 
     // Divide the nodes into chunks of 25 waypoints
     let chunks: google.maps.LatLng[][] = [];
@@ -210,9 +210,9 @@ export async function calculateActualTravel(route: VehicleRoute): Promise<void> 
     route.actualTimeMins = totalActualDuration * 60;
     route.actualTimeCalculated = true;
 
-    console.log("Actual Metrics for Route: " + responseRouteLegs + " legs")
-    console.log(route.actualDistanceMiles.toFixed(2) + " miles")
-    console.log(route.actualTimeMins.toFixed(2) + " minutes")
+    //console.log("Actual Metrics for Route: " + responseRouteLegs + " legs")
+    //console.log(route.actualDistanceMiles.toFixed(2) + " miles")
+    //console.log(route.actualTimeMins.toFixed(2) + " minutes")
 }
 
 function createEvenlySpreadIndices(length: number, maxIndices: number = 25): number[] {

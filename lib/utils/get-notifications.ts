@@ -40,7 +40,7 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
     if (store && storeDepot) {
         // Assuming the fetch.byDate function returns schedules for today
         const schedulesToday = await db.schedules.fetch.byDate(new Date());
-        console.log(schedulesToday);
+        //console.log(schedulesToday);
 
         // Assume storeDepot.dispatch_time is in 'HH:mm' format and storeDepot.days_active is an array of active days
         const deadlineTime = parseISO(`${format(new Date(), 'yyyy-MM-dd')}T${storeDepot.dispatch_time}:00`);

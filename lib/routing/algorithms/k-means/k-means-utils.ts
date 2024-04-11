@@ -76,7 +76,7 @@ export function kMeans(queue: PriorityQueue, k: number, maxIterations = 100, rec
         if (recursionDepth >= MAX_RECURSION_DEPTH) {
             return new Error("Max recursion depth reached, unable to find non-empty clusters.");
         }
-        console.log("Empty cluster found, restarting...");
+        //console.log("Empty cluster found, restarting...");
         queue = new PriorityQueue();
         originalNodes.forEach(node => queue.enqueue(node));
         return kMeans(queue, k, maxIterations, recursionDepth + 1);

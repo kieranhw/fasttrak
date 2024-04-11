@@ -102,7 +102,7 @@ export const columns = (refreshData: () => void): ColumnDef<Vehicle>[] => [
                 const res = await db.vehicles.delete.byId(id);
 
                 if (res) {
-                    console.log("Vehicle removed successfully.")
+                    //console.log("Vehicle removed successfully.")
                 } else {
                     console.warn("Failed to remove vehicle.");
                 }
