@@ -53,7 +53,7 @@ export function insert(offspring: VRPSolution, remainingPackages: PriorityQueue 
     if (newFitness < 499) {
         return clonedOffspring;
     } else {
-        // If the new offspring has more than 2 penalties, return the original offspring
+        // If the new offspring has penalties, return the original offspring
         remainingPackages.enqueue(node);
         return offspring;
     }

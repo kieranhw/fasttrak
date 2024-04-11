@@ -57,10 +57,5 @@ function performCrossoverOnRoutes(parent1: VehicleRoute, parent2: VehicleRoute):
     clone1.nodes.splice(startIndex1, segmentSize, ...segment2);
     clone2.nodes.splice(startIndex2, segmentSize, ...segment1);
 
-    // Update measurements with a fixed delivery time of 5
-    const deliveryTime = clone1.scheduleProfile.delivery_time;
-    clone1.updateMeasurements(deliveryTime);
-    clone2.updateMeasurements(deliveryTime);
-
     return [clone1, clone2];
 }

@@ -21,8 +21,6 @@ export function mutate(clonedRoute: VehicleRoute, depotNode: RouteNode): Vehicle
             findShortestPathForNodes(clonedRoute, depotNode);
     }
 
-    clonedRoute.updateMeasurements(clonedRoute.scheduleProfile.delivery_time);
-
     return clonedRoute;
 }
 
