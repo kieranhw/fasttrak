@@ -76,7 +76,6 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
 
         const pkgAddress = node.pkg ? node.pkg.recipient_address : null;
 
-
         return {
             data: {
                 id: index.toString(),
@@ -107,7 +106,7 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
                     data: {
                         source: sourceIndex.toString(),
                         target: targetIndex.toString(),
-                        color: ['red', 'green', 'blue', 'yellow', 'purple', 'pink', 'orange', 'cyan'][index % 8],
+                        color: ['red', 'green', 'blue', 'purple', 'pink', 'orange', 'cyan', 'yellow'][index % 8],
                         label: routeName,
                         routeName,
                         minutes: minutesToTraverse
@@ -127,7 +126,7 @@ export function displayGraph(graph: Graph, solution: VRPSolution) {
             edges: cyEdges,
         },
         layout: { name: 'preset' },
-        autoungrabify: true,
+        autoungrabify: false,
         style: [
             {
                 selector: 'node',
