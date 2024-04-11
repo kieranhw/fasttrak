@@ -7,6 +7,7 @@ import { RouteNode } from "../routing/model/RouteNode";
 import { Location } from "@/types/Location";
 import { calculateDistance } from "./calculate-distance";
 import { Edge } from "../routing/model/Edge";
+import { ScheduleInitialiser, ScheduleOptimiser } from "@/types/db/ScheduleReport";
 
 export async function createGraphAndSolutionFromScheduleArray(schedules: DeliverySchedule[]): Promise<[Graph, VRPSolution]> {
     const graph = new Graph();
@@ -37,7 +38,11 @@ export async function createGraphAndSolutionFromScheduleArray(schedules: Deliver
         time_window: 8,
         delivery_time: 3,
         selected_vehicles: schedules.map(schedule => schedule.vehicle),
-        auto_selection: true
+        auto_selection: true,
+        select_optimal: false,
+        initialisation_algorithm: ScheduleInitialiser.None,
+        optimisation_algorithm: ScheduleOptimiser.None,
+        generations: 0
     }
 
     // Create VehicleRoutes and VRPSolution from schedules
@@ -86,7 +91,11 @@ export async function createGraphAndSolutionFromSchedule(schedule: DeliverySched
         time_window: 8,
         delivery_time: 3,
         selected_vehicles: [schedule.vehicle],
-        auto_selection: true
+        auto_selection: true,
+        select_optimal: false,
+        initialisation_algorithm: ScheduleInitialiser.None,
+        optimisation_algorithm: ScheduleOptimiser.None,
+        generations: 0
     }
 
     // Create VehicleRoute and VRPSolution from schedule

@@ -31,7 +31,7 @@ export type VRPMetrics = {
  * Two optimised solutions are processed with the Genetic Algorithm: one with random initialisation, and one with 
  * K-Means initialisation.
  * 
- * The final solution is selected based on the efficiency scores of each solution.
+ * The solution with the highest total efficiency score is selected as the final solution.
  * 
  * @param graph - Graph of nodes: packages and depot
  * @param vehicles - Array of available vehicles
@@ -49,8 +49,9 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     const start1 = Date.now();
     let randomOnly = await roundRobinAllocation(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
     randomOnly.loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
+    const randomOnlyEfficiency: EfficiencyScores = calculateEfficiencyScores(randomOnly);
     const end1 = Date.now();
-    //console.log("Random solution computed in " + (end1 - start1) / 1000 + " seconds");
+    console.log("Random solution computed in " + (end1 - start1) / 1000 + " seconds");
 
     // 3. If selected, estimate the maximum number of vehicles required to deliver all packages 
     if (profile.auto_selection == true) {
@@ -104,7 +105,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     kMeansOnly[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
     const KMeansOnlyEfficiency: EfficiencyScores = calculateEfficiencyScores(kMeansOnly[0]);
     const end2 = Date.now();
-    //console.log("K-Means solution computed in " + (end2 - start2) / 1000 + " seconds");
+    console.log("K-Means solution computed in " + (end2 - start2) / 1000 + " seconds");
 
     // 5. Run K-Means and Random initialisation to get an initial solution for the GA
     let KMeansInitial = await initKMeans(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
@@ -112,7 +113,6 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
 
     let randomInitial = await initRandom(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
     randomInitial[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
-    const randomOnlyEfficiency: EfficiencyScores = calculateEfficiencyScores(randomInitial[0]);
 
     // 6. Run the Genetic Algorithm to optimise the K-Means and Random initialisation solutions
     const NUM_GENERATIONS = 1000000;
@@ -123,7 +123,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     const kMeansOptimised = gaKMeansInit.evolve();
     const kMeansOptimisedEfficiency: EfficiencyScores = calculateEfficiencyScores(kMeansOptimised);
     const end3 = Date.now();
-    //console.log("K-Means Optimised solution computed in " + (end3 - start3) / 1000 + " seconds");
+    console.log("K-Means Optimised solution computed in " + (end3 - start3) / 1000 + " seconds");
 
     // Random Initialised
     const start4 = Date.now();
@@ -131,7 +131,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     const randomOptimised = gaRandomInit.evolve();
     const randomOptimisedEfficiency: EfficiencyScores = calculateEfficiencyScores(randomOptimised);
     const end4 = Date.now();
-    //console.log("Random Optimised solution computed in " + (end4 - start4) / 1000 + " seconds");
+    console.log("Random Optimised solution computed in " + (end4 - start4) / 1000 + " seconds");
 
     // 7. Calculate the real times and distances for the optimised solutions
     for (const solution of [randomOnly, kMeansOnly[0], kMeansOptimised, randomOptimised]) {

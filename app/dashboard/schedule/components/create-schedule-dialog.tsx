@@ -27,6 +27,8 @@ import { db } from '@/lib/db/db';
 import { HiLightningBolt } from 'react-icons/hi';
 import { FaLeaf, FaTruck } from 'react-icons/fa';
 import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ScheduleInitialiser, ScheduleOptimiser } from '@/types/db/ScheduleReport';
 
 
 interface ScheduleDialogProps {
@@ -46,7 +48,8 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
     const [numPendingPackages, setNumPendingPackages] = useState<Number | null>(null);
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [selectedVehicles, setSelectedVehicles] = useState<Vehicle[]>([]);
-    const [minimiseVehicles, setMinimiseVehicles] = useState<boolean>(false);
+    const [minimiseVehicles, setMinimiseVehicles] = useState<boolean>(true);
+    const [selectOptimal, setSelectOptimal] = useState<boolean>(true);
     const [isScheduling, setIsScheduling] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [userHasDepot, setUserHasDepot] = useState<boolean>(false);
@@ -101,6 +104,9 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
                     optimisationProfile: 'Eco',
                     timeWindow: '8',
                     deliveryTime: '3',
+                    initialisationAlgorithm: ScheduleInitialiser.Random,
+                    optimisationAlgorithm: ScheduleOptimiser.GA,
+                    generations: '1000000',
                 });
             }, 200);
 
@@ -121,6 +127,9 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
         optimisationProfile: 'Eco',
         timeWindow: '8',
         deliveryTime: '3',
+        initialisationAlgorithm: ScheduleInitialiser.Random,
+        optimisationAlgorithm: ScheduleOptimiser.GA,
+        generations: '1000000',
     });
 
     const isSubmitDisabled = () => {
@@ -138,15 +147,20 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
         event.preventDefault();
 
         const scheduleProfile: ScheduleProfile = {
+            // Profile settings
             selected_vehicles: selectedVehicles,
             auto_selection: minimiseVehicles,
             optimisation_profile: formFields.optimisationProfile as OptimisationProfile,
             time_window: parseInt(formFields.timeWindow),
             delivery_time: parseInt(formFields.deliveryTime),
+            // Advanced settings
+            select_optimal: selectOptimal,
+            initialisation_algorithm: formFields.initialisationAlgorithm,
+            optimisation_algorithm: formFields.optimisationAlgorithm,
+            generations: formFields.optimisationAlgorithm === ScheduleOptimiser.GA ? parseInt(formFields.generations) : 0,
         };
 
-        //console.log(scheduleProfile);
-
+        console.log(scheduleProfile);
         // Call the handleScheduleDelivery function to process the schedule
         handleScheduleDelivery(scheduleProfile);
 
@@ -169,6 +183,7 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
                     </DialogDescription>
                 }
             </DialogHeader>
+
 
             {/* Info */}
             <div className="grid gap-2 grid-cols-1 sm:grid-cols-2 text-xs">
@@ -221,105 +236,181 @@ export const ScheduleDialogContent: React.FC<ScheduleDialogProps> = ({
             {/* Divider */}
             <div className="w-full border-t" />
 
-            {/* Form */}
-            <div className="flex justify-between gap-4">
-                <Label className="my-auto justify-center line-clamp-1">Selected Vehicles</Label>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="selectTrigger" disabled={vehicles.length == 0}>
-                            {vehicles.length > 0 &&
-                                <div className="line-clamp-1 font-normal">{selectedVehicles.length} Selected</div>
-                            }
-                            {!isLoading && vehicles.length == 0 &&
-                                <div className="line-clamp-1 font-normal">None available</div>
-                            }
-                            {isLoading &&
-                                <div className="inline-flex gap-2 font-normal items-center"><Loader2 size={18} className="animate-spin" /> Loading...</div>
-                            }
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-[180px] max-h-[200px] overflow-y-scroll">
-                        {vehicles.map((vehicle) => {
-                            return (
-                                <DropdownMenuCheckboxItem
-                                    key={vehicle.vehicle_id}
-                                    className="capitalize flex-grow"
-                                    checked={selectedVehicles.some(v => v.vehicle_id === vehicle.vehicle_id)}
-                                    onCheckedChange={(value) => handleCheckedChange(vehicle, value)}
-                                    onSelect={(event) => event.preventDefault()}
-                                >
-                                    {vehicle.registration}
-                                </DropdownMenuCheckboxItem>
-                            )
-                        })}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
+            <Tabs defaultValue="profile" className="w-full">
+                <TabsList className="w-full">
+                    <TabsTrigger className="w-full" value="profile">Profile</TabsTrigger>
+                    <TabsTrigger className="w-full" value="advanced">Advanced</TabsTrigger>
+                </TabsList>
+                <TabsContent value="profile">
+                    {/* Profile Form */}
+                    <div className="flex flex-col justify-between gap-4 mt-4">
+                        <div className="flex justify-between gap-4">
+                            <Label className="my-auto justify-center line-clamp-1">Selected Vehicles</Label>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="selectTrigger" disabled={vehicles.length == 0}>
+                                        {vehicles.length > 0 &&
+                                            <div className="line-clamp-1 font-normal">{selectedVehicles.length} Selected</div>
+                                        }
+                                        {!isLoading && vehicles.length == 0 &&
+                                            <div className="line-clamp-1 font-normal">None available</div>
+                                        }
+                                        {isLoading &&
+                                            <div className="inline-flex gap-2 font-normal items-center"><Loader2 size={18} className="animate-spin" /> Loading...</div>
+                                        }
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-[180px] max-h-[200px] overflow-y-scroll">
+                                    {vehicles.map((vehicle) => {
+                                        return (
+                                            <DropdownMenuCheckboxItem
+                                                key={vehicle.vehicle_id}
+                                                className="capitalize flex-grow"
+                                                checked={selectedVehicles.some(v => v.vehicle_id === vehicle.vehicle_id)}
+                                                onCheckedChange={(value) => handleCheckedChange(vehicle, value)}
+                                                onSelect={(event) => event.preventDefault()}
+                                            >
+                                                {vehicle.registration}
+                                            </DropdownMenuCheckboxItem>
+                                        )
+                                    })}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
 
-            <div className="flex justify-between ">
-                <Label htmlFor="min-vehicles" className="my-auto justify-center line-clamp-1">Auto Minimise Vehicles</Label>
-                <Switch id="min-vehicles" checked={minimiseVehicles} onCheckedChange={setMinimiseVehicles} />
-            </div>
+                        <div className="flex justify-between ">
+                            <Label htmlFor="min-vehicles" className="my-auto justify-center line-clamp-1">Auto Minimise Vehicles</Label>
+                            <Switch id="min-vehicles" checked={minimiseVehicles} onCheckedChange={setMinimiseVehicles} />
+                        </div>
 
-            <div className="flex justify-between gap-4">
-                <Label className="my-auto justify-center line-clamp-1 flex gap-1">Optimisation Profile</Label>
-                <Select value={formFields.optimisationProfile}
-                    onValueChange={(e) => setFormFields({ ...formFields, optimisationProfile: e.valueOf() })}>
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select Profile" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectLabel>Optimisation</SelectLabel>
-                            <SelectItem value="Eco"><div className="flex items-center gap-2">Economical<FaLeaf className="text-primary" /></div></SelectItem>
-                            <SelectItem value="Space"><div className="flex items-center gap-2">Load Utilisation<FaTruck /></div></SelectItem>
-                            <SelectItem value="Time"><div className="flex items-center gap-2">Fastest Delivery<HiLightningBolt className="text-yellow-400" /></div></SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
-            </div>
-            <div className="flex justify-between gap-4">
-                <Label className="my-auto justify-center line-clamp-1">Time Window</Label>
-                <Select value={formFields.timeWindow}
-                    onValueChange={(e) => setFormFields({ ...formFields, timeWindow: e.valueOf() })}>
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select Time" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectLabel>Time Window</SelectLabel>
-                            <SelectItem value="4">4 hours</SelectItem>
-                            <SelectItem value="5">5 hours</SelectItem>
-                            <SelectItem value="6">6 hours</SelectItem>
-                            <SelectItem value="7">7 hours</SelectItem>
-                            <SelectItem value="8">8 hours</SelectItem>
-                            <SelectItem value="9">9 hours</SelectItem>
-                            <SelectItem value="10">10 hours</SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
-            </div>
+                        <div className="flex justify-between gap-4">
+                            <Label className="my-auto justify-center line-clamp-1 flex gap-1">Optimisation Profile</Label>
+                            <Select value={formFields.optimisationProfile}
+                                onValueChange={(e) => setFormFields({ ...formFields, optimisationProfile: e.valueOf() })}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Select Profile" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Optimisation</SelectLabel>
+                                        <SelectItem value="Eco"><div className="flex items-center gap-2">Economical<FaLeaf className="text-primary" /></div></SelectItem>
+                                        <SelectItem value="Space"><div className="flex items-center gap-2">Load Utilisation<FaTruck /></div></SelectItem>
+                                        <SelectItem value="Time"><div className="flex items-center gap-2">Fastest Delivery<HiLightningBolt className="text-yellow-400" /></div></SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="flex justify-between gap-4">
+                            <Label className="my-auto justify-center line-clamp-1">Time Window</Label>
+                            <Select value={formFields.timeWindow}
+                                onValueChange={(e) => setFormFields({ ...formFields, timeWindow: e.valueOf() })}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Select Time" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Time Window</SelectLabel>
+                                        <SelectItem value="4">4 hours</SelectItem>
+                                        <SelectItem value="5">5 hours</SelectItem>
+                                        <SelectItem value="6">6 hours</SelectItem>
+                                        <SelectItem value="7">7 hours</SelectItem>
+                                        <SelectItem value="8">8 hours</SelectItem>
+                                        <SelectItem value="9">9 hours</SelectItem>
+                                        <SelectItem value="10">10 hours</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-            <div className="flex justify-between gap-4">
-                <Label className="my-auto justify-center line-clamp-1">Time Per Delivery</Label>
-                <Select value={formFields.deliveryTime}
-                    onValueChange={(e) => setFormFields({ ...formFields, deliveryTime: e.valueOf() })}>
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select Time" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectLabel>Time Per Delivery</SelectLabel>
-                            <SelectItem value="2">2 Minutes</SelectItem>
-                            <SelectItem value="3">3 Minutes</SelectItem>
-                            <SelectItem value="4">4 Minutes</SelectItem>
-                            <SelectItem value="5">5 Minutes</SelectItem>
-                            <SelectItem value="6">6 Minutes</SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
-            </div>
+                        <div className="flex justify-between gap-4">
+                            <Label className="my-auto justify-center line-clamp-1">Time Per Delivery</Label>
+                            <Select value={formFields.deliveryTime}
+                                onValueChange={(e) => setFormFields({ ...formFields, deliveryTime: e.valueOf() })}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Select Time" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Time Per Delivery</SelectLabel>
+                                        <SelectItem value="2">2 Minutes</SelectItem>
+                                        <SelectItem value="3">3 Minutes</SelectItem>
+                                        <SelectItem value="4">4 Minutes</SelectItem>
+                                        <SelectItem value="5">5 Minutes</SelectItem>
+                                        <SelectItem value="6">6 Minutes</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                </TabsContent>
 
+
+
+
+                <TabsContent value="advanced">
+                    {/* Advanced Form */}
+                    <div className="flex flex-col justify-between gap-4 mt-4">
+                        <div className="flex justify-between ">
+                            <Label htmlFor="min-vehicles" className="my-auto justify-center line-clamp-1 h-4">Select Optimal (Slow)</Label>
+                            <Switch id="min-vehicles" checked={selectOptimal} onCheckedChange={setSelectOptimal} />
+                        </div>
+
+                        <div className="flex justify-between gap-4">
+                            <Label className="my-auto justify-center line-clamp-1 flex gap-1 h-4">Initialisation</Label>
+                            <Select disabled={selectOptimal} value={formFields.initialisationAlgorithm}
+                                onValueChange={(e) => setFormFields({ ...formFields, initialisationAlgorithm: e.valueOf() as ScheduleInitialiser })}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Select Profile" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Initialisation Algorithm</SelectLabel>
+                                        <SelectItem value={ScheduleInitialiser.Random}><div className="flex items-center gap-2">Random</div></SelectItem>
+                                        <SelectItem value={ScheduleInitialiser.KMeans}><div className="flex items-center gap-2">K-Means</div> </SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="flex justify-between gap-4">
+                            <Label className="my-auto justify-center line-clamp-1 flex gap-1">Optimisation</Label>
+                            <Select disabled={selectOptimal} value={formFields.optimisationAlgorithm}
+                                onValueChange={(e) => setFormFields({ ...formFields, optimisationAlgorithm: e.valueOf() as ScheduleOptimiser })}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Select Profile" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Optimisation Algorithm</SelectLabel>
+                                        <SelectItem value={ScheduleOptimiser.None}><div className="flex items-center gap-2">None</div></SelectItem>
+                                        <SelectItem value={ScheduleOptimiser.GA}><div className="flex items-center gap-2">Genetic Algorithm</div></SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        {formFields.optimisationAlgorithm === ScheduleOptimiser.GA && selectOptimal == false &&
+                            <div className="flex justify-between gap-4">
+                                <Label className="my-auto justify-center line-clamp-1">Generations</Label>
+                                <Select value={formFields.generations}
+                                    onValueChange={(e) => setFormFields({ ...formFields, generations: e.valueOf() })}>
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue placeholder="Select Generations" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectLabel>Generations</SelectLabel>
+                                            <SelectItem value="500000">500,000</SelectItem>
+                                            <SelectItem value="1000000">1,000,000</SelectItem>
+                                            <SelectItem value="1500000">1,500,000</SelectItem>
+                                            <SelectItem value="2000000">2,000,000</SelectItem>
+                                            <SelectItem value="2500000">2,500,000</SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        }
+                    </div>
+                </TabsContent>
+            </Tabs>
 
             <DialogFooter>
                 <>

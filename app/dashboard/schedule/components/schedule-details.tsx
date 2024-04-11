@@ -209,6 +209,8 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
         setIsScheduleLoading(true);
         setIsScheduling(true);
 
+        console.log(profile);
+
         // Fetch vehicles and packages
         let vehicles = profile.selected_vehicles;
         let packages = await db.packages.fetch.pending();
