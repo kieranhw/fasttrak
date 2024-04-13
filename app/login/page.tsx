@@ -1,5 +1,6 @@
+"use server";
 import Link from "next/link";
-import { headers, cookies } from "next/headers";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import LoginForm from "./login-form";
@@ -10,6 +11,10 @@ export const metadata: Metadata = {
   description: "Sign in to your account to access the FastTrak dashboard.",
 }
 
+/**
+ * Login page component to allow users to sign in to the FastTrak dashboard. 
+ * Validates user credentials and redirects to the dashboard on success.
+ */
 export default function Login({
   searchParams,
 }: {
@@ -32,41 +37,6 @@ export default function Login({
 
     return redirect("/dashboard");
   };
-
-  const signUp = async (formData: FormData) => {
-    "use server";
-
-    const origin = headers().get("origin");
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${origin}/auth/callback`,
-      },
-    });
-
-    if (error) {
-      return redirect("/login?message=Could not authenticate user");
-    }
-
-    return redirect("/login?message=Check email to continue sign in process");
-  };
-
-  const signOut = async () => {
-    "use server";
-
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
-
-    await supabase.auth.signOut();
-
-    return redirect("/login");
-  }
 
   return (
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-[450px] justify-center gap-2">

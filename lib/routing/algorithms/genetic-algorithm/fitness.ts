@@ -4,11 +4,11 @@ import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { GeneticAlgorithm } from "./genetic-algorithm";
 
 export function routeFitness(route: VehicleRoute): number {
-
     const TimeWindowMins = (route.scheduleProfile.time_window * 60); // Time window in mins
 
+    // Adjust weights based on optimisation profile - must equal 12
     if (route.scheduleProfile.optimisation_profile === OptimisationProfile.Eco) {
-        var w1 = 4, w2 = 2, w3 = 3, w4 = 3;
+        var w1 = 5, w2 = 1, w3 = 3, w4 = 3;
     } else if (route.scheduleProfile.optimisation_profile === OptimisationProfile.Space) {
         var w1 = 1, w2 = 1, w3 = 5, w4 = 5;
     } else if (route.scheduleProfile.optimisation_profile === OptimisationProfile.Time) {
@@ -16,7 +16,6 @@ export function routeFitness(route: VehicleRoute): number {
     } else {
         var w1 = 3, w2 = 3, w3 = 3, w4 = 3;
     }
-
 
     const p1 = 500; // Penalty for space violation
     const p2 = 500; // Penalty for load violation

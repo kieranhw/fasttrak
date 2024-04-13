@@ -154,6 +154,7 @@ export class VehicleRoute {
             // Break if no next node, allowing the weight and volume to still be calculated
             if (!nextNode) break;
 
+            // Calculate Euclidean distance and time
             const distance = calculateDistance(node, nextNode);
             const traversalTime = calculateTravelTime(distance, this.avgSpeed);
 
@@ -169,6 +170,7 @@ export class VehicleRoute {
             this.eucDistanceMiles += distance;
         }
 
+        // Calculate actual time and distance
         if (this.avgSpeed !== 0 && this.distanceMultiplier !== 0) {
             this.actualDistanceMiles = this.eucDistanceMiles * this.distanceMultiplier;
             this.actualTimeMins = ((this.actualDistanceMiles / this.avgSpeed) * 60); // calculate time in minutes

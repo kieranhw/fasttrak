@@ -15,6 +15,9 @@ interface EmailCheckerProps {
     validateEmail: (email: string) => Promise<Boolean>;
 }
 
+/**
+ * Component to validate an email and check if exists in the database, and if not, proceed to the registration form.
+ */
 export const EmailChecker = ({ signUp, errorMsg, validateEmail }: EmailCheckerProps) => {
     const [email, setEmail] = useState('');
     const [emailChecked, setEmailChecked] = useState(false);

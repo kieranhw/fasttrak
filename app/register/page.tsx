@@ -1,19 +1,10 @@
+"use server";
 import { Metadata } from "next"
-import Image from "next/image"
-import Link from "next/link"
-
-import { cn } from "@/lib/utils/utils"
-import { buttonVariants } from "@/components/ui/button"
-import bgFull from '@/public/images/bgFull.jpg'
 import { headers, cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import RegisterForm from "./register-form"
 import { db } from "@/lib/db/db"
-import { useState } from "react"
 import { EmailChecker } from "./email-checker"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircle } from "lucide-react"
 import validator from "validator"
 
 export const metadata: Metadata = {
@@ -21,14 +12,13 @@ export const metadata: Metadata = {
     description: "Register a new account for the FastTrak dashboard.",
 }
 
-export default function Login({
+export default function Register({
     searchParams,
 }: {
     searchParams: { message: string };
 }) {
     const signUp = async (email: string, password: string, confirmPassword: string, firstName: string, lastName: string) => {
         "use server";
-        //console.log("Sign up called")
 
         const origin = headers().get("origin");
         const cookieStore = cookies();
@@ -39,21 +29,22 @@ export default function Login({
         // Minimum 8 characters, include one special character
         const passwordValid = password.length >= 8 && /[^A-Za-z0-9]/.test(password);
 
-        // Check if the email is valid
+        // Check if the email is valid format
         if (!validator.isEmail(email)) return redirect("/register?message=Email format is invalid");
 
-        // Check password requirements
+        // Check if password meets requirements
         if (!passwordValid) return redirect("/register?message=Password is weak");
 
-        // Check password matches
+        // Check password matches confirm password
         if (password !== confirmPassword) return redirect("/register?message=Passwords do not match");
 
-        // Check first and last name exist
+        // Check first and last name exist in request
         if (!firstName || !lastName) return redirect("/register?message=First name and last name are required");
 
-        // Check first and last name are valid
+        // Check first and last name are valid format
         if (!validator.isAlpha(firstName) || !validator.isAlpha(lastName)) return redirect("/register?message=Name format is invalid")
 
+        // Sign up user to auth service
         const { data: user, error } = await supabase.auth.signUp({
             email,
             password,
@@ -68,8 +59,6 @@ export default function Login({
             const profileCreationResult = await db.profiles.create.byUser(user.user, firstName, lastName);
             if (profileCreationResult.error) {
                 console.error("Error creating user profile:", profileCreationResult.error);
-
-                // TODO: Remove user's auth if profile cannot be created
             } else {
                 // If success, log user in and redirect to dashboard
                 const { error } = await supabase.auth.signInWithPassword({
@@ -91,7 +80,12 @@ export default function Login({
 
     const validateEmail = async (email: string): Promise<Boolean> => {
         "use server";
+
+        // Check if email is valid format
         if (!validator.isEmail(email)) return false
+
+        // Check if email exists in database
+        if (await db.profiles.fetch.profile.byEmail(email).then(res => res.found)) return false
 
         return true
     }
