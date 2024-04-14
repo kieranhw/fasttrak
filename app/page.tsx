@@ -1,19 +1,15 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
-
 import { Button } from '@/components/ui/button';
-import { BiPackage } from 'react-icons/bi';
 import { TbRoute } from 'react-icons/tb'
-import { FaSearchLocation, FaTruck } from 'react-icons/fa';
-import './globals.css'
-
-import bgFull from '@/public/images/bgFull.jpg'
-import { useEffect, useState } from 'react';
-import { UserProfile } from '@/types/db/UserProfile';
+import { FaSearchLocation } from 'react-icons/fa';
 import { MdLowPriority } from 'react-icons/md';
 import { LiaClipboardListSolid } from "react-icons/lia";
 import { cookies } from "next/headers";
+import bgFull from '@/public/images/bgFull.jpg'
+
+import './globals.css'
 
 export default async function Index() {
   const supabase = createClient(cookies());
@@ -54,7 +50,7 @@ export default async function Index() {
                 Vehicle Routing
               </h1>
               <p className="mt-2 text-md lg:text-xl text-white text-center xl:text-start drop-shadow-md max-w-xl">
-                Network optimisation for 'last mile' delivery services.
+                Route optimisation for last mile delivery.
               </p>
               <div className="my-4 flex gap-2">
                 <Link href="/demo">
@@ -97,7 +93,7 @@ export default async function Index() {
                       <h3 className="text-xl font-bold text-white text-start">Route Optimisation</h3>
                     </div>
                     <p className="mt-4 text-start text-neutral-200 text-white">
-                      Optimise delivery routes with our advanced algorithms, ensuring cost effective routing networks.
+                      Advanced algorithmic routing ensures the most efficient delivery routes are calculated.
                     </p>
                   </div>
                 </div>
