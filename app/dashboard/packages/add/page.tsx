@@ -14,6 +14,7 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { geocodeAddresses as geocode } from "@/lib/google-maps/client/geocoder";
 import { toast } from "@/components/ui/use-toast";
+import { db } from "@/lib/db/db";
 
 export default function AddPackage() {
 
@@ -76,10 +77,17 @@ export default function AddPackage() {
   }
 
   async function confirmPackage(values: z.infer<typeof PackageSchema>, resultSender: google.maps.GeocoderResult[], resultRecipient: google.maps.GeocoderResult[]) {
+    const store = await db.stores.fetch.forUser();
+    if (!store.data || !store.data.store_id) {
+      alert("You do not have a store. Please create or join a store first.")
+      return;
+    }
+
     const { error } = await supabase
       .from('packages')
       .insert({
         tracking_id: generateFT(),
+        store_id: store.data?.store_id,
         recipient_name: values.recipient_name,
         recipient_phone: values.recipient_phone,
         recipient_address: resultRecipient[0].formatted_address,
