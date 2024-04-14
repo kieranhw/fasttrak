@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { geocodeAddresses as geocode } from "@/lib/google-maps/client/geocoder";
 import { toast } from "@/components/ui/use-toast";
 import { db } from "@/lib/db/db";
+import { CurrentState } from "@/types/db/Package";
 
 export default function AddPackage() {
 
@@ -99,6 +100,7 @@ export default function AddPackage() {
         sender_address_lat: resultSender[0].geometry.location.lat(),
         sender_address_lng: resultSender[0].geometry.location.lng(),
         status: "Pending",
+        current_state: CurrentState.Pending,
         weight: Number(values.weight).toFixed(2),
         volume: Number(values.volume).toFixed(2),
         fragile: values.fragile,
