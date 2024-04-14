@@ -1,4 +1,3 @@
-"use server";
 import { Metadata } from "next"
 import { headers, cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
