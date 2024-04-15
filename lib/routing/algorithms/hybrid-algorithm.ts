@@ -45,16 +45,13 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
 
     // 1. Generate a random solution to be used as a baseline and to estimate the maximum number of vehicles required
     // Start timer to calculate the time taken to generate the solution
-    
-    const start1 = Date.now();
-    let randomOnly = await roundRobinAllocation(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
-    randomOnly.loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
-    const randomOnlyEfficiency: EfficiencyScores = calculateEfficiencyScores(randomOnly);
-    const end1 = Date.now();
-    console.log("Random solution computed in " + (end1 - start1) / 1000 + " seconds");
+
 
     // 3. If selected, estimate the maximum number of vehicles required to deliver all packages 
     if (profile.auto_selection == true) {
+        let vehicleEstimator = await roundRobinAllocation(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
+        vehicleEstimator.loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
+
         // Estimate the amount of vehicles needed to deliver all pending packages
         const totalWeightCapacityNeeded = graph.nodes.reduce((acc, node) => acc + (node.pkg?.weight ?? 0), 0);
         const totalVolumeCapacityNeeded = graph.nodes.reduce((acc, node) => acc + (node.pkg?.volume ?? 0), 0);
@@ -83,7 +80,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
         const EFFICIENCY_INCREASE = 0.5 // Estimated routing efficiency increase between the random solution and the final solution
 
         let currentTimeWindowMins = (profile.time_window * maximumVehiclesRequired.length) * 60; // Current time window available
-        const averageTimePerPackage = (randomOnly.actualTime * EFFICIENCY_INCREASE) / randomOnly.numberOfPackages;
+        const averageTimePerPackage = (vehicleEstimator.actualTime * EFFICIENCY_INCREASE) / vehicleEstimator.numberOfPackages;
         const estimatedTravelTimeMins = averageTimePerPackage * graph.nodes.length - 1; // Estimated (worst case) time to deliver all packages
 
         // From the remaining vehicles, add more vehicles if required based on the estimated time to deliver
@@ -97,7 +94,16 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
             }
         }
         vehicles = maximumVehiclesRequired;
+        profile.selected_vehicles = maximumVehiclesRequired;
     }
+
+    const start1 = Date.now();
+    let randomOnly = await roundRobinAllocation(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
+    randomOnly.loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
+    const randomOnlyEfficiency: EfficiencyScores = calculateEfficiencyScores(randomOnly);
+    const end1 = Date.now();
+    console.log("Random solution computed in " + (end1 - start1) / 1000 + " seconds");
+
 
     // 4. Run K-Means clustering to get a solution without any optimisation
     const start2 = Date.now();
@@ -115,7 +121,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     randomInitial[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
 
     // 6. Run the Genetic Algorithm to optimise the K-Means and Random initialisation solutions
-    const NUM_GENERATIONS = 1000000;
+    const NUM_GENERATIONS = 10;
 
     // K Means
     const start3 = Date.now();

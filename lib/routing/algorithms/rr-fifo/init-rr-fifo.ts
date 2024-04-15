@@ -24,8 +24,7 @@ export async function initRandom(graph: Graph, vehicles: Vehicle[], profile: Sch
     // Initialise solution and load metrics
     const solution = new VRPSolution();
     solution.loadMetrics(avgSpeed, distanceMultiplier);
-
-    const timeWindowHours = profile.time_window * 0.75; // 75% of time window
+    const timeWindowHours = profile.time_window * 0.75; // Time window with 5% buffer
     const deliveryTime = profile.delivery_time;
 
     const availableVehicles = [...vehicles];
@@ -55,7 +54,7 @@ export async function initRandom(graph: Graph, vehicles: Vehicle[], profile: Sch
      * If no vehicle can fit, split group into two and try again
      * If no vehicle can fit a single package, package is not allocated
      */
-    let currVehicle = 0; 
+    let currVehicle = 0;
     for (const pkgGroup of groupedPackages) {
         let vehiclesChecked = 0;
 
@@ -66,7 +65,7 @@ export async function initRandom(graph: Graph, vehicles: Vehicle[], profile: Sch
             // Calculate time required to travel from last node in the route to the potential new node
             const distanceMiles = calculateDistance(route.nodes[route.nodes.length - 1], pkgGroup[0], distanceMultiplier);
             const timeRequiredMins = calculateTravelTime(distanceMiles, avgSpeed) + deliveryTime;
-            solution.updateRouteMeasurements();
+            solution.loadMetrics(avgSpeed, distanceMultiplier);
 
             // Check if the route can accommodate the package group
             if (route.canAddGroup(pkgGroup, timeRequiredMins, timeWindowHours)) {
