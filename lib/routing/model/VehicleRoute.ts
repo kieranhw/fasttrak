@@ -59,6 +59,7 @@ export class VehicleRoute {
 
         // Convert tw to minutes
         const timeWindowMins = (timeWindowhours * 60);
+        const timeToDeliver = this.scheduleProfile.delivery_time;
 
         // calculate distance to travel from potential new node to depot
         const actualDistanceToDepot = calculateDistance(pkgNode, this.depotNode, this.distanceMultiplier);
@@ -67,7 +68,7 @@ export class VehicleRoute {
         return (
             this.currentWeight + pkg.weight < this.vehicle.max_load &&
             this.currentVolume + pkg.volume < this.vehicle.max_volume &&
-            this.actualTimeMins + timeRequired + timeToDepot <= timeWindowMins
+            this.actualTimeMins + timeRequired + timeToDeliver + timeToDepot <= timeWindowMins
         );
     }
 
@@ -86,6 +87,7 @@ export class VehicleRoute {
 
         this.updateMeasurements(this.scheduleProfile.delivery_time);
         const timeWindowMins = (timeWindowHours * 60);
+        const timeToDeliver = this.scheduleProfile.delivery_time;
 
         // Calculate distance to travel from potential new node to the depot node
         const actualDistanceToDepot = calculateDistance(pkgGroup[0], this.depotNode, this.distanceMultiplier);
@@ -102,7 +104,7 @@ export class VehicleRoute {
         return (
             this.currentWeight + groupWeight <= this.vehicle.max_load &&
             this.currentVolume + groupVolume <= this.vehicle.max_volume &&
-            this.actualTimeMins + timeRequiredMins + timeToDepot <= timeWindowMins
+            this.actualTimeMins + timeRequiredMins + timeToDeliver + timeToDepot <= timeWindowMins
         );
     }
 
