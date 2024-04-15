@@ -121,7 +121,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     randomInitial[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
 
     // 6. Run the Genetic Algorithm to optimise the K-Means and Random initialisation solutions
-    const NUM_GENERATIONS = 10;
+    const NUM_GENERATIONS = 1000000;
 
     // K Means
     const start3 = Date.now();
