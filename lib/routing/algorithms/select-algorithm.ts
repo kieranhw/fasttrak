@@ -127,7 +127,7 @@ export async function selectAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     }
 
     // K Means only solution
-    if (profile.initialisation_algorithm == ScheduleInitialiser.KMeans && profile.optimisation_algorithm == ScheduleOptimiser.None) {
+    else if (profile.initialisation_algorithm == ScheduleInitialiser.KMeans && profile.optimisation_algorithm == ScheduleOptimiser.None) {
         let kMeansOnly = await KMeansClustering(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
         kMeansOnly[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
         const kMeansOnlyEfficiency: EfficiencyScores = calculateEfficiencyScores(kMeansOnly[0]);
@@ -167,13 +167,13 @@ export async function selectAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     }
 
     // Random initialsied Genetic Algorithm solution
-    if (profile.initialisation_algorithm == ScheduleInitialiser.Random && profile.optimisation_algorithm == ScheduleOptimiser.GA) {
+    else if (profile.initialisation_algorithm == ScheduleInitialiser.Random && profile.optimisation_algorithm == ScheduleOptimiser.GA) {
         let randomInitial = await initRandom(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
         randomInitial[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
 
 
         // Random Initialised
-        const gaRandomInit = new GeneticAlgorithm(randomInitial[0], graph.depot!, randomInitial[1], profile, profile.generations);
+        const gaRandomInit = new GeneticAlgorithm(randomInitial[0], randomInitial[1], profile, profile.generations);
         const randomOptimised = gaRandomInit.evolve();
         const randomOptimisedEfficiency: EfficiencyScores = calculateEfficiencyScores(randomOptimised);
 
@@ -214,13 +214,13 @@ export async function selectAlgorithm(graph: Graph, vehicles: Vehicle[], profile
     }
 
     // KMeans initialised Genetic Algorithm solution
-    if (profile.initialisation_algorithm == ScheduleInitialiser.KMeans && profile.optimisation_algorithm == ScheduleOptimiser.GA) {
+    else if (profile.initialisation_algorithm == ScheduleInitialiser.KMeans && profile.optimisation_algorithm == ScheduleOptimiser.GA) {
         // KMeans Initial Solution
         let KMeansInitial = await initKMeans(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
         KMeansInitial[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
 
         // kMeans Initialised GA
-        const gaKMeansInit = new GeneticAlgorithm(KMeansInitial[0], graph.depot!, KMeansInitial[1], profile, profile.generations);
+        const gaKMeansInit = new GeneticAlgorithm(KMeansInitial[0], KMeansInitial[1], profile, profile.generations);
         const kMeansOptimised = gaKMeansInit.evolve();
         const kMeansOptimisedEfficiency: EfficiencyScores = calculateEfficiencyScores(kMeansOptimised);
 
