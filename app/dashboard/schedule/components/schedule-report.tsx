@@ -216,7 +216,7 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
 
                             <View style={styles.section}>
                                 <Text style={styles.subtitle}>Efficiency Metrics</Text>
-                                <Text style={{ marginBottom: 10 }}>Higher efficiency scores indicate better performance. A utilisation score 
+                                <Text style={{ marginBottom: 10 }}>Higher efficiency scores indicate better performance. A utilisation score
                                     of 100 indicates that the vehicle is being used to its full capacity.
                                 </Text>
                                 <Text><Text style={styles.subtitle}>Time Efficiency (TE) =</Text> Number of Packages / Time (minutes) * 100</Text>
@@ -258,7 +258,12 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
                         </Page>
                         <Page size="A4" style={styles.page}>
                             <Text style={styles.title}>Algorithm Information</Text>
-                            <Text style={{ marginBottom: 10 }} >The solution with the greatest total efficiency value has been automatically selected:</Text>
+                            {otherScheduleReports.length === 0 &&
+                                <Text style={{ marginBottom: 10 }} >The algorithm configuration has been selected as:</Text>
+                            }
+                            {otherScheduleReports.length > 0 &&
+                                <Text style={{ marginBottom: 10 }} >The solution with the greatest total efficiency value has been automatically selected:</Text>
+                            }
                             <Text>Initialisation: {bestScheduleReport?.initialiser}</Text>
                             <Text>Optimisation: {bestScheduleReport?.optimiser}</Text>
                             {bestScheduleReport?.iterations && bestScheduleReport?.optimiser !== "Genetic Algorithm" &&
@@ -273,8 +278,15 @@ export const ScheduleReport: React.FC<ScheduleReportProps> = (props) => {
                             <Text>Packages pending: {bestScheduleReport?.total_packages_count}</Text>
                             <Text>Packages scheduled: {bestScheduleReport?.scheduled_packages_count}</Text>
                             <Text>Total Time Window: {bestScheduleReport?.time_window_hours! * props.schedules.length} hours</Text>
-                            <Text style={[styles.subtitle, { marginTop: 10 }]}>Solution Comparison - Total Delivery Network</Text>
-                            <Text style={{ marginBottom: 10 }}>Comparison of all generated solutions for the same set of vehicles and pending packages.</Text>
+                            {otherScheduleReports.length === 0 &&
+                                <Text style={[styles.subtitle, { marginTop: 10, marginBottom: 10 }]}>Solution Statistics</Text>
+                            }
+                            {otherScheduleReports.length > 0 &&
+                                <>
+                                    <Text style={[styles.subtitle, { marginTop: 10 }]}>Solution Comparison - Total Delivery Network</Text>
+                                    <Text style={{ marginBottom: 10 }}>Comparison of all generated solutions for the same set of vehicles and pending packages.</Text>
+                                </>
+                            }
                             <View style={styles.table}>
                                 <View style={[styles.tableRow, styles.tableRowHeader]}>
                                     <Text style={styles.tableColHeader}>Initialisation</Text>

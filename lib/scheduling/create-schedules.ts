@@ -81,11 +81,6 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
         scheduleReport = response.scheduleReport;
     }
 
-    // Process the solution locally as a fallback
-    //const response = await hybridAlgorithm(graph, vehiclesData, profile, metrics, false);
-    //vrpSolution = response.finalSolution;
-    //scheduleReport = response.scheduleReport;
-
     // Initialize an empty array to hold delivery schedules for each vehicle
     let schedules: DeliverySchedule[] = [];
 

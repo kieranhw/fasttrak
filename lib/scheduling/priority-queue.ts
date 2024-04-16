@@ -1,13 +1,20 @@
 import { RouteNode } from '@/lib/routing/model/RouteNode';
 
-// Priority queue for node objects
+/**
+ * A priority queue implementation for the RouteNode class ordered based on the package's effective priority.
+ */
 export class PriorityQueue {
-    private nodes: RouteNode[];
+    private nodes: RouteNode[]; // The array of nodes in the queue
 
     constructor() {
         this.nodes = [];
     }
 
+    /**
+     * Calculate the effective priority of a package based on its age and priority.
+     * @param node The RouteNode to calculate the effective priority for
+     * @returns The effective priority of the package
+     */
     private calculateEffectivePriority(node: RouteNode): number {
         if (!node.pkg || !node.pkg.date_added) return 0;
 
@@ -19,7 +26,7 @@ export class PriorityQueue {
         const daysOld = (new Date().getTime() - dateAdded.getTime()) / (1000 * 3600 * 24);
         const priorityMap = {
             MoreThan5Days: 4,
-            MoreThan3Days: 4,
+            MoreThan3Days: 2,
             Express: 2,
             Standard: 1
         };
@@ -28,8 +35,10 @@ export class PriorityQueue {
         return (agePriority + pkgPriorityValue);
     }
 
-
-
+    /**
+     * Enqueue a RouteNode into the priority queue.
+     * @param node The RouteNode to enqueue
+     */
     enqueue(node: RouteNode): void {
         if (!node.pkg) return;
         node.pkg!.effective_priority = this.calculateEffectivePriority(node);
@@ -37,10 +46,19 @@ export class PriorityQueue {
         this.nodes.sort((a, b) => (b.pkg?.effective_priority || 0) - (a.pkg?.effective_priority || 0)); // Sort in descending order of priority
     }
 
+    /**
+     * Dequeue the RouteNode with the highest effective priority from the queue.
+     * @returns The RouteNode with the highest effective priority
+     */
     dequeue(): RouteNode | undefined {
         return this.nodes.shift();
     }
 
+    /**
+     * Dequeue a specific RouteNode from the queue.
+     * @param node The RouteNode to dequeue
+     * @returns The dequeued RouteNode
+     */
     dequeueNode(node: RouteNode): RouteNode | undefined {
         const index = this.nodes.findIndex(n => n.pkg?.package_id === node.pkg?.package_id);
         if (index !== -1) {
@@ -48,6 +66,11 @@ export class PriorityQueue {
         }
     }
 
+    /**
+     * Peek at the RouteNode at a specific index in the queue.
+     * @param index The index to peek at
+     * @returns The RouteNode at the specified index
+     */
     peek(index?: number): RouteNode | undefined {
         if (index) {
             return this.nodes[index] ?? undefined;
@@ -56,10 +79,18 @@ export class PriorityQueue {
         }
     }
 
+    /**
+     * Peek the smallest node from the queue, without removing it.
+     * @returns The RouteNode[] data from the queue
+     */
     peekSmallest(): RouteNode | undefined {
         return [...this.nodes].sort((a, b) => a.pkg!.volume - b.pkg!.volume)[0];
     }
 
+    /**
+     * Peek the lightest node from the queue, without removing it.
+     * @returns The RouteNode[] data from the queue
+     */
     peekLightest(): RouteNode | undefined {
         return [...this.nodes].sort((a, b) => a.pkg!.weight - b.pkg!.weight)[0];
     }

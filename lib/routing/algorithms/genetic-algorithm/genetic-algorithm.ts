@@ -1,5 +1,4 @@
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
-import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { PriorityQueue } from "../../../scheduling/priority-queue";
 import { RouteNode } from '@/lib/routing/model/RouteNode';
 import { crossover } from "./crossover";
@@ -13,10 +12,9 @@ export class GeneticAlgorithm {
     private remainingPackages: PriorityQueue;
     private scheduleProfile: ScheduleProfile
     private generationFitness: { generation: number, fitness: number }[];
-    private depot: RouteNode;
     private generations: number;
 
-    constructor(initialPopulation: VRPSolution, depot: RouteNode, remainingPackages: PriorityQueue | RouteNode[], scheduleProfile: ScheduleProfile, generations: number) {
+    constructor(initialPopulation: VRPSolution, remainingPackages: PriorityQueue | RouteNode[], scheduleProfile: ScheduleProfile, generations: number) {
         // Convert nodes to priority queue
         let packages = new PriorityQueue();
         if (remainingPackages instanceof PriorityQueue) {
@@ -28,7 +26,6 @@ export class GeneticAlgorithm {
             }
             packages = queue;
         }
-        this.depot = depot;
         this.generations = generations;
         this.remainingPackages = packages;
         this.bestGeneration = initialPopulation.clone();
@@ -61,7 +58,7 @@ export class GeneticAlgorithm {
         for (const route of offspring.routes) {
             // 20% chance of mutation if there is more than one route, else always mutate
             if (Math.random() < 0.2 || offspring.routes.length === 1) {
-                const mutatedRoute = mutate(route, this.depot);
+                const mutatedRoute = mutate(route, this.bestGeneration.routes[0].depotNode);
                 offspring.routes[offspring.routes.indexOf(route)] = mutatedRoute;
             }
         }
@@ -74,7 +71,7 @@ export class GeneticAlgorithm {
             offspringFitness += routeFitness(route);
         }
 
-        // Step 7: Replace old population with new population if new population is better
+        // 7. Replace old population with new population if new population is better
         if (offspringFitness < generationFitness) {
             this.bestGeneration = offspring;
         }
@@ -110,6 +107,7 @@ export class GeneticAlgorithm {
         }
 
         this.bestGeneration.cleanRoutes();
+
         return this.bestGeneration;
     }
 }

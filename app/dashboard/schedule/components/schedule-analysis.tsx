@@ -43,7 +43,7 @@ import { ScheduleDialogContent } from "./create-schedule-dialog";
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 import { CurrentState, PackageStatus } from "@/types/db/Package";
 import { BreadcrumbLink } from "@/components/ui/breadcrumb-link";
-import { ScheduleReport } from "./pdf-generation";
+import { ScheduleReport } from "./schedule-report";
 import { GetServerSideProps } from 'next';
 import { Store } from "@/types/db/Store";
 import { Depot } from "@/types/db/Depot";
