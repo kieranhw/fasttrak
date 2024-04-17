@@ -37,6 +37,10 @@ export class VRPSolution {
         return this.routes.reduce((sum, route) => sum + route.eucDistanceMiles, 0);
     }
 
+    get euclideanTime(): number {
+        return this.routes.reduce((sum, route) => sum + route.eucTimeMins, 0);
+    }
+
 
     get totalVolume(): number {
         this.updateRouteMeasurements();
