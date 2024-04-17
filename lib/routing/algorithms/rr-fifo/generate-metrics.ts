@@ -6,7 +6,7 @@ import { VRPSolution } from "@/lib/routing/model/VRPSolution";
 import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { calculateTravelTime } from "@/lib/utils/calculate-travel-time";
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
-import { VRPMetrics } from "./hybrid-algorithm";
+import { VRPMetrics } from "../hybrid-algorithm";
 import { initialiseMetrics } from "@/lib/google-maps/client/directions";
 
 /***

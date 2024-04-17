@@ -24,7 +24,7 @@ interface VRP {
  */
 export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
     // Enable test mode to bypass calling Google Maps API
-    const test: Boolean = true;
+    const test: Boolean = false;
 
     if (test == true) {
         const distanceMultiplier = 1.5;
@@ -86,7 +86,7 @@ export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
  * @param route - VehicleRoute object containing the route nodes and package information
  */
 export async function calculateActualTravel(route: VehicleRoute): Promise<void> {
-    const test: Boolean = true;
+    const test: Boolean = false;
     if (test == true) {
         return;
     }

@@ -126,7 +126,7 @@ export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
 export async function calculateActualTravel(route: VehicleRoute): Promise<void> {
     if (!service) await initDirectionsService();
     
-    const test: Boolean = true;
+    const test: Boolean = false;
     if (test == true) {
         return;
     }

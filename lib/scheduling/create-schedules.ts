@@ -9,7 +9,7 @@ import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 import { db } from "../db/db";
 import { VRPMetrics, hybridAlgorithm } from "../routing/algorithms/hybrid-algorithm";
 import { ScheduleReport } from "@/types/db/ScheduleReport";
-import { generateMetrics as generateMetrics } from "../routing/algorithms/generate-metrics";
+import { generateMetrics as generateMetrics } from "../routing/algorithms/rr-fifo/generate-metrics";
 
 /**
  * The main function to create delivery schedules for a given set of vehicles and packages.
