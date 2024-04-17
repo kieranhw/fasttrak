@@ -218,11 +218,26 @@ export async function selectAlgorithm(graph: Graph, vehicles: Vehicle[], profile
         // KMeans Initial Solution
         let KMeansInitial = await initKMeans(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
         KMeansInitial[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
+        console.log("----------------------")
+        console.log("Calculated Conversion Metrics")
+        console.log("Average Speed: " + metrics.avgSpeed)
+        console.log("Distance Multiplier: " + metrics.distanceMultiplier)
+        console.log("----------------------")
+
 
         // kMeans Initialised GA
         const gaKMeansInit = new GeneticAlgorithm(KMeansInitial[0], KMeansInitial[1], profile, profile.generations);
         const kMeansOptimised = gaKMeansInit.evolve();
         const kMeansOptimisedEfficiency: EfficiencyScores = calculateEfficiencyScores(kMeansOptimised);
+
+        console.log("Euclidean Values")
+        console.log("Distance (miles): " + kMeansOptimised.euclideanDistance.toFixed(2))
+        console.log("Time (hrs): " + (kMeansOptimised.euclideanTime / 60).toFixed(2))
+        console.log("----------------------")
+        console.log("Estimated Real-World Values")
+        console.log("Distance (miles): " + kMeansOptimised.actualDistance.toFixed(2))
+        console.log("Time (hrs): " + (kMeansOptimised.actualTime / 60).toFixed(2))
+        console.log("----------------------")
 
         // Calculate actual travel time and distance for each route
         for (const route of kMeansOptimised.routes) {
@@ -233,6 +248,11 @@ export async function selectAlgorithm(graph: Graph, vehicles: Vehicle[], profile
                 await calculateActualTravelClient(route);
             }
         }
+
+        console.log("Actual Real-World Values")
+        console.log("Distance (miles): " + kMeansOptimised.actualDistance.toFixed(2))
+        console.log("Time (hrs): " + (kMeansOptimised.actualTime / 60).toFixed(2))
+        console.log("----------------------")
 
         const kMeansOptimisedReport: ScheduleReport = {
             initialiser: ScheduleInitialiser.KMeans,
