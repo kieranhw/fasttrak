@@ -62,6 +62,14 @@ export class VRPSolution {
         return this.routes.reduce((sum, route) => sum + route.actualDistanceMiles, 0);
     }
 
+    get realDistance(): number {
+        return this.routes.reduce((sum, route) => sum + route.realDistanceMiles, 0);
+    }
+
+    get realTime(): number {
+        return this.routes.reduce((sum, route) => sum + route.realTimeMins, 0);
+    }
+
     get numberOfPackages(): number {
         // Return number of packages that are nodes which are not depots
         return this.routes.reduce((sum, route) => sum + route.nodes.filter(node => !node.isDepot).length, 0);

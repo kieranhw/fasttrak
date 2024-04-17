@@ -250,8 +250,8 @@ export async function selectAlgorithm(graph: Graph, vehicles: Vehicle[], profile
         }
 
         console.log("Actual Real-World Values")
-        console.log("Distance (miles): " + kMeansOptimised.actualDistance.toFixed(2))
-        console.log("Time (hrs): " + (kMeansOptimised.actualTime / 60).toFixed(2))
+        console.log("Distance (miles): " + kMeansOptimised.realDistance.toFixed(2))
+        console.log("Time (hrs): " + (kMeansOptimised.realTime / 60).toFixed(2))
         console.log("----------------------")
 
         const kMeansOptimisedReport: ScheduleReport = {

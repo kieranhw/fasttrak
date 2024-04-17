@@ -26,6 +26,10 @@ export class VehicleRoute {
     public actualDistanceMiles: number = 0; // distance in miles
     public actualTimeCalculated: boolean = false;
 
+    // Real measurements
+    public realDistanceMiles: number = 0;
+    public realTimeMins: number = 0;
+
     constructor(
         public vehicle: Vehicle,
         public depotNode: RouteNode, // depot node
@@ -132,16 +136,29 @@ export class VehicleRoute {
      * @returns void
      */
     updateMeasurements(deliveryTime: number): void {
+        this.currentVolume = 0;
+        this.currentWeight = 0;
+
         // Do not recalculate if already finalised with real metrics
         if (this.actualTimeCalculated == true) {
-            this.actualTimeMins = this.actualTimeMins + this.scheduleProfile.delivery_time * this.nodes.length;
+            // Set the real time and distance 
+            this.actualTimeMins = this.realTimeMins + (this.scheduleProfile.delivery_time * this.nodes.length - 1);
+            this.actualDistanceMiles = this.realDistanceMiles;
+            console.log(" Actual time mins : " + (this.actualTimeMins + (this.scheduleProfile.delivery_time * this.nodes.length - 1)));
+
+            // Sum weight and volume
+            for (let i = 0; i < this.nodes.length; i++) {
+                const node = this.nodes[i];
+
+                this.currentWeight += node.pkg?.weight ?? 0;
+                this.currentVolume += node.pkg?.volume ?? 0;
+            }
+
             return
         }
 
         this.eucTimeMins = 0;
         this.eucDistanceMiles = 0;
-        this.currentVolume = 0;
-        this.currentWeight = 0;
         this.actualDistanceMiles = 0;
         this.actualTimeMins = 0;
 

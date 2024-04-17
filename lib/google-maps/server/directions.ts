@@ -29,20 +29,23 @@ export async function calculateActualTravel(route: VehicleRoute): Promise<void> 
         return;
     }
 
+
     // Store the accumulated actual distance and time for the route
     let totalActualDuration = 0;
     let totalActualDistance = 0;
     let responseRouteLegs = 0;
 
     // Separate the depot and customer locations, then create an array of all nodes
-    const depot = new google.maps.LatLng(route.depotNode.coordinates.lat, route.depotNode.coordinates.lng);
-    const customerLocations = route.nodes.map(node => new google.maps.LatLng(node.coordinates.lat, node.coordinates.lng))
-        .filter((location) => location.lat() !== depot.lat() && location.lng() !== depot.lng());
+
+    const depot = ({ lat: route.depotNode.coordinates.lat, lng: route.depotNode.coordinates.lng });
+
+    const customerLocations = route.nodes.map(node => ({ lat: node.coordinates.lat, lng: node.coordinates.lng }))
+        .filter((location) => location.lat !== depot.lat && location.lng !== depot.lng);
+
     const allNodes = [depot, ...customerLocations, depot];
 
     // Divide the nodes into chunks of 25 waypoints
-    let chunks: google.maps.LatLng[][] = [];
-
+    let chunks: { lat: number, lng: number }[][] = [];
     for (let i = 0; i < allNodes.length; i += 25) {
         let chunk = allNodes.slice(i, i + 25);
         chunks.push(chunk);
@@ -64,32 +67,34 @@ export async function calculateActualTravel(route: VehicleRoute): Promise<void> 
         }
     }
 
+
     // Iterate through the chunks of 25 waypoints
     for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
 
+        // Create a DirectionsRequest object for the chunk
         const directionsRequest: DirectionsRequest = {
             params: {
-                origin: `${chunk[0].lat()},${chunk[0].lng()}`,
-                destination: `${chunk[chunk.length - 1].lat()},${chunk[chunk.length - 1].lng()}`, // Return to depot
+                origin: `${chunk[0].lat},${chunk[0].lng}`,
+                destination: `${chunk[chunk.length - 1].lat},${chunk[chunk.length - 1].lng}`, // Return to depot
                 waypoints: chunk.slice(1, -1).map(waypoint => `${waypoint.lat},${waypoint.lng}`),
                 mode: TravelMode.driving,
                 units: UnitSystem.imperial,
                 avoid: [TravelRestriction.tolls],
-                key: process.env.GOOGLE_MAPS_API_KEY!,
+                key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY!,
             }
         };
 
-        client.directions(directionsRequest)
+        await client.directions(directionsRequest)
             .then((response) => {
                 if (response) {
                     // Calculate total actual distance and time for each leg of the route
                     response.data.routes[0].legs.forEach((element) => {
-                        const distanceMeters = element.distance?.value;
-                        const durationSeconds = element.duration?.value;
+                        const distanceMeters = element.distance.value;
+                        const durationSeconds = element.duration.value;
                         if (distanceMeters && durationSeconds) {
                             // Convert units
-                            totalActualDuration += durationSeconds / 3600; // convert to hours
+                            totalActualDuration += durationSeconds / 60; // convert to minutes
                             totalActualDistance += distanceMeters / 1609;  // convert to miles
                         }
                     });
@@ -98,9 +103,9 @@ export async function calculateActualTravel(route: VehicleRoute): Promise<void> 
     }
 
     // Modify the route object with the actual distance and time
-    route.actualDistanceMiles = totalActualDistance;
-    route.actualTimeMins = totalActualDuration * 60;
     route.actualTimeCalculated = true;
+    route.realDistanceMiles = totalActualDistance;
+    route.realTimeMins = totalActualDuration;
 }
 
 function createEvenlySpreadIndices(length: number, maxIndices: number = 25): number[] {
