@@ -30,7 +30,7 @@ export class GeneticAlgorithm {
         this.remainingPackages = packages;
         this.bestGeneration = initialPopulation.clone();
         this.scheduleProfile = scheduleProfile;
-        this.scheduleProfile.time_window = scheduleProfile.time_window * 0.9; // Reduce time window by 10% for some buffer room
+        this.scheduleProfile.time_window = scheduleProfile.time_window;
         this.generationFitness = [];
     }
 

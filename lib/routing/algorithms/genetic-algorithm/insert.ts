@@ -24,7 +24,7 @@ export function insert(offspring: VRPSolution, remainingPackages: PriorityQueue 
     for (const route of clonedOffspring.routes.sort(() => Math.random() - 0.5)){
         // Check if the route can accommodate the package
         const deliveryTime = profile.delivery_time;
-        const timeWindow = (profile.time_window * 60) - 15;
+        const timeWindow = (profile.time_window * 60) * 0.9;
 
         // Update the measurements of the route
         route.updateMeasurements(deliveryTime);
