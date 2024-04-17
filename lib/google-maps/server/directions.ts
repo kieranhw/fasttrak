@@ -33,7 +33,6 @@ export async function calculateActualTravel(route: VehicleRoute): Promise<void> 
     // Store the accumulated actual distance and time for the route
     let totalActualDuration = 0;
     let totalActualDistance = 0;
-    let responseRouteLegs = 0;
 
     // Separate the depot and customer locations, then create an array of all nodes
 
@@ -103,7 +102,6 @@ export async function calculateActualTravel(route: VehicleRoute): Promise<void> 
     }
 
     // Modify the route object with the actual distance and time
-    route.actualTimeCalculated = true;
     route.realDistanceMiles = totalActualDistance;
     route.realTimeMins = totalActualDuration;
 }
