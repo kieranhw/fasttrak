@@ -29,7 +29,7 @@ interface VRP {
  */
 export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
     // Enable test mode to bypass calling Google Maps API
-    const test: Boolean = true;
+    const test: Boolean = false;
 
     if (test == true) {
         const distanceMultiplier = 1.5;

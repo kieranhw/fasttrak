@@ -14,68 +14,6 @@ interface VRP {
 }
 
 /**
- * Calculate the estimated distance multiplier and average speed for the solution.
- * 
- * This is only used for calculating the estimated metrics for optimisation, and not for calculating
- * the actual distance and time for the routes.
- * 
- * @param solution - VRPSolution object containing all of the routes
- * @returns Promise of VRP object containing the updated VRPSolution, distance multiplier, and average speed
- */
-export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
-    // Enable test mode to bypass calling Google Maps API
-    const test: Boolean = false;
-
-    if (test == true) {
-        const distanceMultiplier = 1.5;
-        const avgSpeed = 20;
-        solution.loadMetrics(avgSpeed, distanceMultiplier);
-        return { solution, distanceMultiplier, avgSpeed };
-    }
-
-
-    const responses = [];
-    let totalActualDistanceMiles = 0;
-    let totalActualTimeHours = 0;
-    let totalEucDistanceMiles = 0;
-    let totalEucDuration = 0;
-
-    for (const route of solution.routes) {
-        // Filter out route nodes which have duplicate addresses
-        const uniqueNodes: RouteNode[] = route.nodes.filter((node, index, self) => {
-            const firstIndex = self.findIndex(n => n.pkg?.recipient_address === node.pkg?.recipient_address);
-            return firstIndex === index;
-        },);
-
-        // Determine the indices of the nodes to be selected
-        const selectedIndices = createEvenlySpreadIndices(uniqueNodes.length);
-        const nodes: RouteNode[] = selectedIndices.map(index => uniqueNodes[index]);
-
-        // Get total euclidean distance for the selected nodes
-        for (let i = 0; i < nodes.length - 1; i++) {
-            const node = nodes[i];
-            const nextNode = nodes[i + 1];
-            const distance = calculateDistance(node, nextNode);
-            totalEucDistanceMiles += distance;
-            totalEucDuration += calculateTravelTime(distance);
-        }
-
-        const origin = new google.maps.LatLng(route.nodes[0].coordinates.lat, route.nodes[0].coordinates.lng); // Starting at node 0 (depot)
-        const destinations = nodes.map(pkg => new google.maps.LatLng(pkg.coordinates.lat, pkg.coordinates.lng));
-
-
-    }
-
-    const avgSpeed = totalActualDistanceMiles / totalActualTimeHours; // miles per hour
-    const distanceMultiplier = totalActualDistanceMiles / totalEucDistanceMiles; // ratio of actual distance to euclidean distance
-
-    // Update the solution with the calculated metrics
-    solution.loadMetrics(avgSpeed, distanceMultiplier);
-
-    return { solution, distanceMultiplier, avgSpeed };
-}
-
-/**
  * Calculate the actual distance and time values for each route using the Google Maps Directions API.
  * 
  * This is used to update the routes with the actual distance and time travelled by the vehicle. The API
