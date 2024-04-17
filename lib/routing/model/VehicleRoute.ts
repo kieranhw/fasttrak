@@ -24,7 +24,6 @@ export class VehicleRoute {
     public distanceMultiplier: number = 0; // DM
     public actualTimeMins: number = 0;  // in minutes
     public actualDistanceMiles: number = 0; // distance in miles
-    public actualTimeCalculated: boolean = false;
 
     // Real measurements
     public realDistanceMiles: number = 0;
@@ -140,11 +139,10 @@ export class VehicleRoute {
         this.currentWeight = 0;
 
         // Do not recalculate if already finalised with real metrics
-        if (this.actualTimeCalculated == true) {
+        if (this.realTimeMins !== 0 && this.realDistanceMiles !== 0) {
             // Set the real time and distance 
             this.actualTimeMins = this.realTimeMins + (this.scheduleProfile.delivery_time * this.nodes.length - 1);
             this.actualDistanceMiles = this.realDistanceMiles;
-            console.log(" Actual time mins : " + (this.actualTimeMins + (this.scheduleProfile.delivery_time * this.nodes.length - 1)));
 
             // Sum weight and volume
             for (let i = 0; i < this.nodes.length; i++) {

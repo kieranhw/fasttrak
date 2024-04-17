@@ -79,7 +79,7 @@ export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
                 avoidHighways: false,
                 avoidTolls: true,
                 drivingOptions: {
-                    departureTime: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1, 7),
+                    departureTime: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1, 9), 
                     trafficModel: google.maps.TrafficModel.PESSIMISTIC,
                 },
             },
@@ -105,7 +105,7 @@ export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
     }
 
     const avgSpeed = totalActualDistanceMiles / totalActualTimeHours; // miles per hour
-    const distanceMultiplier = totalActualDistanceMiles / totalEucDistanceMiles; // ratio of actual distance to euclidean distance
+    const distanceMultiplier = (totalActualDistanceMiles / totalEucDistanceMiles) + 0.2; // ratio of actual distance to euclidean distance with adjustment
 
     // Update the solution with the calculated metrics
     solution.loadMetrics(avgSpeed, distanceMultiplier);
@@ -208,7 +208,6 @@ export async function calculateActualTravel(route: VehicleRoute): Promise<void> 
     // Modify the route object with the actual distance and time
     route.actualDistanceMiles = totalActualDistance;
     route.actualTimeMins = totalActualDuration * 60;
-    route.actualTimeCalculated = true;
 
     //console.log("Actual Metrics for Route: " + responseRouteLegs + " legs")
     //console.log(route.actualDistanceMiles.toFixed(2) + " miles")
