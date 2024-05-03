@@ -29,11 +29,11 @@ interface VRP {
  */
 export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
     // Enable test mode to bypass calling Google Maps API
-    const test: Boolean = false;
+    const test: Boolean = true;
 
     if (test == true) {
-        const distanceMultiplier = 1.5;
-        const avgSpeed = 20;
+        const distanceMultiplier = 1.4882;
+        const avgSpeed = 18.419;
         solution.loadMetrics(avgSpeed, distanceMultiplier);
         return { solution, distanceMultiplier, avgSpeed };
     }
@@ -126,7 +126,7 @@ export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
 export async function calculateActualTravel(route: VehicleRoute): Promise<void> {
     if (!service) await initDirectionsService();
     
-    const test: Boolean = false;
+    const test: Boolean = true;
     if (test == true) {
         return;
     }

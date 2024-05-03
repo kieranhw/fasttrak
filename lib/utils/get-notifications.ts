@@ -42,14 +42,12 @@ export const getNotifications = async (): Promise<{ data: Notification[], error:
         const schedulesToday = await db.schedules.fetch.byDate(new Date());
         //console.log(schedulesToday);
 
-        // Assume storeDepot.dispatch_time is in 'HH:mm' format and storeDepot.days_active is an array of active days
         const deadlineTime = parseISO(`${format(new Date(), 'yyyy-MM-dd')}T${storeDepot.dispatch_time}:00`);
         const currentTime = new Date();
 
-        // Mapping of date-fns weekday format to your days_active array format
+        // Mapping of date-fns weekday format to days_active array format
         type DayOfWeek = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
 
-        // Define your day map with the DayOfWeek type
         const dayMap: Record<DayOfWeek, string> = {
             'Monday': 'MO',
             'Tuesday': 'TU',

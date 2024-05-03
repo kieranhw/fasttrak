@@ -1,4 +1,4 @@
-import { PriorityQueue } from "@/lib/scheduling/priority-queue";
+import { PriorityQueue } from "@/lib/scheduling/PriorityQueue";
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
 import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { routeFitness } from "./fitness";

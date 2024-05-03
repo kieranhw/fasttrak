@@ -1,5 +1,5 @@
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
-import { PriorityQueue } from "../../../scheduling/priority-queue";
+import { PriorityQueue } from "../../../scheduling/PriorityQueue";
 import { RouteNode } from '@/lib/routing/model/RouteNode';
 import { crossover } from "./crossover";
 import { routeFitness } from "./fitness";

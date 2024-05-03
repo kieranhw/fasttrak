@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ vrpSolution, scheduleReport, status: 200 });
         }
     } catch (error) {
+        console.log(error)
         return NextResponse.json({ error: 'An error occurred', status: 500 });
     }
 };

@@ -1,7 +1,7 @@
 import { RouteNode } from '@/lib/routing/model/RouteNode';
 
 /**
- * A priority queue implementation for the RouteNode class ordered based on the package's effective priority.
+ * The priority queue implementation for the RouteNode class ordered based on the package's effective priority.
  */
 export class PriorityQueue {
     private nodes: RouteNode[]; // The array of nodes in the queue
@@ -23,13 +23,18 @@ export class PriorityQueue {
             node.pkg.date_added :
             new Date(node.pkg.date_added);
 
+        // Calculate the age of the package in days
         const daysOld = (new Date().getTime() - dateAdded.getTime()) / (1000 * 3600 * 24);
+
+        // Priority map for different priority levels
         const priorityMap = {
             MoreThan5Days: 4,
             MoreThan3Days: 2,
             Express: 2,
             Standard: 1
         };
+
+        // Calculate the effective priority based on the age and priority of the package
         const agePriority = daysOld > 5 ? priorityMap.MoreThan5Days : daysOld > 3 ? priorityMap.MoreThan3Days : 0;
         const pkgPriorityValue = priorityMap[node.pkg.priority];
         return (agePriority + pkgPriorityValue);

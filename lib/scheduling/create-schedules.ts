@@ -10,6 +10,7 @@ import { db } from "../db/db";
 import { VRPMetrics, hybridAlgorithm } from "../routing/algorithms/hybrid-algorithm";
 import { ScheduleReport } from "@/types/db/ScheduleReport";
 import { generateMetrics as generateMetrics } from "../routing/algorithms/rr-fifo/generate-metrics";
+import { selectAlgorithm } from "../routing/algorithms/select-algorithm";
 
 /**
  * The main function to create delivery schedules for a given set of vehicles and packages.
@@ -61,15 +62,24 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
         metrics: metrics,
     };
 
+    /**
     try {
-        // Call the API endpoint with the data
+        // Requires Vercel premium to be activated run this code on the server, therefore it will run locally
+        // as the demonstration period has passed. This has been documented in my project demo video.
+
+        
         const response = await axios.post('/api/run-hybrid-algorithm', JSON.stringify(data), {
             headers: { 'Content-Type': 'application/json' }
         });
 
+        console.log(response);
+
         const result: { vrpSolution: VRPSolution, scheduleReport: ScheduleReport } = response.data;
         vrpSolution = result.vrpSolution;
         scheduleReport = result.scheduleReport;
+        
+
+
     } catch (error) {
         // Handle error and validate data before processing locally
         console.error('Error processing data via API:', error);
@@ -79,6 +89,26 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
         const response = await hybridAlgorithm(graph, vehiclesData, profile, metrics, false);
         vrpSolution = response.finalSolution;
         scheduleReport = response.scheduleReport;
+    }
+    */
+
+
+    // Choose between running the hybrid algorithm or the select algorithm
+    if (profile.select_optimal) {
+        // Run hybrid algorithm with server settings
+        const response = await hybridAlgorithm(graph, vehiclesData, profile, metrics, false);
+        vrpSolution = response.finalSolution;
+        scheduleReport = response.scheduleReport;
+
+    } else {
+        // Run select algorithm with server settings
+        const response = await selectAlgorithm(graph, vehiclesData, profile, metrics, false);
+        if (response.finalSolution && response.scheduleReport) {
+            vrpSolution = response.finalSolution;
+            scheduleReport = response.scheduleReport;
+        } else {
+            alert("Error processing schedules.")
+        }
     }
 
     // Initialize an empty array to hold delivery schedules for each vehicle
@@ -119,5 +149,3 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
     }
 
 }
-
-

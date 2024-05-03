@@ -7,7 +7,7 @@ import { calculateDistance } from '@/lib/utils/calculate-distance';
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
 import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { calculateTravelTime } from "@/lib/utils/calculate-travel-time";
-import { PriorityQueue } from "../../../scheduling/priority-queue";
+import { PriorityQueue } from "../../../scheduling/PriorityQueue";
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 import { calculateCentroidFromNodes, calculateCentroidNodeDistance, findShortestPathForNodes, kMeans } from "./k-means-utils";
 import { roundRobinAllocation } from "../rr-fifo/rr-fifo";
@@ -359,9 +359,7 @@ export async function geospatialClustering(graph: Graph, vehicles: Vehicle[], pr
             const node = mainQueue.peek(); // Look at the next package without removing it
             if (!node) break; // Exit if there's nothing to peek at
 
-            // Assuming `vehicleRoute` has a method `canAddNode` similar to `canAddPackage`
-            // and you've already defined how to calculate travel time to the next node
-            const nextNode = node; // For simplification, assume direct allocation without checking next node
+            const nextNode = node;
             const actualDistance = calculateDistance(vehicleRoute.nodes[vehicleRoute.nodes.length - 1], nextNode, distanceMultiplier);
             const travelTime = calculateTravelTime(actualDistance, avgSpeed) + deliveryTime;
 

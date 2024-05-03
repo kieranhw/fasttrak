@@ -7,7 +7,7 @@ import { calculateDistance } from '@/lib/utils/calculate-distance';
 import { VRPSolution } from "@/lib/routing/model/VRPSolution";
 import { VehicleRoute } from "@/lib/routing/model/VehicleRoute";
 import { calculateTravelTime } from "@/lib/utils/calculate-travel-time";
-import { PriorityQueue } from "../../../scheduling/priority-queue";
+import { PriorityQueue } from "../../../scheduling/PriorityQueue";
 import { ScheduleProfile } from "@/types/db/ScheduleProfile";
 import { initRandom } from "../rr-fifo/init-rr-fifo";
 import { calculateCentroidFromNodes, calculateCentroidNodeDistance, findShortestPathForNodes, kMeans } from "./k-means-utils";

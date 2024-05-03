@@ -24,7 +24,7 @@ interface VRP {
  * @param route - VehicleRoute object containing the route nodes and package information
  */
 export async function calculateActualTravel(route: VehicleRoute): Promise<void> {
-    const test: Boolean = false;
+    const test: Boolean = true;
     if (test == true) {
         return;
     }
