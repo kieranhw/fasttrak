@@ -1,0 +1,14 @@
+Acknowledgements
+Kieran Hardwick 2024 - FastTrak Vehicle Routing
+
+React Framework
+https://react.dev/
+
+NextJS Framework
+https://nextjs.org/
+
+ShadCN UI Components
+https://ui.shadcn.com/
+
+Supabase JS Client Library + Code Examples
+https://github.com/supabase/supabase-jsz    
