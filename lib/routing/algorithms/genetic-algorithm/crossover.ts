@@ -45,7 +45,12 @@ function performCrossoverOnRoutes(parent1: VehicleRoute, parent2: VehicleRoute):
     const maxLen = Math.min(clone1.nodes.length-2, clone2.nodes.length-2);
 
     // Determine the segment size for crossover (between 1 and maxLen nodes)
-    const segmentSize = Math.floor(Math.random() * maxLen) + 1; // 1 to maxLen
+    let segmentSize: number;
+    if (Math.random() < 0.5) {
+        segmentSize = 1;
+    } else {
+        segmentSize = Math.floor(Math.random() * (maxLen - 1)) + 2; // 2 to maxLen
+    }
 
     // Choose random start index for the segment in each parent, ensuring the segment fits
     const startIndex1 = Math.floor(Math.random() * (clone1.nodes.length - segmentSize - 2)) + 1;

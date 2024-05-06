@@ -1,6 +1,7 @@
 import { VRPMetrics, hybridAlgorithm } from '@/lib/routing/algorithms/hybrid-algorithm';
 import { selectAlgorithm } from '@/lib/routing/algorithms/select-algorithm';
 import { Graph } from '@/lib/routing/model/Graph';
+import { RouteNode } from '@/lib/routing/model/RouteNode';
 import { Package } from '@/types/db/Package';
 import { ScheduleProfile } from '@/types/db/ScheduleProfile';
 import { Vehicle } from '@/types/db/Vehicle';
@@ -28,20 +29,31 @@ export async function POST(req: NextRequest) {
 
         // If any of the body is missing, return an error
         if (!packagesData || !depot || !vehiclesData || !profile || !metrics) return NextResponse.json({ error: 'Missing data in the request body', status: 400 });
-        
-        const graph = new Graph(packagesData, { lat: depot.lat, lng: depot.lng }, true);
 
+        // Create array of route nodes to represent the delivery network
+        const routeNodes: RouteNode[] = new Array();
+
+        // Add depot node
+        const depotNode = new RouteNode(null, { lat: depot.lat, lng: depot.lng }, true);
+        routeNodes.push(depotNode);
+
+        // Add package nodes
+        for (const pkg of packagesData) {
+            const pkgNode = new RouteNode(pkg, { lat: pkg.recipient_address_lat, lng: pkg.recipient_address_lng }, false);
+            routeNodes.push(pkgNode);
+        }
+        
         // Choose between running the hybrid algorithm or the select algorithm
         if (profile.select_optimal) {
             // Run hybrid algorithm with server settings
-            const response = await hybridAlgorithm(graph, vehiclesData, profile, metrics, true);
+            const response = await hybridAlgorithm(routeNodes, vehiclesData, profile, metrics, true);
             const vrpSolution = response.finalSolution;
             const scheduleReport = response.scheduleReport;
 
             return NextResponse.json({ vrpSolution, scheduleReport, status: 200 });
         } else {
             // Run select algorithm with server settings
-            const response = await selectAlgorithm(graph, vehiclesData, profile, metrics, true);
+            const response = await selectAlgorithm(routeNodes, vehiclesData, profile, metrics, true);
             const vrpSolution = response.finalSolution;
             const scheduleReport = response.scheduleReport;
 

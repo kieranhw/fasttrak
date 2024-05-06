@@ -23,15 +23,15 @@ export function routeFitness(route: VehicleRoute): number {
 
     const packageCount = (route.nodes.length - 2); // Ensure no division by zero
     const distance = route.actualDistanceMiles / packageCount; // Calculate average distance per package
-    const time = route.actualTimeMins / packageCount; // Calculate average actual time per package
+    const time = route.currentTimeMins / packageCount; // Calculate average actual time per package
    
     // Ensure efficiencies are calculated such that lower values are better
-    let spaceEfficiency = route.currentVolume / route.vehicle.max_volume;
-    let loadEfficiency = route.currentWeight / route.vehicle.max_load;
+    let spaceEfficiency = route.vehicle.max_volume / route.currentVolume;
+    let loadEfficiency = route.vehicle.max_load / route.currentWeight;
 
-    const spacePenalty = spaceEfficiency > 1 ? p1 : 0;
-    const loadPenalty = loadEfficiency > 1 ? p2 : 0;
-    const timeWindowPenalty = route.actualTimeMins > TimeWindowMins ? p3 : 0;
+    const spacePenalty = spaceEfficiency < 1 ? p1 : 0;
+    const loadPenalty = loadEfficiency < 1 ? p2 : 0;
+    const timeWindowPenalty = route.currentTimeMins > TimeWindowMins ? p3 : 0;
 
     const fitnessInfo = {
         distance: w1 * distance,

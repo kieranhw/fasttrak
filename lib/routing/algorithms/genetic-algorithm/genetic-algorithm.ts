@@ -48,16 +48,18 @@ export class GeneticAlgorithm {
         // 3. Create a deep copy of the best generation
         let offspring = this.bestGeneration.clone();
 
-        // 4. Crossover
+        // 4. Crossover occurs with 80% probability, only if there is more than one route
         if (offspring.routes.length > 1) {
-            offspring = crossover(offspring);
+            if (Math.random() < 0.8) {
+                offspring = crossover(offspring);
+            }
         }
 
         offspring.updateRouteMeasurements()
 
         // 5. Mutation
         for (const route of offspring.routes) {
-            // 20% chance of mutation if there is more than one route, else always mutate
+            // 20% chance of mutation if there is more than one route, else mutate for every iteration
             if (Math.random() < 0.2 || offspring.routes.length === 1) {
                 const mutatedRoute = mutate(route, this.bestGeneration.routes[0].depotNode);
                 offspring.routes[offspring.routes.indexOf(route)] = mutatedRoute;
@@ -94,7 +96,7 @@ export class GeneticAlgorithm {
         for (let i = 0; i < this.generations; i++) {
             this.evolveGeneration(i);
 
-            if (i > this.generations / 5) {
+            if (i > this.generations / 4 && Math.random() < 0.20) {
                 // Artificial Gene Transfer - start attempting to add genes to the pool after 20% of the generations
                 this.bestGeneration = insert(this.bestGeneration, this.remainingPackages, this.scheduleProfile);
             }

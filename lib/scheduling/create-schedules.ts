@@ -11,6 +11,7 @@ import { VRPMetrics, hybridAlgorithm } from "../routing/algorithms/hybrid-algori
 import { ScheduleReport } from "@/types/db/ScheduleReport";
 import { generateMetrics as generateMetrics } from "../routing/algorithms/rr-fifo/generate-metrics";
 import { selectAlgorithm } from "../routing/algorithms/select-algorithm";
+import { RouteNode } from "../routing/model/RouteNode";
 
 /**
  * The main function to create delivery schedules for a given set of vehicles and packages.
@@ -44,11 +45,21 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
         return null;
     }
 
-    // Create fully connected graph from packages and depot
-    const graph = new Graph(packagesData, { lat: depot.data.depot_lat, lng: depot.data.depot_lng }, true);
+    // Create array of route nodes to represent the delivery network
+    const routeNodes: RouteNode[] = new Array();
+
+    // Add depot node
+    const depotNode = new RouteNode(null, { lat: depot.data.depot_lat, lng: depot.data.depot_lng }, true);
+    routeNodes.push(depotNode);
+
+    // Add package nodes
+    for (const pkg of packagesData) {
+        const pkgNode = new RouteNode(pkg, { lat: pkg.recipient_address_lat, lng: pkg.recipient_address_lng }, false);
+        routeNodes.push(pkgNode);
+    }
 
     // Calculate the conversion metrics for the delivery network
-    const metrics: VRPMetrics = await generateMetrics(graph, vehiclesData, profile);
+    const metrics: VRPMetrics = await generateMetrics(routeNodes, vehiclesData, profile);
 
     // Call the hybrid algorithm to process the data via API 
     let vrpSolution = new VRPSolution();
@@ -85,10 +96,22 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
         console.error('Error processing data via API:', error);
         console.warn('Processing locally...');
 
-        // Process the solution locally as a fallback
-        const response = await hybridAlgorithm(graph, vehiclesData, profile, metrics, false);
-        vrpSolution = response.finalSolution;
-        scheduleReport = response.scheduleReport;
+        if (profile.select_optimal) {
+            // Run hybrid algorithm with server settings
+            const response = await hybridAlgorithm(routeNodes, vehiclesData, profile, metrics, false);
+            vrpSolution = response.finalSolution;
+            scheduleReport = response.scheduleReport;
+
+        } else {
+            // Run select algorithm with server settings
+            const response = await selectAlgorithm(routeNodes, vehiclesData, profile, metrics, false);
+            if (response.finalSolution && response.scheduleReport) {
+                vrpSolution = response.finalSolution;
+                scheduleReport = response.scheduleReport;
+            } else {
+                alert("Error processing schedules.")
+            }
+        }
     }
     */
 
@@ -96,13 +119,13 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
     // Choose between running the hybrid algorithm or the select algorithm
     if (profile.select_optimal) {
         // Run hybrid algorithm with server settings
-        const response = await hybridAlgorithm(graph, vehiclesData, profile, metrics, false);
+        const response = await hybridAlgorithm(routeNodes, vehiclesData, profile, metrics, false);
         vrpSolution = response.finalSolution;
         scheduleReport = response.scheduleReport;
 
     } else {
         // Run select algorithm with server settings
-        const response = await selectAlgorithm(graph, vehiclesData, profile, metrics, false);
+        const response = await selectAlgorithm(routeNodes, vehiclesData, profile, metrics, false);
         if (response.finalSolution && response.scheduleReport) {
             vrpSolution = response.finalSolution;
             scheduleReport = response.scheduleReport;
@@ -129,7 +152,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
             status: DeliveryStatus.Scheduled,
             num_packages: route.nodes.length - 1, // Subtract 1 to account for depot marker
             estimated_duration_mins: route.eucTimeMins,
-            actual_duration_mins: route.actualTimeMins,
+            actual_duration_mins: route.currentTimeMins,
             euclidean_distance_miles: route.eucDistanceMiles.toFixed(2) as unknown as number,
             actual_distance_miles: route.actualDistanceMiles.toFixed(2) as unknown as number,
             load_weight: route.currentWeight,

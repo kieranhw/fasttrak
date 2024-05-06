@@ -20,7 +20,7 @@ import { ScheduleProfile } from "@/types/db/ScheduleProfile";
  * @param timeWindow Number of hours to deliver packages
  * @returns VRPSolution of VehicleRoutes.
  */
-export async function initRandom(graph: Graph, vehicles: Vehicle[], profile: ScheduleProfile, distanceMultiplier: number, avgSpeed: number): Promise<[VRPSolution, RouteNode[]]> {
+export async function initRandom(routeNodes: RouteNode[], vehicles: Vehicle[], profile: ScheduleProfile, distanceMultiplier: number, avgSpeed: number): Promise<[VRPSolution, RouteNode[]]> {
     // Initialise solution and load metrics
     const solution = new VRPSolution();
     solution.loadMetrics(avgSpeed, distanceMultiplier);
@@ -30,16 +30,18 @@ export async function initRandom(graph: Graph, vehicles: Vehicle[], profile: Sch
     const availableVehicles = [...vehicles];
     const remainingPackages = []; // Packages that could not be allocated
 
-    // Sort packages by date added (FIFO) and filter out depot node
-    let sortedPackages = graph.nodes
+    // Sort nodes containing packages by date added (FIFO) and filter out depot node
+    const sortedPackageNodes = routeNodes
         .filter(node => !node.isDepot)
         .sort((a, b) =>
             (new Date(a.pkg?.date_added || 0).getTime()) - (new Date(b.pkg?.date_added || 0).getTime())
         );
+    
+    const depot = routeNodes.find(node => node.isDepot)!;
 
     // Group packages by recipient address
     const addressToPackagesMap: Record<string, RouteNode[]> = {};
-    for (const pkgNode of sortedPackages) {
+    for (const pkgNode of sortedPackageNodes) {
         const address = pkgNode.pkg?.recipient_address || '';
         if (!addressToPackagesMap[address]) {
             addressToPackagesMap[address] = [];
@@ -60,7 +62,7 @@ export async function initRandom(graph: Graph, vehicles: Vehicle[], profile: Sch
 
         while (vehiclesChecked < availableVehicles.length) {
             // Get the vehicles route or create a new one
-            const route = solution.routes[currVehicle] || new VehicleRoute(availableVehicles[currVehicle], graph.depot as RouteNode, profile);
+            const route = solution.routes[currVehicle] || new VehicleRoute(availableVehicles[currVehicle], depot, profile);
 
             // Calculate time required to travel from last node in the route to the potential new node
             const distanceMiles = calculateDistance(route.nodes[route.nodes.length - 1], pkgGroup[0], distanceMultiplier);
@@ -110,7 +112,7 @@ export async function initRandom(graph: Graph, vehicles: Vehicle[], profile: Sch
 
     // Close routes back to depot
     for (const route of solution.routes) {
-        route.closeRoute(graph.depot as RouteNode);
+        route.closeRoute(depot);
         route.updateMeasurements(profile.delivery_time);
     }
 

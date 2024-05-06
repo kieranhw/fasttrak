@@ -11,6 +11,7 @@ import { geospatialClustering as KMeansClustering } from './k-means/k-means';
 import { ScheduleInitialiser, ScheduleOptimiser, ScheduleReport } from '@/types/db/ScheduleReport';
 import { initKMeans } from './k-means/init-k-means';
 import { initRandom } from './rr-fifo/init-rr-fifo';
+import { RouteNode } from '../model/RouteNode';
 
 export type VRPMetrics = {
     solution: VRPSolution;
@@ -29,24 +30,24 @@ export type VRPMetrics = {
  * 
  * The solution with the highest total efficiency score is selected as the final solution.
  * 
- * @param graph - Graph of nodes: packages and depot
+ * @param routeNodes - Array of RouteNodes containing packages
  * @param vehicles - Array of available vehicles
  * @param profile - Schedule profile of configuration settings
  * @returns 
  */
-export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile: ScheduleProfile, metrics: VRPMetrics, server: boolean):
+export async function hybridAlgorithm(routeNodes: RouteNode[], vehicles: Vehicle[], profile: ScheduleProfile, metrics: VRPMetrics, server: boolean):
     Promise<{ finalSolution: VRPSolution, scheduleReport: ScheduleReport }> {
 
     const originalVehicles = vehicles.slice(); // Clone the vehicles array
 
     // 1. If selected, estimate the maximum number of vehicles required to deliver all packages 
     if (profile.auto_selection == true) {
-        let vehicleEstimator = await roundRobinAllocation(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
+        let vehicleEstimator = await roundRobinAllocation(routeNodes, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
         vehicleEstimator.loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
 
         // Estimate the amount of vehicles needed to deliver all pending packages
-        const totalWeightCapacityNeeded = graph.nodes.reduce((acc, node) => acc + (node.pkg?.weight ?? 0), 0);
-        const totalVolumeCapacityNeeded = graph.nodes.reduce((acc, node) => acc + (node.pkg?.volume ?? 0), 0);
+        const totalWeightCapacityNeeded = routeNodes.reduce((acc, node) => acc + (node.pkg?.weight ?? 0), 0);
+        const totalVolumeCapacityNeeded = routeNodes.reduce((acc, node) => acc + (node.pkg?.volume ?? 0), 0);
 
         // Create a clone of the vehicles array
         const startingVehicles = vehicles.slice();
@@ -73,7 +74,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
 
         let currentTimeWindowMins = (profile.time_window * maximumVehiclesRequired.length) * 60; // Current time window available
         const averageTimePerPackage = (vehicleEstimator.actualTime * EFFICIENCY_INCREASE) / vehicleEstimator.numberOfPackages;
-        const estimatedTravelTimeMins = averageTimePerPackage * graph.nodes.length - 1; // Estimated (worst case) time to deliver all packages
+        const estimatedTravelTimeMins = averageTimePerPackage * routeNodes.length - 1; // Estimated (worst case) time to deliver all packages
 
         // From the remaining vehicles, add more vehicles if required based on the estimated time to deliver
         for (const vehicle in startingVehicles) {
@@ -91,7 +92,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
 
     // 2. Generate a Random solution without any optimisation
     const start1 = Date.now();
-    let randomOnly = await roundRobinAllocation(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
+    let randomOnly = await roundRobinAllocation(routeNodes, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
     randomOnly.loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
     const randomOnlyEfficiency: EfficiencyScores = calculateEfficiencyScores(randomOnly);
     const end1 = Date.now();
@@ -99,17 +100,17 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
 
     // 3. Generate a K-Means solution without any optimisation
     const start2 = Date.now();
-    let kMeansOnly = await KMeansClustering(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
+    let kMeansOnly = await KMeansClustering(routeNodes, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
     kMeansOnly[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
     const KMeansOnlyEfficiency: EfficiencyScores = calculateEfficiencyScores(kMeansOnly[0]);
     const end2 = Date.now();
     console.log("K-Means solution computed in " + (end2 - start2) / 1000 + " seconds");
 
     // 4. Run K-Means and Random initialisation to get an initial solution for the GA
-    let KMeansInitial = await initKMeans(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
+    let KMeansInitial = await initKMeans(routeNodes, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
     KMeansInitial[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
 
-    let randomInitial = await initRandom(graph, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
+    let randomInitial = await initRandom(routeNodes, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
     randomInitial[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
 
     // 5. Run the Genetic Algorithm to optimise the K-Means and Random initialisation solutions
@@ -152,7 +153,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
         average_speed: metrics.avgSpeed,
         vehicles_available: originalVehicles,
         vehicles_used: randomOnly.routes.map(route => route.vehicle),
-        total_packages_count: graph.nodes.reduce((acc, node) => acc + (node.pkg ? 1 : 0), 0),
+        total_packages_count: routeNodes.reduce((acc, node) => acc + (node.pkg ? 1 : 0), 0),
         scheduled_packages_count: randomOnly.numberOfPackages,
         total_distance_miles: randomOnly.actualDistance,
         total_duration_hours: randomOnly.actualTime / 60,
@@ -174,7 +175,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
         average_speed: metrics.avgSpeed,
         vehicles_available: originalVehicles,
         vehicles_used: kMeansOnly[0].routes.map(route => route.vehicle),
-        total_packages_count: graph.nodes.reduce((acc, node) => acc + (node.pkg ? 1 : 0), 0),
+        total_packages_count: routeNodes.reduce((acc, node) => acc + (node.pkg ? 1 : 0), 0),
         scheduled_packages_count: kMeansOnly[0].numberOfPackages,
         total_distance_miles: kMeansOnly[0].actualDistance,
         total_duration_hours: kMeansOnly[0].actualTime / 60,
@@ -197,7 +198,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
         average_speed: metrics.avgSpeed,
         vehicles_available: originalVehicles,
         vehicles_used: randomOptimised.routes.map(route => route.vehicle),
-        total_packages_count: graph.nodes.reduce((acc, node) => acc + (node.pkg ? 1 : 0), 0),
+        total_packages_count: routeNodes.reduce((acc, node) => acc + (node.pkg ? 1 : 0), 0),
         scheduled_packages_count: randomOptimised.numberOfPackages,
         total_distance_miles: randomOptimised.actualDistance,
         total_duration_hours: randomOptimised.actualTime / 60,
@@ -220,7 +221,7 @@ export async function hybridAlgorithm(graph: Graph, vehicles: Vehicle[], profile
         average_speed: metrics.avgSpeed,
         vehicles_available: originalVehicles,
         vehicles_used: kMeansOptimised.routes.map(route => route.vehicle),
-        total_packages_count: graph.nodes.reduce((acc, node) => acc + (node.pkg ? 1 : 0), 0),
+        total_packages_count: routeNodes.reduce((acc, node) => acc + (node.pkg ? 1 : 0), 0),
         scheduled_packages_count: kMeansOptimised.numberOfPackages,
         total_distance_miles: kMeansOptimised.actualDistance,
         total_duration_hours: kMeansOptimised.actualTime / 60,

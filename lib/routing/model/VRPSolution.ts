@@ -54,7 +54,7 @@ export class VRPSolution {
 
     get actualTime(): number {
         this.updateRouteMeasurements();
-        return this.routes.reduce((sum, route) => sum + route.actualTimeMins, 0);
+        return this.routes.reduce((sum, route) => sum + route.currentTimeMins, 0);
     }
 
     get actualDistance(): number {

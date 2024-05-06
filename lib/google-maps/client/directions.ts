@@ -207,7 +207,7 @@ export async function calculateActualTravel(route: VehicleRoute): Promise<void> 
 
     // Modify the route object with the actual distance and time
     route.actualDistanceMiles = totalActualDistance;
-    route.actualTimeMins = totalActualDuration * 60;
+    route.currentTimeMins = totalActualDuration * 60;
 
     //console.log("Actual Metrics for Route: " + responseRouteLegs + " legs")
     //console.log(route.actualDistanceMiles.toFixed(2) + " miles")

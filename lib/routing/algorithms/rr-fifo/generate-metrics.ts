@@ -15,28 +15,30 @@ import { initialiseMetrics } from "@/lib/google-maps/client/directions";
  * Generates a VRPSolution using the same approach as the RR FIFO algorithm, without respecting time constraints. Uses the solution
  * to calculate the average speed and distance multiplier metrics.
 
- * @param graph Graph of packages and depot
+ * @param routeNodes Array of RouteNodes containing packages
  * @param vehicles Array of available vehicles
  * @param timeWindow Number of hours to deliver packages
  * @returns VRPSolution of VehicleRoutes.
  */
-export async function generateMetrics(graph: Graph, vehicles: Vehicle[], profile: ScheduleProfile): Promise<VRPMetrics> {
+export async function generateMetrics(routeNodes: RouteNode[], vehicles: Vehicle[], profile: ScheduleProfile): Promise<VRPMetrics> {
     const solution = new VRPSolution();
     const availableVehicles = [...vehicles];
 
     const timeWindowHours = profile.time_window; // Double the time window to allocate packages as many as possible
     const deliveryTime = profile.delivery_time;
 
-    // Sort packages by date added (FIFO) and filter out depot node
-    const sortedPackages = graph.nodes
+    // Sort nodes containing packages by date added (FIFO) and filter out depot node
+    const sortedPackageNodes = routeNodes
         .filter(node => !node.isDepot)
         .sort((a, b) =>
             (new Date(a.pkg?.date_added || 0).getTime()) - (new Date(b.pkg?.date_added || 0).getTime())
         );
+    
+    const depot = routeNodes.find(node => node.isDepot)!;
 
     // Group packages by recipient address
     const addressToPackagesMap: Record<string, RouteNode[]> = {};
-    for (const pkgNode of sortedPackages) {
+    for (const pkgNode of sortedPackageNodes) {
         const address = pkgNode.pkg?.recipient_address || '';
         if (!addressToPackagesMap[address]) {
             addressToPackagesMap[address] = [];
@@ -51,7 +53,7 @@ export async function generateMetrics(graph: Graph, vehicles: Vehicle[], profile
     for (const pkgGroup of groupedPackages) {
         let vehiclesChecked = 0;
         while (vehiclesChecked < availableVehicles.length) {
-            const route = solution.routes[vehicleIndex] || new VehicleRoute(availableVehicles[vehicleIndex], graph.depot as RouteNode, profile);
+            const route = solution.routes[vehicleIndex] || new VehicleRoute(availableVehicles[vehicleIndex], depot, profile);
             const travelCost = calculateDistance(route.nodes[route.nodes.length - 1], pkgGroup[0]);
             const timeRequired = calculateTravelTime(travelCost) + deliveryTime;
 
@@ -87,7 +89,7 @@ export async function generateMetrics(graph: Graph, vehicles: Vehicle[], profile
 
     // Close routes back to depot
     for (const route of solution.routes) {
-        route.closeRoute(graph.depot as RouteNode);
+        route.closeRoute(depot);
     }
 
     const metrics: VRPMetrics = await initialiseMetrics(solution);
