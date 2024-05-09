@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { v4 as uuidv4 } from 'uuid';
 
 import {
     DropdownMenu,
@@ -15,8 +16,10 @@ import { AiFillTool } from "react-icons/ai"
 import { useState } from "react";
 import { generatePackages } from "@/lib/data/generatePackages";
 import { createClient } from "@/lib/supabase/client";
-import evenData from "@/lib/data/experiment-1/even-data.json";
 import { Package } from "@/types/db/Package";
+import { db } from "@/lib/db/db";
+import { Vehicle } from "@/types/db/Vehicle";
+import { UUID } from "crypto";
 
 export default function DemoTools() {
     const supabase = createClient();
@@ -24,9 +27,15 @@ export default function DemoTools() {
     // Generate Packages
     const [loadingPackages, setLoadingPackages] = useState<boolean>(false);
 
-    async function handleGeneratePackages(numPackages: number) {
+    async function handleGenerateMore(num: number, distribution: string) {
+        for (let i = 0; i < num; i++) {
+            await handleGeneratePackages(10, distribution);
+        }
+    }
+
+    async function handleGeneratePackages(numPackages: number, distribution: string) {
         setLoadingPackages(true);
-        const packages = await generatePackages(numPackages);
+        const packages = await generatePackages(numPackages, distribution);
 
         const { error } = await supabase
             .from('packages')
@@ -36,11 +45,39 @@ export default function DemoTools() {
         }
     }
 
+    async function handleCreateVehicles() {
+        // Create 40 vehicles
+    
+        // Start registration from "VE30ABC"
+        let registrationNumber = 70;
+    
+        for (let i = 0; i < 11; i++) {
+            const reg = `VE${registrationNumber}ABC`;
+            const vehicleData: Vehicle = {
+                vehicle_id: (uuidv4()) as UUID,
+                registration: reg,
+                store_id: (await db.stores.fetch.forUser()).data?.store_id!,
+                manufacturer: "Test",
+                model: "Vehicle",
+                manufacture_year: 2024,
+                status: "Available",
+                max_load: 1000,
+                max_volume: 15
+            };
+    
+            // Insert one vehicle at a time
+            await db.vehicles.create(vehicleData);
+    
+            // Increment registration number
+            registrationNumber++;
+        }
+    }
+
     // Function to handle package generation and save them
     async function handleSavePackages(num: number) {
         setLoadingPackages(true); // Set loading state to true
         try {
-            const packages = await generatePackages(num); // Generate packages
+            const packages = await generatePackages(num, "even"); // Generate packages
             const json = JSON.stringify(packages); // Convert to JSON string
             const blob = new Blob([json], { type: "application/json" }); // Create a Blob from the JSON
             const url = URL.createObjectURL(blob); // Create a URL for the Blob
@@ -81,19 +118,16 @@ export default function DemoTools() {
                 <Button variant="outline" size="sm" className="text-foreground gap-2"><AiFillTool /> Demo</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="mr-4">
-                <DropdownMenuLabel>Demo Tools</DropdownMenuLabel>
+                <DropdownMenuLabel>Create Packages</DropdownMenuLabel>
+                <DropdownMenuItem onClick={e => handleGeneratePackages(1, "random")}>Sample Package (Random)</DropdownMenuItem>
+                <DropdownMenuItem onClick={e => handleGenerateMore(30, "random")}>300 Sample Packages (Random)</DropdownMenuItem>
+                <DropdownMenuItem onClick={e => handleGenerateMore(10, "random")}>100 Sample Packages (Random)</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={e => handleGeneratePackages(1)}>Create Sample Package</DropdownMenuItem>
-                <DropdownMenuItem onClick={e => handleGeneratePackages(10)}>Create 10 Sample Packages</DropdownMenuItem>
-                <DropdownMenuItem onClick={e => handleSavePackages(300)}>Create 300 Sample Packages</DropdownMenuItem>
-                <DropdownMenuItem onClick={e => handleLoadData(evenData)}>Experiment 1 Even Data</DropdownMenuItem>
-                <DropdownMenuItem onClick={e => handleLoadData(evenData)}>Experiment 1 Random Data</DropdownMenuItem>
+                <DropdownMenuItem onClick={e => handleGeneratePackages(1, "even")}>Sample Package (Even)</DropdownMenuItem>
+                <DropdownMenuItem onClick={e => handleGeneratePackages(10, "even")}>10 Sample Packages (Even)</DropdownMenuItem>
+                <DropdownMenuItem onClick={e => handleGenerateMore(10, "even")}>100 Sample Packages (Even)</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Experiment 1 Dataset</DropdownMenuItem>
-                <DropdownMenuItem>Experiment 2 Dataset</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Clear Packages Data</DropdownMenuItem>
-                <DropdownMenuItem>Clear Vehicles Data</DropdownMenuItem>
+                <DropdownMenuItem onClick={e => alert("Vehicle generation currently disabled.")}>40 Sample Vehicles</DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
 

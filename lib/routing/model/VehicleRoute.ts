@@ -11,21 +11,25 @@ import { ScheduleProfile } from "@/types/db/ScheduleProfile";
  * VehicleRoute class to model a single vehicle route in the vehicle routing problem.
  */
 export class VehicleRoute {
-    public nodes: RouteNode[] = [];
+    public nodes: RouteNode[] = []; // Packages
 
-    // measurements
-    public eucTimeMins: number = 0;  // euclidean time in minutes
-    public eucDistanceMiles: number = 0; // euclidean distance in miles
+    // Euclidean measurements
+    public eucTimeMins: number = 0;  // Euclidean time in minutes
+    public eucDistanceMiles: number = 0; // Euclidean distance in miles
+
+    // Vehicle capacity
     public currentWeight: number = 0; // in kg
     public currentVolume: number = 0; // in cubic meters
 
-    // actual measurements
-    public avgSpeed: number = 0; // in miles per hour (V bar)
+    // Euclidean conversion metrics
     public distanceMultiplier: number = 0; // DM
-    public currentTimeMins: number = 0;  // in minutes
-    public actualDistanceMiles: number = 0; // distance in miles
+    public avgSpeed: number = 0; // in miles per hour (V bar)
 
-    // Real measurements
+    // Measurements as a result of calculations with the metrics
+    public currentTimeMins: number = 0;  // in minutes
+    public estimatedRoadDistanceMiles: number = 0; // distance in miles
+
+    // Real measurements, present as final to the user
     public realDistanceMiles: number = 0;
     public realTimeMins: number = 0;
 
@@ -51,7 +55,7 @@ export class VehicleRoute {
         clonedRoute.avgSpeed = this.avgSpeed;
         clonedRoute.distanceMultiplier = this.distanceMultiplier;
         clonedRoute.currentTimeMins = this.currentTimeMins;
-        clonedRoute.actualDistanceMiles = this.actualDistanceMiles;
+        clonedRoute.estimatedRoadDistanceMiles = this.estimatedRoadDistanceMiles;
 
         return clonedRoute;
     }
@@ -151,7 +155,7 @@ export class VehicleRoute {
         if (this.realTimeMins !== 0 && this.realDistanceMiles !== 0) {
             // Set the real time and distance 
             this.currentTimeMins = this.realTimeMins + (this.scheduleProfile.delivery_time * this.nodes.length - 1);
-            this.actualDistanceMiles = this.realDistanceMiles;
+            this.estimatedRoadDistanceMiles = this.realDistanceMiles;
 
             // Sum weight and volume
             for (let i = 0; i < this.nodes.length; i++) {
@@ -166,7 +170,7 @@ export class VehicleRoute {
 
         this.eucTimeMins = 0;
         this.eucDistanceMiles = 0;
-        this.actualDistanceMiles = 0;
+        this.estimatedRoadDistanceMiles = 0;
         this.currentTimeMins = 0;
 
         // Sum euclidean time, euclidean distance, volume, weight
@@ -198,8 +202,8 @@ export class VehicleRoute {
 
         // Calculate actual time and distance
         if (this.avgSpeed !== 0 && this.distanceMultiplier !== 0) {
-            this.actualDistanceMiles = this.eucDistanceMiles * this.distanceMultiplier;
-            this.currentTimeMins = ((this.actualDistanceMiles / this.avgSpeed) * 60); // calculate time in minutes
+            this.estimatedRoadDistanceMiles = this.eucDistanceMiles * this.distanceMultiplier;
+            this.currentTimeMins = ((this.estimatedRoadDistanceMiles / this.avgSpeed) * 60); // calculate time in minutes
             this.currentTimeMins += this.scheduleProfile.delivery_time * this.nodes.length;
         }
     }

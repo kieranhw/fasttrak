@@ -82,10 +82,12 @@ export class GeneticAlgorithm {
         // Log the fitness of the generation
         if (offspringFitness < generationFitness || generationNumber % 100 === 0) {
             this.generationFitness.push({ generation: generationNumber, fitness: generationFitness });
+            console.log(generationNumber);
         }
     }
 
     public evolve(): VRPSolution {
+        console.log("Starting evolve")
         // Test Initial Population
         let fitness = 0;
         for (const route of this.bestGeneration.routes) {
@@ -110,6 +112,22 @@ export class GeneticAlgorithm {
         }
 
         this.bestGeneration.cleanRoutes();
+
+        // Used for experiment 2 - logging fitness
+        // Turn generationFitness into csv and download to file
+        let csv = "Generation,Fitness\n";
+        for (const fitness of this.generationFitness) {
+            csv += `${fitness.generation},${fitness.fitness}\n`;
+        }
+
+        // download
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'generation_fitness.csv';
+        a.click();
+        
 
         return this.bestGeneration;
     }

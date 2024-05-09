@@ -32,8 +32,8 @@ export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
     const test: Boolean = true;
 
     if (test == true) {
-        const distanceMultiplier = 1.4882;
-        const avgSpeed = 18.419;
+        const distanceMultiplier = 1.53;
+        const avgSpeed = 20.35;
         solution.loadMetrics(avgSpeed, distanceMultiplier);
         return { solution, distanceMultiplier, avgSpeed };
     }
@@ -105,7 +105,9 @@ export async function initialiseMetrics(solution: VRPSolution): Promise<VRP> {
     }
 
     const avgSpeed = totalActualDistanceMiles / totalActualTimeHours; // miles per hour
-    const distanceMultiplier = (totalActualDistanceMiles / totalEucDistanceMiles) + 0.2; // ratio of actual distance to euclidean distance with adjustment
+    const distanceMultiplier = (totalActualDistanceMiles / totalEucDistanceMiles) + 0.4; // ratio of actual distance to euclidean distance with adjustment
+
+    console.log("Metrics: " + avgSpeed.toFixed(2) + " mph, " + distanceMultiplier.toFixed(4) + " DM");
 
     // Update the solution with the calculated metrics
     solution.loadMetrics(avgSpeed, distanceMultiplier);
@@ -206,12 +208,9 @@ export async function calculateActualTravel(route: VehicleRoute): Promise<void> 
     }
 
     // Modify the route object with the actual distance and time
-    route.actualDistanceMiles = totalActualDistance;
-    route.currentTimeMins = totalActualDuration * 60;
+    route.realDistanceMiles = totalActualDistance;
+    route.realTimeMins = totalActualDuration*60;
 
-    //console.log("Actual Metrics for Route: " + responseRouteLegs + " legs")
-    //console.log(route.actualDistanceMiles.toFixed(2) + " miles")
-    //console.log(route.actualTimeMins.toFixed(2) + " minutes")
 }
 
 function createEvenlySpreadIndices(length: number, maxIndices: number = 25): number[] {

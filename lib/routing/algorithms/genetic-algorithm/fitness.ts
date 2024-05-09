@@ -22,7 +22,7 @@ export function routeFitness(route: VehicleRoute): number {
     const p3 = 500; // Penalty for time window violation
 
     const packageCount = (route.nodes.length - 2); // Ensure no division by zero
-    const distance = route.actualDistanceMiles / packageCount; // Calculate average distance per package
+    const distance = route.estimatedRoadDistanceMiles / packageCount; // Calculate average distance per package
     const time = route.currentTimeMins / packageCount; // Calculate average actual time per package
    
     // Ensure efficiencies are calculated such that lower values are better

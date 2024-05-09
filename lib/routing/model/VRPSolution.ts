@@ -59,7 +59,7 @@ export class VRPSolution {
 
     get actualDistance(): number {
         this.updateRouteMeasurements();
-        return this.routes.reduce((sum, route) => sum + route.actualDistanceMiles, 0);
+        return this.routes.reduce((sum, route) => sum + route.estimatedRoadDistanceMiles, 0);
     }
 
     get realDistance(): number {

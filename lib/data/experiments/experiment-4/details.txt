@@ -1,0 +1,8 @@
+In order to test the effectiveness of each solution, each algorithm will be compared against
+the efficiency metrics specified. The number of vehicles will remain fixed, and the number
+of packages shall fill the vehicles.
+
+• Run each algorithms 5 times with random dataset, 5 times with even dataset.
+• 10 vehicles with capacities 15m3 and 1000kg.
+• Each vehicle fully utilised with packages measured 0.1-0.4 m3 and 5-20 kg.
+• Schedule configuration: 8-hour time window, 3 minutes per delivery.

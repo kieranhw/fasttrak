@@ -24,7 +24,7 @@ export function calculateEfficiencyScores(vrpSolution: VRPSolution): EfficiencyS
     
     vrpSolution.routes.forEach(route => {
         totalDrivingTimeMins += route.currentTimeMins;
-        totalMilesDriven += route.actualDistanceMiles;
+        totalMilesDriven += route.estimatedRoadDistanceMiles;
         totalPackagesDelivered += route.nodes.filter(node => node.pkg !== null).length;
         volumeUtilised += route.currentVolume;
         volumeCapacity += route.vehicle.max_volume;
