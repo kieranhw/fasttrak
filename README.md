@@ -3,7 +3,7 @@
 <h3 align="center">
 Delivery Management System: Priority Scheduling and Optimised Vehicle Routing
 </h3>
-<a href="https://drive.google.com/file/d/1u-8Oqo1KexVCNoLnYGA5qYBwmvZyIE6p/view?usp=sharing"><strong>Read the Detailed Documentation</strong></a>
+<a href="https://drive.google.com/file/d/1u-8Oqo1KexVCNoLnYGA5qYBwmvZyIE6p/view?usp=sharing"><strong>Read the Detailed Dissertation</strong></a>
 <br/>
 <br/>
 </p>
