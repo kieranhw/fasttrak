@@ -6,45 +6,46 @@ Delivery Management System: Priority Scheduling and Optimised Vehicle Routing
 <a href="https://drive.google.com/file/d/1u-8Oqo1KexVCNoLnYGA5qYBwmvZyIE6p/view?usp=sharing"><strong>Read the Detailed Dissertation</strong></a>
 <br/>
 <br/>
+  <!-- Technologies -->
+  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="NextJS" />
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/HTML-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML" />
+  <img src="https://img.shields.io/badge/CSS-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS" />
+  <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
 </p>
 </div>
 
-## Table of Contents
+## Background & Acknowledgements
+This repository contains the code for a conceptual software system I designed and implemented as part of my final year project at the University of Liverpool. The database and hosting service is now paused. Therefore, a live version of the project is no longer available. A full demonstration of the software's capabilities is shown in <a href="https://www.youtube.com/watch?v=_DSCNPs5n3M"><strong><u>this video</u></strong></a>. 
 
-- [Table of Contents](#table-of-contents)
-- [About The Project](#about-the-project)
-  - [Built With](#built-with)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
-- [Acknowledgments](#acknowledgments)
-
+My academic supervisor, Professor Prudence Wong, provided support throughout the various stages of the project.
 
 ## About The Project
 
-This software is currently under development as part of my final-year dissertation. The project aimed to create a system that generates optimised routes for 'last mile' delivery schedules. The system is inspired by research into the Vehicle Routing Problem (VRP) and Travelling Salesman Problem (TSP). As the problem is NP-hard, the goal is to find a 'good enough' optimisation solution, such that computation is fast and could scale to the size of a realistic last-mile service.
+My fascination with logistics planning and route optimisation began during the summer of 2023 when I discovered and researched the vehicle routing problem (VRP). I then proposed my final year project to develop my own software, bridging the gap between theory and a practical, real-world solution. The system's domain focuses on intracity logistics, with two constraints: delivery time window and vehicle capacity. 
 
-A modern user interface provides a platform to manage the network of delivery operations, including creating and managing vehicles, packages and detailed analytical reports. The application is built with React and NextJS written in TypeScript, with the back end making AWS Lambda function calls to handle compute-heavy data processing. Data is stored within a cloud-hosted PostgreSQL database.
+Regarding the technical aspects, I implemented a priority queue for scheduling. This allowed 'express' level packages to be prioritised ahead of 'standard' while concurrently prioritising the oldest packages over newer ones. The optimisation used the genetic algorithm, initialised with K-means, to pre-process the data into geospatial clusters, generating efficient routes following experimental evaluation. The system outputs each route containing the order of packages for each vehicle to instruct the real-world dispatch and delivery process.
 
-A schedule can be generated at any point for each day from the /dashboard/schedules page, which attempts to assign the maximum number of packages currently pending to vehicles available for the specified date. A hybrid genetic algorithm was designed to concurrently optimise the vehicle routes and the load utilisation for each vehicle. Regarding route optimisation, the network is modelled as a graph problem where customers are represented as nodes, connected by edges representing roads. This model allows the problem to be analysed as a typical graph problem. The Google Maps API is frequently used to calculate travel times to ensure the greatest accuracy. It is also used for geocoding tasks such as verifying customer addresses and converting street addresses into coordinates.
+To develop the system, I aimed to integrate the advanced algorithms behind a user-centric GUI. Therefore, it was implemented as a web application with React and Next.js utilising TypeScript for client-side and server-side code. Next.js couples with Vercel, the deployment service, offering auto-managed infrastructure, such as serverless functions, written within the same codebase as the application code. The data was stored using a cloud-based PostgreSQL database provided by Supabase and accessed via Rest API.
 
-### Built With
+I chose this stack to get up and running quickly—a single codebase written in the same language provided great utility, ensuring that interfaces and functions only needed to be written once. I used the Google Maps API to geocode print addresses to find their coordinates and calculate real-world travel times for vehicle routes. 
 
-This project was built with the following technologies:
+The project's successful realisation allowed me to develop my algorithm design, software engineering and web development skills.
 
-- [Next.js](https://nextjs.org/)
-- [React](https://react.dev/)
-- [Shadcn/ui](https://ui.shadcn.com/)
-- [Typescript](https://www.typescriptlang.org/)
-
-## File Structure
+## Notable Files
 
 - /lib/db: re-usable functions for database operations
-- /lib/routing: files for the route optimisation
-- /lib/scheduling: files for delivery schedule generation
+- /lib/data: test data generation programs and experimental results
+- /lib/routing: route optimisation algorithms
+- /lib/scheduling: delivery scheduling algorithms
 - /lib/utils: standard utilities
-- /lib/data: test data generation used during evaluation of the project
+
+## Software Screenshots
+
+<img src="https://media.licdn.com/dms/image/D4E2DAQHr0eujr303eA/profile-treasury-image-shrink_800_800/0/1715609019987?e=1720987200&v=beta&t=s2T9nNETh385urM4mCPUFkk64K1dYpsCRcSgm73doTo" alt="Screenshot of FastTrak project - Dashboard" />
+<img src="https://media.licdn.com/dms/image/D4E2DAQHBcoyitC7smw/profile-treasury-image-shrink_800_800/0/1715609095514?e=1720990800&v=beta&t=0Gsmh7JGqr_RjQJTWgfof--jdDZPY9kah0qTYYAP81o" alt="Screenshot of FastTrak project - Store Page" />
+<img src="https://media.licdn.com/dms/image/D4E2DAQHd_mYUN73Tog/profile-treasury-image-shrink_800_800/0/1715609231969?e=1720990800&v=beta&t=mofpZoU0xJrQarw5fePSNCzUkdyZfZykbkwkEdZzt0Y" alt="Screenshot of FastTrak project - Vehicles Page" />
+<img src="https://media.licdn.com/dms/image/D4E2DAQED-q_V9A4hPw/profile-treasury-image-shrink_800_800/0/1715610269052?e=1720990800&v=beta&t=oaFV5jYw-vb6dho8zMXdwvcj0rBEaGSl866PHCdh-Wc" alt="Screenshot of FastTrak project - Packages Page" />
+<img src="https://media.licdn.com/dms/image/D4E2DAQHbTpSLOv_xSg/profile-treasury-image-shrink_800_800/0/1715610418622?e=1720990800&v=beta&t=9bh1k-XD4PkUHvrpXKR-RJqfxdUpIUeQfXXTJXUzqWQ" alt="Screenshot of FastTrak project - Confirm Package Info Page" />
+<img src="https://media.licdn.com/dms/image/D4E2DAQGVksqFAiZyAw/profile-treasury-image-shrink_800_800/0/1715610535718?e=1720990800&v=beta&t=1sUs2ye7CrSREonRldjoPHjqh9rYBq766smdRMRl5LA" alt="Screenshot of FastTrak project - Delivery Schedules Page" />
