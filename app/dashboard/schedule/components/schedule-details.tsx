@@ -495,8 +495,8 @@ export const ScheduleDetails: React.FC<ScheduleDetailsProps> = (props) => {
                                             {isScheduling == false &&
                                                 <Button className="border hover:cursor-pointer"
                                                     onClick={e => setScheduleDialogOpen(true)}
-                                                    //disabled={date! < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date! < new Date("1900-01-01") || isScheduledToday != false || isScheduleLoading == true}
-                                                disabled={false} // Used for testing only
+                                                    disabled={date! < new Date((new Date()).valueOf() - 1000 * 3600 * 24) || date! < new Date("1900-01-01") || isScheduledToday != false || isScheduleLoading == true}
+                                                //disabled={false} // Used for testing only
                                                 >
                                                     Schedule
                                                 </Button>

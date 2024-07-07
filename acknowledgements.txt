@@ -1,0 +1,9 @@
+Third-Party Acknowledgements
+
+React - Frontend framework
+Next.js - Config of this repository and relevant npm packages
+Supabase - Code written by Supabase stored in lib/supabase and relevant npm packages
+ShadCN UI components - components/ui
+Cytoscape - Delivery network graph
+Re-Charts - Dashboard chart display
+Google Maps - Geocoding and directions API

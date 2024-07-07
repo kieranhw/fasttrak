@@ -60,6 +60,19 @@ export class PriorityQueue {
     }
 
     /**
+    * Peek at the RouteNode at a specific index in the queue.
+    * @param index The index to peek at
+    * @returns The RouteNode at the specified index
+    */
+    peek(index?: number): RouteNode | undefined {
+        if (index) {
+            return this.nodes[index] ?? undefined;
+        } else {
+            return this.nodes[0];
+        }
+    }
+
+    /**
      * Dequeue a specific RouteNode from the queue.
      * @param node The RouteNode to dequeue
      * @returns The dequeued RouteNode
@@ -71,18 +84,7 @@ export class PriorityQueue {
         }
     }
 
-    /**
-     * Peek at the RouteNode at a specific index in the queue.
-     * @param index The index to peek at
-     * @returns The RouteNode at the specified index
-     */
-    peek(index?: number): RouteNode | undefined {
-        if (index) {
-            return this.nodes[index] ?? undefined;
-        } else {
-            return this.nodes[0];
-        }
-    }
+
 
     /**
      * Peek the smallest node from the queue, without removing it.

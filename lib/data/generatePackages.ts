@@ -5,12 +5,14 @@ import { UUID } from "crypto"
 import { faker } from '@faker-js/faker';
 import { generateFT } from "@/lib/utils/generate-ids";
 import { db } from "@/lib/db/db";
-import { evenData as evenAddresses } from "./750-liverpool-addresses-even";
-import { randomData as randomAddresses } from "./750-liverpool-addresses-random";
+
 
 export const generatePackages = async (numPackages: number, distribution: string): Promise<Package[]> => {
     const packages: Package[] = [];
-    const addresses: { address: string, lat: number, lng: number }[] = distribution === "even" ? evenAddresses : randomAddresses;
+    return packages;
+
+    /** No longer currently used 
+    //const addresses: { address: string, lat: number, lng: number }[] = distribution === "even" ? evenAddresses : randomAddresses;
 
     //console.log("addresses:" + addresses.length);
 
@@ -53,9 +55,9 @@ export const generatePackages = async (numPackages: number, distribution: string
             fragile: false,
             priority: priority, // 20% chance of express
             delivery_notes: faker.lorem.words(10),
-            date_added: new Date("2024-05-07"),
+            date_added: faker.date.between({ from: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), to: new Date().getTime() }),
         });
     }
-
+    */
     return packages;
 }
