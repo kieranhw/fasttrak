@@ -42,7 +42,7 @@ The project's successful realisation allowed me to develop my algorithm design, 
 - /lib/utils: standard utilities
 
 ## Software Screenshots
-
+<div align="center">
 <img src="https://media.licdn.com/dms/image/D4E2DAQHr0eujr303eA/profile-treasury-image-shrink_800_800/0/1715609019987?e=1720987200&v=beta&t=s2T9nNETh385urM4mCPUFkk64K1dYpsCRcSgm73doTo" alt="Screenshot of FastTrak project - Dashboard" />
 <img src="https://media.licdn.com/dms/image/D4E2DAQHBcoyitC7smw/profile-treasury-image-shrink_800_800/0/1715609095514?e=1720990800&v=beta&t=0Gsmh7JGqr_RjQJTWgfof--jdDZPY9kah0qTYYAP81o" alt="Screenshot of FastTrak project - Store Page" />
 <img src="https://media.licdn.com/dms/image/D4E2DAQHd_mYUN73Tog/profile-treasury-image-shrink_800_800/0/1715609231969?e=1720990800&v=beta&t=mofpZoU0xJrQarw5fePSNCzUkdyZfZykbkwkEdZzt0Y" alt="Screenshot of FastTrak project - Vehicles Page" />
@@ -50,4 +50,5 @@ The project's successful realisation allowed me to develop my algorithm design, 
 <img src="https://media.licdn.com/dms/image/D4E2DAQHbTpSLOv_xSg/profile-treasury-image-shrink_800_800/0/1715610418622?e=1720990800&v=beta&t=9bh1k-XD4PkUHvrpXKR-RJqfxdUpIUeQfXXTJXUzqWQ" alt="Screenshot of FastTrak project - Confirm Package Info Page" />
 <img src="https://media.licdn.com/dms/image/D4E2DAQGVksqFAiZyAw/profile-treasury-image-shrink_800_800/0/1715610535718?e=1720990800&v=beta&t=1sUs2ye7CrSREonRldjoPHjqh9rYBq766smdRMRl5LA" alt="Screenshot of FastTrak project - Delivery Schedules Page" />
 <img src="https://media.licdn.com/dms/image/D4E2DAQEc1YIbGbCHNg/profile-treasury-image-shrink_1920_1920/0/1715610700773?e=1720990800&v=beta&t=5Rgo783AOOot4RPfEfYrV18S_9XGTmcEsLJnGJ9B99Q" alt="Screenshot of FastTrak project - Route Optimisation Page" />
+</div>
 
