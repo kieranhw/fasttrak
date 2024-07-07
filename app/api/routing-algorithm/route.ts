@@ -9,8 +9,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-// Maximum duration to run the serverless function
-export const maxDuration = 300;
+// Maximum duration to run the serverless function - no longer used
+export const maxDuration = 1;
 
 /**
  * Executes a serverless function on Vercel to execute the hybrid algorithm.

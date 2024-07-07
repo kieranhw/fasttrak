@@ -114,7 +114,7 @@ export async function hybridAlgorithm(routeNodes: RouteNode[], vehicles: Vehicle
     randomInitial[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
 
     // 5. Run the Genetic Algorithm to optimise the K-Means and Random initialisation solutions
-    const NUM_GENERATIONS = 1000000;
+    const NUM_GENERATIONS = 1500000;
 
     // K Means
     const start3 = Date.now();

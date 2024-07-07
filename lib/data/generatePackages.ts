@@ -5,21 +5,19 @@ import { UUID } from "crypto"
 import { faker } from '@faker-js/faker';
 import { generateFT } from "@/lib/utils/generate-ids";
 import { db } from "@/lib/db/db";
-import { addressData as evenAddresses } from "./wide-liverpool-addresses-even";
-import { addressData as randomAddresses } from "./wide-liverpool-addresses-random";
 
-export const generatePackages = async (numPackages: number): Promise<Package[]> => {
+
+export const generatePackages = async (numPackages: number, distribution: string): Promise<Package[]> => {
     const packages: Package[] = [];
-    const addresses: { address: string, lat: number, lng: number }[] = randomAddresses;
+    return packages;
+
+    /** No longer currently used 
+    //const addresses: { address: string, lat: number, lng: number }[] = distribution === "even" ? evenAddresses : randomAddresses;
 
     //console.log("addresses:" + addresses.length);
 
     for (let i = 0; i < numPackages; i++) {
         const priorities: PriorityType[] = [PriorityType.Standard, PriorityType.Express];
-        const randomNumber = faker.number.int({
-            'min': 0,
-            'max': priorities.length - 1
-        });
 
         const priority = i < numPackages * 0.2 ? PriorityType.Express : PriorityType.Standard;
 
@@ -52,14 +50,14 @@ export const generatePackages = async (numPackages: number): Promise<Package[]> 
             status: PackageStatus.Pending,
             current_state: CurrentState.Pending,
             delivery_attempts: 0,
-            weight: faker.number.int({ min: 5, max: 20 }),
-            volume: parseFloat(faker.number.float({ min: 0.1, max: 0.4 }).toPrecision(2)),
+            weight: faker.number.int({ min: 1, max: 30 }),
+            volume: parseFloat(faker.number.float({ min: 0.05, max: 0.5 }).toPrecision(2)),
             fragile: false,
             priority: priority, // 20% chance of express
             delivery_notes: faker.lorem.words(10),
             date_added: faker.date.between({ from: new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000), to: new Date().getTime() }),
         });
     }
-
+    */
     return packages;
 }

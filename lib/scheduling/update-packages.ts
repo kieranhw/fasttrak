@@ -5,7 +5,6 @@ import { CurrentState, Package, PackageStatus } from "@/types/db/Package";
 
 
 export async function updatePackages(schedule: DeliverySchedule, deliveredPackages: Package[], failedPackages: Package[]) {
-
     // Delivered packages
     // 1. Update package status to delivered, completed etc
     // 2. Redact personal information

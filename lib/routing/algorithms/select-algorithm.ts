@@ -91,6 +91,7 @@ export async function selectAlgorithm(routeNodes: RouteNode[], vehicles: Vehicle
     // FIFO RR only solution
     if (profile.initialisation_algorithm == ScheduleInitialiser.Random && profile.optimisation_algorithm == ScheduleOptimiser.None) {
 
+
         // Calculate actual travel time
         for (const route of randomOnly.routes) {
             if (server) {
@@ -100,6 +101,7 @@ export async function selectAlgorithm(routeNodes: RouteNode[], vehicles: Vehicle
                 await calculateActualTravelClient(route);
             }
         }
+
 
         // Generate report
         const randomOnlyReport: ScheduleReport = {
@@ -172,7 +174,6 @@ export async function selectAlgorithm(routeNodes: RouteNode[], vehicles: Vehicle
         let randomInitial = await initRandom(routeNodes, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
         randomInitial[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
 
-
         // Random Initialised
         const gaRandomInit = new GeneticAlgorithm(randomInitial[0], randomInitial[1], profile, profile.generations);
         const randomOptimised = gaRandomInit.evolve();
@@ -219,26 +220,15 @@ export async function selectAlgorithm(routeNodes: RouteNode[], vehicles: Vehicle
         // KMeans Initial Solution
         let KMeansInitial = await initKMeans(routeNodes, vehicles, profile, metrics.distanceMultiplier, metrics.avgSpeed);
         KMeansInitial[0].loadMetrics(metrics.avgSpeed, metrics.distanceMultiplier);
-        console.log("----------------------")
-        console.log("Calculated Conversion Metrics")
-        console.log("Average Speed: " + metrics.avgSpeed)
-        console.log("Distance Multiplier: " + metrics.distanceMultiplier)
-        console.log("----------------------")
-
 
         // kMeans Initialised GA
+        const start3 = Date.now();
         const gaKMeansInit = new GeneticAlgorithm(KMeansInitial[0], KMeansInitial[1], profile, profile.generations);
         const kMeansOptimised = gaKMeansInit.evolve();
         const kMeansOptimisedEfficiency: EfficiencyScores = calculateEfficiencyScores(kMeansOptimised);
+        const end3 = Date.now();
+        console.log("K-Means Optimised solution computed in " + (end3 - start3) / 1000 + " seconds");
 
-        console.log("Euclidean Values")
-        console.log("Distance (miles): " + kMeansOptimised.euclideanDistance.toFixed(2))
-        console.log("Time (hrs): " + (kMeansOptimised.euclideanTime / 60).toFixed(2))
-        console.log("----------------------")
-        console.log("Estimated Real-World Values")
-        console.log("Distance (miles): " + kMeansOptimised.actualDistance.toFixed(2))
-        console.log("Time (hrs): " + (kMeansOptimised.actualTime / 60).toFixed(2))
-        console.log("----------------------")
 
         // Calculate actual travel time and distance for each route
         for (const route of kMeansOptimised.routes) {

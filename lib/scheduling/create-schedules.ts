@@ -115,13 +115,13 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
     }
     */
 
-
     // Choose between running the hybrid algorithm or the select algorithm
     if (profile.select_optimal) {
         // Run hybrid algorithm with server settings
         const response = await hybridAlgorithm(routeNodes, vehiclesData, profile, metrics, false);
         vrpSolution = response.finalSolution;
         scheduleReport = response.scheduleReport;
+
 
     } else {
         // Run select algorithm with server settings
@@ -133,6 +133,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
             alert("Error processing schedules.")
         }
     }
+
 
     // Initialize an empty array to hold delivery schedules for each vehicle
     let schedules: DeliverySchedule[] = [];
@@ -154,7 +155,7 @@ export async function createSchedules(vehiclesData: Vehicle[], packagesData: Pac
             estimated_duration_mins: route.eucTimeMins,
             actual_duration_mins: route.currentTimeMins,
             euclidean_distance_miles: route.eucDistanceMiles.toFixed(2) as unknown as number,
-            actual_distance_miles: route.actualDistanceMiles.toFixed(2) as unknown as number,
+            actual_distance_miles: route.estimatedRoadDistanceMiles.toFixed(2) as unknown as number,
             load_weight: route.currentWeight,
             load_volume: route.currentVolume,
             metric_distance_multiplier: route.distanceMultiplier,
