@@ -49,3 +49,5 @@ The project's successful realisation allowed me to develop my algorithm design, 
 <img src="https://media.licdn.com/dms/image/D4E2DAQED-q_V9A4hPw/profile-treasury-image-shrink_800_800/0/1715610269052?e=1720990800&v=beta&t=oaFV5jYw-vb6dho8zMXdwvcj0rBEaGSl866PHCdh-Wc" alt="Screenshot of FastTrak project - Packages Page" />
 <img src="https://media.licdn.com/dms/image/D4E2DAQHbTpSLOv_xSg/profile-treasury-image-shrink_800_800/0/1715610418622?e=1720990800&v=beta&t=9bh1k-XD4PkUHvrpXKR-RJqfxdUpIUeQfXXTJXUzqWQ" alt="Screenshot of FastTrak project - Confirm Package Info Page" />
 <img src="https://media.licdn.com/dms/image/D4E2DAQGVksqFAiZyAw/profile-treasury-image-shrink_800_800/0/1715610535718?e=1720990800&v=beta&t=1sUs2ye7CrSREonRldjoPHjqh9rYBq766smdRMRl5LA" alt="Screenshot of FastTrak project - Delivery Schedules Page" />
+<img src="https://media.licdn.com/dms/image/D4E2DAQEc1YIbGbCHNg/profile-treasury-image-shrink_1920_1920/0/1715610700773?e=1720990800&v=beta&t=5Rgo783AOOot4RPfEfYrV18S_9XGTmcEsLJnGJ9B99Q" alt="Screenshot of FastTrak project - Route Optimisation Page" />
+
