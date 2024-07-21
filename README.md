@@ -21,11 +21,17 @@ This repository contains the code for a conceptual software system I designed an
 
 My academic supervisor, Professor Prudence Wong, provided support throughout the various stages of the project.
 
+## Project Goals
+- Explore academic research regarding the Vehicle Routing Problem (VRP) and devise solutions that bridge the gap between theory and real-world route planning.
+- Engineer a vehicle routing system with data input and management features, priority-based delivery scheduling, and route optimisation in last-mile delivery.
+- Design an algorithm to optimise the vehicles' routes to a set of customer locations while abiding by the constraints of maximum load and time window.
+- Design a priority-based data structure to prioritise urgent packages implemented with a custom priority queue.
+
 ## About The Project
 
 My fascination with logistics planning and route optimisation began during the summer of 2023 when I discovered and researched the vehicle routing problem (VRP). I then proposed my final year project to develop my own software, bridging the gap between theory and a practical, real-world solution. The system's domain focuses on intracity logistics, with two constraints: delivery time window and vehicle capacity. 
 
-Regarding the technical aspects, I implemented a priority queue for scheduling. This allowed 'express' level packages to be prioritised ahead of 'standard' while concurrently prioritising the oldest packages over newer ones. The optimisation used the genetic algorithm, initialised with K-means, to pre-process the data into geospatial clusters, generating efficient routes following experimental evaluation. The system outputs each route containing the order of packages for each vehicle to instruct the real-world dispatch and delivery process. The overall route optimisation process uses around 1 million generations to improve the final solution's fitness incrementally.
+Regarding the technical aspects, I implemented a priority queue for scheduling. This allowed 'express' level packages to be prioritised ahead of 'standard' while concurrently prioritising the oldest packages over newer ones. The optimisation used the genetic algorithm, initialised with K-means, to pre-process the data into geospatial clusters, generating efficient routes following experimental evaluation. The system outputs each route containing the order of packages for each vehicle to instruct the real-world dispatch and delivery process. The overall route optimisation process uses around 1 million generations to incrementally improve the final solution's fitness.
 
 To develop the system, I aimed to integrate the advanced algorithms behind a user-centric GUI. Therefore, it was implemented as a web application with React and Next.js utilising TypeScript for client-side and server-side code. Next.js couples with Vercel, the deployment service, offering auto-managed infrastructure, such as serverless functions, written within the same codebase as the application code. The data was stored using a cloud-based PostgreSQL database provided by Supabase and accessed via Rest API.
 
@@ -37,8 +43,8 @@ The project's successful realisation allowed me to develop my algorithm design, 
 
 - /lib/db: re-usable functions for database operations
 - /lib/data: test data generation programs and experimental results
-- /lib/routing: route optimisation algorithms
-- /lib/scheduling: delivery scheduling algorithms
+- /lib/routing: route optimisation algorithms (genetic algorithm, k-means)
+- /lib/scheduling: delivery scheduling algorithms (priority queue)
 - /lib/utils: standard utilities
 
 ## Software Screenshots
