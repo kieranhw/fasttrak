@@ -17,7 +17,7 @@ Delivery Management System: Priority Scheduling and Optimised Vehicle Routing
 </div>
 
 ## Background & Acknowledgements
-This repository contains the code for a conceptual software system I designed and implemented as part of my final year project at the University of Liverpool. As this was an educational endeavour, the cloud database and hosting services are now paused, and a live version of the project is no longer available. A full demonstration of the software's capabilities is shown in <a href="https://www.youtube.com/watch?v=_DSCNPs5n3M"><strong><u>this video</u></strong></a>. 
+This repository contains the code for a conceptual software system I designed and implemented as part of my final year project at the University of Liverpool. As this was an educational endeavour, the cloud database and hosting services are now paused, and a live version of the project is no longer available. The project is discussed, with a full demonstration of the software's capabilities, in <a href="https://www.youtube.com/watch?v=_DSCNPs5n3M"><strong><u>this video</u></strong></a>. 
 
 My academic supervisor, Professor Prudence Wong, provided support throughout the various stages of the project.
 
