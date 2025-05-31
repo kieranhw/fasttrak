@@ -3,8 +3,6 @@
 <h3 align="center">
 Delivery Management System: Priority Scheduling and Optimised Vehicle Routing
 </h3>
-<br/>
-<br/>
   <!-- Technologies -->
   <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="NextJS" />
